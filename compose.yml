@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  mysql:
+#    volumes:
+#      - C:\\Users\\Diego\\Documents\\projects\\volumes\\mysqlnewrbms:/var/lib/mysql
+    image: mysql:8.0
+    container_name: mysql-springboot
+    command: --default-authentication-plugin=mysql_native_password
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: medical
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+    ports:
+      - '33060:3306'
