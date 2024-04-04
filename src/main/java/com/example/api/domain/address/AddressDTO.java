@@ -1,4 +1,4 @@
-package com.example.api.address;
+package com.example.api.domain.address;
 
 import jakarta.validation.constraints.NotBlank;
 

@@ -1,6 +1,6 @@
-package com.example.api.doctors;
+package com.example.api.domain.doctors;
 
-import com.example.api.address.Address;
+import com.example.api.domain.address.Address;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;

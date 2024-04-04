@@ -1,6 +1,6 @@
-package com.example.api.doctors;
+package com.example.api.domain.doctors;
 
-import com.example.api.address.AddressDTO;
+import com.example.api.domain.address.AddressDTO;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

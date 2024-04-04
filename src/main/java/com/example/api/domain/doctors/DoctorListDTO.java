@@ -1,4 +1,4 @@
-package com.example.api.doctors;
+package com.example.api.domain.doctors;
 
 public record DoctorListDTO(Long id, String name, String email, String cpso, Specialty specialty) {
 
