@@ -1,6 +1,9 @@
 package com.example.api.controller;
 
 import com.example.api.domain.users.AuthenticationDTO;
+import com.example.api.domain.users.User;
+import com.example.api.infra.security.JTWTokenDTO;
+import com.example.api.infra.security.TokenService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,12 +20,18 @@ public class AuthenticationController {
 
     @Autowired
     private AuthenticationManager manager;
+
+    @Autowired
+    private TokenService tokenService;
+
     @PostMapping
     public ResponseEntity handleLogin(@RequestBody @Valid AuthenticationDTO data) {
 
-        var token = new UsernamePasswordAuthenticationToken(data.username(), data.password());
-        var authentication = manager.authenticate(token);
+        var authenticationToken = new UsernamePasswordAuthenticationToken(data.username(), data.password());
+        var authentication = manager.authenticate(authenticationToken);
 
-        return ResponseEntity.ok().build();
+        var tokenJWT = tokenService.generateToken((User) authentication.getPrincipal());
+
+        return ResponseEntity.ok(new JTWTokenDTO(tokenJWT));
     }
 }
