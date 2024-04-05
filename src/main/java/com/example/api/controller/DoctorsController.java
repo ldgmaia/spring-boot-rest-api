@@ -35,7 +35,7 @@ public class DoctorsController {
 //        return repository.findAll(pagination).stream().map(DoctorListDTO::new).toList(); // convert from Doctor to DoctorListDTO and then to List (array). Return of method must be List
 //        return repository.findAll(pagination).map(DoctorListDTO::new); // add pagination to the query. Return of method must be Page
 
-        var page = repository.findAllByActiveTrue(pagination).map(DoctorListDTO::new); // add pagination to the query. Return of method must be Page
+        var page = repository.findAllByActiveTrue(pagination).map(DoctorListDTO::new); // add pagination with only active doctors to the query. Return of method must be Page
         return ResponseEntity.ok(page);
     }
 

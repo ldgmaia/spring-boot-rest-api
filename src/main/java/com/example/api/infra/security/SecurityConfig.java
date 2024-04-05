@@ -1,5 +1,6 @@
 package com.example.api.infra.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -24,15 +25,19 @@ public class SecurityConfig {
 //
 //    }
 
+    @Autowired
+    private SecurityFilter securityFilter;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf(csrf -> csrf.disable())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-//                .authorizeHttpRequests(req -> {
-//                    req.requestMatchers(HttpMethod.POST, "/login").permitAll();
-//                    req.anyRequest().authenticated();
-//                })
-//                .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
+                .authorizeHttpRequests(req -> {
+                    req.requestMatchers(HttpMethod.POST, "/login").permitAll(); // exclude the /login route from requiring the authentication token
+                    req.requestMatchers(HttpMethod.POST, "/users").permitAll(); // exclude the /users route from requiring the authentication token
+                    req.anyRequest().authenticated(); // any other request, needs to be authenticated
+                })
+                .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
