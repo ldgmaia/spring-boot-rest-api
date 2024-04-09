@@ -25,8 +25,8 @@ public class AppointmentController {
     @Transactional
     public ResponseEntity bookAppointment(@RequestBody @Valid AppointmentCreateDTO data) {
 
-        appointmentBooking.booking(data);
+        var appointment = appointmentBooking.booking(data);
 
-        return ResponseEntity.ok(new AppointmentDetailsDTO(null, null, null, null));
+        return ResponseEntity.ok(appointment);
     }
 }

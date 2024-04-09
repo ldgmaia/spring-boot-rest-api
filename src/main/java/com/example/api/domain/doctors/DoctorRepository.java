@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 public interface DoctorRepository extends JpaRepository<Doctor, Long> {
 
@@ -23,4 +24,11 @@ public interface DoctorRepository extends JpaRepository<Doctor, Long> {
             limit 1
             """)
     Doctor pickAvailableDoctor(Specialty specialty, LocalDateTime date);
+
+    @Query("""
+            select d.active
+            from Doctor d
+            where d.id = :doctorId
+            """)
+    Boolean findActiveById(Long doctorId);
 }

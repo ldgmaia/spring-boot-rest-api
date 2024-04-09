@@ -1,5 +1,6 @@
 package com.example.api.infra.exception;
 
+import com.example.api.domain.ValidationException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -20,6 +21,11 @@ public class ErrorHandler {
         var errors = exception.getFieldErrors();
 
         return ResponseEntity.badRequest().body(errors.stream().map(ErrorDataValidation::new).toList());
+    }
+
+@ExceptionHandler(ValidationException.class)
+    public ResponseEntity handleBusinessRuleError(ValidationException exception) {
+        return ResponseEntity.badRequest().body(exception.getMessage());
     }
 
     private record ErrorDataValidation(String field, String message) {
