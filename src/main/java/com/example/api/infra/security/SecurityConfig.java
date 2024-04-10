@@ -33,8 +33,8 @@ public class SecurityConfig {
         return http.csrf(csrf -> csrf.disable())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(req -> {
-                    req.requestMatchers(HttpMethod.POST, "/login").permitAll(); // exclude the /login route from requiring the authentication token
-                    req.requestMatchers(HttpMethod.POST, "/users").permitAll(); // exclude the /users route from requiring the authentication token
+                    req.requestMatchers(HttpMethod.POST, "/login", "/users").permitAll(); // exclude the /login route from requiring the authentication token
+                    req.requestMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll(); // exclude the /users route from requiring the authentication token
                     req.anyRequest().authenticated(); // any other request, needs to be authenticated
                 })
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)

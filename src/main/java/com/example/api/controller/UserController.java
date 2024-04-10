@@ -4,6 +4,7 @@ import com.example.api.domain.users.User;
 import com.example.api.domain.users.UserInfoDTO;
 import com.example.api.domain.users.UserRegisterDTO;
 import com.example.api.domain.users.UserRepository;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
 @RequestMapping("users")
+@SecurityRequirement(name = "bearer-key")
 public class UserController {
 
     @Autowired
