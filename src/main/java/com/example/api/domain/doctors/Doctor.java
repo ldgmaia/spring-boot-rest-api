@@ -6,6 +6,11 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @Table(name = "doctors")
 @Entity(name = "Doctor")
@@ -24,6 +29,12 @@ public class Doctor {
     private String cpso;
     private Boolean active;
 
+    @CreatedDate
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
+
     @Enumerated(EnumType.STRING)
     private Specialty specialty;
     @Embedded
@@ -35,6 +46,8 @@ public class Doctor {
         this.phone = data.phone();
         this.cpso = data.cpso();
         this.active = true;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
         this.specialty = data.specialty();
         this.address = new Address(data.address());
     }
@@ -43,6 +56,7 @@ public class Doctor {
 
         this.name = (data.name() != null) ? data.name() : this.name;
         this.phone = (data.phone() != null) ? data.phone() : this.phone;
+        this.updatedAt = LocalDateTime.now();
 
         if (data.address() != null) {
             this.address.updateInfo(data.address());
