@@ -3,6 +3,7 @@ package com.example.api.domain.appointments.validations;
 import com.example.api.domain.ValidationException;
 import com.example.api.domain.appointments.AppointmentCreateDTO;
 import org.springframework.stereotype.Component;
+
 import java.time.DayOfWeek;
 
 @Component

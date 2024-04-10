@@ -2,9 +2,10 @@ package com.example.api.domain.doctors;
 
 import com.example.api.domain.address.AddressDTO;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
-
-import java.time.LocalDateTime;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 
 public record DoctorRegisterDTO(
         @NotBlank

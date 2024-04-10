@@ -2,9 +2,6 @@ package com.example.api.controller;
 
 import com.example.api.domain.appointments.AppointmentBooking;
 import com.example.api.domain.appointments.AppointmentCreateDTO;
-import com.example.api.domain.appointments.AppointmentDetailsDTO;
-import com.example.api.domain.doctors.DoctorRepository;
-import com.example.api.domain.patients.PatientRepository;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
