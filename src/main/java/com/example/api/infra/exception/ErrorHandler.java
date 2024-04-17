@@ -23,7 +23,7 @@ public class ErrorHandler {
         return ResponseEntity.badRequest().body(errors.stream().map(ErrorDataValidation::new).toList());
     }
 
-@ExceptionHandler(ValidationException.class)
+    @ExceptionHandler(ValidationException.class)
     public ResponseEntity handleBusinessRuleError(ValidationException exception) {
         return ResponseEntity.badRequest().body(exception.getMessage());
     }

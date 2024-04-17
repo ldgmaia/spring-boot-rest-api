@@ -1,5 +1,7 @@
-package com.example.api.domain.doctors;
+package com.example.api.repositories;
 
+import com.example.api.domain.doctors.Doctor;
+import com.example.api.domain.doctors.Specialty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

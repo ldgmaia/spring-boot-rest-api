@@ -36,6 +36,7 @@ public class Doctor {
 
     @Enumerated(EnumType.STRING)
     private Specialty specialty;
+    
     @Embedded
     private Address address;
 

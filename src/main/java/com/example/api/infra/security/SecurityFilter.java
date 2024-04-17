@@ -1,6 +1,6 @@
 package com.example.api.infra.security;
 
-import com.example.api.domain.users.UserRepository;
+import com.example.api.repositories.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,7 +27,7 @@ public class SecurityFilter extends OncePerRequestFilter {
 
         var tokenJWT = getToken(request);
 
-        if(tokenJWT != null) {
+        if (tokenJWT != null) {
             var subject = tokenService.getSubject(tokenJWT);
             var user = userRepository.findByUsername(subject);
 
@@ -42,7 +42,7 @@ public class SecurityFilter extends OncePerRequestFilter {
     private String getToken(HttpServletRequest request) {
         var authorizationHeader = request.getHeader("Authorization");
 
-        if(authorizationHeader != null) {
+        if (authorizationHeader != null) {
             return authorizationHeader.replace("Bearer ", "");
         }
 

@@ -2,12 +2,12 @@ package com.example.api.domain.appointments.validations;
 
 import com.example.api.domain.ValidationException;
 import com.example.api.domain.appointments.AppointmentCreateDTO;
-import com.example.api.domain.patients.PatientRepository;
+import com.example.api.repositories.PatientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class InactivePatient implements AppointmentBookingValidator{
+public class InactivePatient implements AppointmentBookingValidator {
 
     @Autowired
     private PatientRepository patientRepository;
@@ -15,7 +15,7 @@ public class InactivePatient implements AppointmentBookingValidator{
     public void validate(AppointmentCreateDTO data) {
         var patient = patientRepository.findActiveById(data.patientId());
 
-        if(!patient) {
+        if (!patient) {
             throw new ValidationException("Appointment cannot be booked for inactive patient");
         }
     }

@@ -15,7 +15,7 @@ public class AppointmentTimeInAdvance implements AppointmentBookingValidator {
 
         var timeInAdvance = Duration.between(LocalDateTime.now(), appointmentDate).toMinutes();
 
-        if(timeInAdvance < 30) {
+        if (timeInAdvance < 30) {
             throw new ValidationException("Appointment must be booked at least 30 min in advance");
         }
     }

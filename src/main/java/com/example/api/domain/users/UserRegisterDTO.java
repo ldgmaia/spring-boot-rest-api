@@ -7,7 +7,13 @@ public record UserRegisterDTO(
         String username,
 
         @NotBlank
-        String password
+        String password,
+
+        @NotBlank
+        String firstName,
+
+        @NotBlank
+        String lastName
 ) {
 
 }

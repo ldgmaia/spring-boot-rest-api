@@ -1,9 +1,10 @@
 package com.example.api.controller;
 
+import com.example.api.domain.ValidationException;
 import com.example.api.domain.users.User;
 import com.example.api.domain.users.UserInfoDTO;
 import com.example.api.domain.users.UserRegisterDTO;
-import com.example.api.domain.users.UserRepository;
+import com.example.api.repositories.UserRepository;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -26,6 +27,12 @@ public class UserController {
     @PostMapping
     @Transactional
     public ResponseEntity register(@RequestBody @Valid UserRegisterDTO data, UriComponentsBuilder uriBuilder) {
+
+        System.out.println("before");
+        if (repository.findByUsername(data.username()) != null) {
+            throw new ValidationException("User already registered");
+        }
+        System.out.println("after");
 
         var user = new User(data);
         repository.save(user);

@@ -2,7 +2,7 @@ package com.example.api.domain.appointments.validations;
 
 import com.example.api.domain.ValidationException;
 import com.example.api.domain.appointments.AppointmentCreateDTO;
-import com.example.api.domain.appointments.AppointmentRepository;
+import com.example.api.repositories.AppointmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -18,7 +18,7 @@ public class PatientMultipleAppointmentSameDay implements AppointmentBookingVali
         var lastTime = data.date().withHour(18);
         var patientHasAnotherAppointment = appointmentRepository.existsByPatientIdAndDateBetween(data.patientId(), firstTime, lastTime);
 
-        if(patientHasAnotherAppointment) {
+        if (patientHasAnotherAppointment) {
             throw new ValidationException("Patient already booked for this day");
         }
 

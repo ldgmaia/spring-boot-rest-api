@@ -15,7 +15,7 @@ public class WorkHoursValidation implements AppointmentBookingValidator {
         var sunday = appointmentDate.getDayOfWeek().equals(DayOfWeek.SUNDAY);
         var notWorkHours = appointmentDate.getHour() < 7 || appointmentDate.getHour() > 18;
 
-        if(sunday || notWorkHours) {
+        if (sunday || notWorkHours) {
             throw new ValidationException("Appointment out of hours");
         }
     }

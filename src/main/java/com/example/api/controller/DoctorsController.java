@@ -1,6 +1,7 @@
 package com.example.api.controller;
 
 import com.example.api.domain.doctors.*;
+import com.example.api.repositories.DoctorRepository;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -18,14 +19,14 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class DoctorsController {
 
     @Autowired
-    private DoctorRepository repository;
+    private DoctorRepository doctorRepository;
 
     @PostMapping
     @Transactional
     public ResponseEntity register(@RequestBody @Valid DoctorRegisterDTO data, UriComponentsBuilder uriBuilder) {
 
         var doctor = new Doctor(data);
-        repository.save(doctor);
+        doctorRepository.save(doctor);
 
         var uri = uriBuilder.path("/doctors/{id}").buildAndExpand(doctor.getId()).toUri();
 
@@ -37,14 +38,14 @@ public class DoctorsController {
 //        return repository.findAll(pagination).stream().map(DoctorListDTO::new).toList(); // convert from Doctor to DoctorListDTO and then to List (array). Return of method must be List
 //        return repository.findAll(pagination).map(DoctorListDTO::new); // add pagination to the query. Return of method must be Page
 
-        var page = repository.findAllByActiveTrue(pagination).map(DoctorListDTO::new); // add pagination with only active doctors to the query. Return of method must be Page
+        var page = doctorRepository.findAllByActiveTrue(pagination).map(DoctorListDTO::new); // add pagination with only active doctors to the query. Return of method must be Page
         return ResponseEntity.ok(page);
     }
 
     @PutMapping
     @Transactional
     public ResponseEntity update(@RequestBody @Valid DoctorUpdateDTO data) {
-        var doctor = repository.getReferenceById(data.id());
+        var doctor = doctorRepository.getReferenceById(data.id());
         doctor.updateInfo(data);
 
         return ResponseEntity.ok(new DoctorInfoDTO(doctor));
@@ -54,7 +55,7 @@ public class DoctorsController {
     @Transactional
     public ResponseEntity delete(@PathVariable Long id) {
 //        repository.deleteById(id); // hard delete from database
-        var doctor = repository.getReferenceById(id);
+        var doctor = doctorRepository.getReferenceById(id);
         doctor.deactivate();
 
         return ResponseEntity.noContent().build();
@@ -62,7 +63,7 @@ public class DoctorsController {
 
     @GetMapping("/{id}")
     public ResponseEntity detail(@PathVariable Long id) {
-        var doctor = repository.getReferenceById(id);
+        var doctor = doctorRepository.getReferenceById(id);
         return ResponseEntity.ok(new DoctorInfoDTO(doctor));
     }
 }

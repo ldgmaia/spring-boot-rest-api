@@ -3,8 +3,9 @@ package com.example.api.domain.appointments;
 import com.example.api.domain.ValidationException;
 import com.example.api.domain.appointments.validations.AppointmentBookingValidator;
 import com.example.api.domain.doctors.Doctor;
-import com.example.api.domain.doctors.DoctorRepository;
-import com.example.api.domain.patients.PatientRepository;
+import com.example.api.repositories.AppointmentRepository;
+import com.example.api.repositories.DoctorRepository;
+import com.example.api.repositories.PatientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,11 +28,11 @@ public class AppointmentBooking {
 
     public AppointmentDetailsDTO booking(AppointmentCreateDTO data) {
 
-        if(!patientRepository.existsById(data.patientId())) {
+        if (!patientRepository.existsById(data.patientId())) {
             throw new ValidationException("Patient ID not valid");
         }
 
-        if(data.doctorId() != null && !doctorRepository.existsById(data.doctorId())) {
+        if (data.doctorId() != null && !doctorRepository.existsById(data.doctorId())) {
             throw new ValidationException("Doctor ID not valid");
         }
 
@@ -42,7 +43,7 @@ public class AppointmentBooking {
         //        var doctor = doctorRepository.findById(data.doctorId()).get();
         var doctor = pickDoctor(data);
 
-        if(doctor == null) {
+        if (doctor == null) {
             throw new ValidationException("No Doctor available on this date for this specialty");
         }
 
@@ -55,7 +56,7 @@ public class AppointmentBooking {
     }
 
     private Doctor pickDoctor(AppointmentCreateDTO data) {
-        if(data.doctorId() != null) {
+        if (data.doctorId() != null) {
             return doctorRepository.getReferenceById(data.doctorId());
         }
 

@@ -1,6 +1,7 @@
 package com.example.api.controller;
 
 import com.example.api.domain.patients.*;
+import com.example.api.repositories.PatientRepository;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;

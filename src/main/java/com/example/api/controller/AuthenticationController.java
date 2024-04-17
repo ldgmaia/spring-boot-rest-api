@@ -2,9 +2,9 @@ package com.example.api.controller;
 
 import com.example.api.domain.users.AuthenticationDTO;
 import com.example.api.domain.users.User;
-import com.example.api.domain.users.UserRepository;
 import com.example.api.infra.security.JTWTokenDTO;
 import com.example.api.infra.security.TokenService;
+import com.example.api.repositories.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -40,6 +40,6 @@ public class AuthenticationController {
 
         var user = userRepository.findByUsername(data.username());
 
-        return ResponseEntity.ok(new JTWTokenDTO(tokenJWT, user.getUsername()));
+        return ResponseEntity.ok(new JTWTokenDTO(user.getId(), user.getUsername(), user.getFirstName(), user.getLastName(), tokenJWT));
     }
 }

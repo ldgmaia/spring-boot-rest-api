@@ -8,8 +8,8 @@ CREATE TABLE doctors (
 	city VARCHAR(100) NOT NULL,
 	postal_code VARCHAR(6) NOT NULL,
 	province CHAR(2) NOT NULL,
-	created_at datetime NOT NULL,
-	updated_at datetime NOT NULL,
+	created_at TIMESTAMP NOT NULL,
+	updated_at TIMESTAMP NOT NULL,
 
 	PRIMARY KEY (id)
 );

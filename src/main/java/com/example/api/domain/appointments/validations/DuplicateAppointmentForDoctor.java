@@ -2,7 +2,7 @@ package com.example.api.domain.appointments.validations;
 
 import com.example.api.domain.ValidationException;
 import com.example.api.domain.appointments.AppointmentCreateDTO;
-import com.example.api.domain.appointments.AppointmentRepository;
+import com.example.api.repositories.AppointmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
