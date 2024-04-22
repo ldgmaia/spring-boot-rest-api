@@ -1,6 +1,6 @@
 package com.example.api.infra.security;
 
-public record JTWTokenDTO(
+public record JWTTokenDTO(
         Long id,
         String username,
         String firstName,

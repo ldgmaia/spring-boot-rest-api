@@ -2,7 +2,7 @@ package com.example.api.controller;
 
 import com.example.api.domain.users.AuthenticationDTO;
 import com.example.api.domain.users.User;
-import com.example.api.infra.security.JTWTokenDTO;
+import com.example.api.infra.security.JWTTokenDTO;
 import com.example.api.infra.security.TokenService;
 import com.example.api.repositories.UserRepository;
 import jakarta.validation.Valid;
@@ -40,6 +40,6 @@ public class AuthenticationController {
 
         var user = userRepository.findByUsername(data.username());
 
-        return ResponseEntity.ok(new JTWTokenDTO(user.getId(), user.getUsername(), user.getFirstName(), user.getLastName(), tokenJWT));
+        return ResponseEntity.ok(new JWTTokenDTO(user.getId(), user.getUsername(), user.getFirstName(), user.getLastName(), tokenJWT));
     }
 }

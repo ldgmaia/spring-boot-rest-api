@@ -47,10 +47,5 @@ public class SecurityFilter extends OncePerRequestFilter {
         }
 
         return null;
-
-//        if(authorizationHeader == null) {
-//            throw new RuntimeException("Token not sent in header");
-//        }
-
     }
 }

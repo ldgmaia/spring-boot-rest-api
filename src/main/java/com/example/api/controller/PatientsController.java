@@ -55,8 +55,12 @@ public class PatientsController {
     @Transactional
     public ResponseEntity delete(@PathVariable Long id) {
         var patient = repository.getReferenceById(id);
-        patient.deactivate();
+        if (!patient.getActive()) {
+//            return ResponseEntity.status(304).build();
+            return ResponseEntity.status(304).header("X-Custom-Message", "Patient is already deactivated").build();
+        }
 
+        patient.deactivate();
         return ResponseEntity.noContent().build();
     }
 

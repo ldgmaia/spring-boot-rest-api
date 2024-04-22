@@ -29,6 +29,9 @@ public class SecurityConfig {
     @Autowired
     private SecurityFilter securityFilter;
 
+    @Autowired
+    private PermissionCheckFilter permissionCheckFilter;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 //        return http.csrf(csrf -> csrf.disable())
@@ -41,6 +44,7 @@ public class SecurityConfig {
                     req.anyRequest().authenticated(); // any other request, needs to be authenticated
                 })
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(permissionCheckFilter, SecurityFilter.class)
                 .build();
     }
 
