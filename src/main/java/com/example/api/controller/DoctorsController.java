@@ -87,6 +87,11 @@ public class DoctorsController {
     public ResponseEntity delete(@PathVariable Long id) { // route is /doctors/1, for example
 //        repository.deleteById(id); // hard delete from database
         var doctor = doctorRepository.getReferenceById(id);
+
+        if (!doctor.getActive()) {
+            return ResponseEntity.status(304).header("X-Custom-Message", "Doctor is already disabled").build();
+        }
+
         doctor.deactivate();
 
         return ResponseEntity.noContent().build();
