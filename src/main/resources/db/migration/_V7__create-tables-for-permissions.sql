@@ -1,4 +1,4 @@
-CREATE TABLE permission_groups (
+CREATE TABLE roles (
 	id BIGINT unsigned NOT NULL AUTO_INCREMENT,
 	name VARCHAR(100) UNIQUE NOT NULL,
 
@@ -7,12 +7,12 @@ CREATE TABLE permission_groups (
 
 CREATE TABLE permissions (
 	id BIGINT unsigned NOT NULL AUTO_INCREMENT,
-	name VARCHAR(100) UNIQUE NOT NULL,
+	route VARCHAR(100) UNIQUE NOT NULL,
 	description VARCHAR(100) NOT NULL,
-	permission_group_id BIGINT unsigned NOT NULL,
+	role_id BIGINT unsigned NOT NULL,
 
 	PRIMARY KEY (id),
-	CONSTRAINT fk_permissions_permission_groups FOREIGN KEY (permission_group_id) REFERENCES permission_groups (id)
+	CONSTRAINT fk_permissions_roles FOREIGN KEY (role_id) REFERENCES roles (id)
 );
 
 CREATE TABLE users_permissions (
@@ -21,6 +21,6 @@ CREATE TABLE users_permissions (
 	user_id BIGINT unsigned NOT NULL,
 
 	PRIMARY KEY (id),
-	CONSTRAINT fk_users_permissions_permission_id FOREIGN KEY (permission_id) REFERENCES permissions (id),
+	CONSTRAINT fk_users_permissions_permissions_id FOREIGN KEY (permission_id) REFERENCES permissions (id),
 	CONSTRAINT fk_users_permissions_user FOREIGN KEY (user_id) REFERENCES users (id)
 );

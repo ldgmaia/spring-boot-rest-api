@@ -19,18 +19,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
 
-//    @Bean
-//    public SecurityFilterChain securityFilterChain(HttpSecurity http)  throws Exception {
-//
-//        return http.csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().build();
-//
-//    }
-
     @Autowired
     private SecurityFilter securityFilter;
-
-    @Autowired
-    private PermissionCheckFilter permissionCheckFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -38,13 +28,12 @@ public class SecurityConfig {
         return http.csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(req -> {
-                    req.requestMatchers(HttpMethod.POST, "/login").permitAll(); // exclude the /login route from requiring the authentication token
-                    req.requestMatchers(HttpMethod.POST, "/users").permitAll(); // only admin users can register new users
+                    req.requestMatchers(HttpMethod.POST, "/login", "/users").permitAll(); // exclude the /login route from requiring the authentication token
+//                    req.requestMatchers(HttpMethod.POST, "/users").hasRole("ADMIN"); // only admin users can register new users
                     req.requestMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll(); // exclude the /users route from requiring the authentication token
                     req.anyRequest().authenticated(); // any other request, needs to be authenticated
                 })
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterAfter(permissionCheckFilter, SecurityFilter.class)
                 .build();
     }
 
@@ -57,6 +46,4 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
-
 }
