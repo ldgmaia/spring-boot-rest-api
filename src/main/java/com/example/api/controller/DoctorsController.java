@@ -2,7 +2,6 @@ package com.example.api.controller;
 
 import com.example.api.domain.doctors.*;
 import com.example.api.repositories.DoctorRepository;
-import com.example.api.repositories.UserPermissionRepository;
 import com.example.api.repositories.UserRepository;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,21 +25,25 @@ public class DoctorsController {
     private DoctorRepository doctorRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private DoctorService doctorService;
 
     @Autowired
-    private UserPermissionRepository userPermissionRepository;
+    private UserRepository userRepository;
+
+//    @Autowired
+//    private UserPermissionRepository userPermissionRepository;
 
     @PostMapping
     @Transactional
     public ResponseEntity register(@RequestBody @Valid DoctorRegisterDTO data, UriComponentsBuilder uriBuilder) {
 
-        var doctor = new Doctor(data);
-        doctorRepository.save(doctor);
+//        var doctor = new Doctor(data);
+//        doctorRepository.save(doctor);
+        var doctor = doctorService.register(data);
 
-        var uri = uriBuilder.path("/doctors/{id}").buildAndExpand(doctor.getId()).toUri();
+        var uri = uriBuilder.path("/doctors/{id}").buildAndExpand(doctor.id()).toUri();
 
-        return ResponseEntity.created(uri).body(new DoctorInfoDTO(doctor));
+        return ResponseEntity.created(uri).body(doctor);
     }
 
     @GetMapping

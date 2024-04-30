@@ -78,8 +78,8 @@ CREATE TABLE IF NOT EXISTS field_groups (
 
 CREATE TABLE IF NOT EXISTS fields (
     id BIGINT unsigned NOT NULL AUTO_INCREMENT,
-    data_type varchar(255) NOT NULL,
     name varchar(255) NOT NULL,
+    data_type varchar(255) NOT NULL,
     field_type varchar(255) NOT NULL,
     field_groups_id BIGINT unsigned NOT NULL,
     is_multiple bit DEFAULT 0 NOT NULL,

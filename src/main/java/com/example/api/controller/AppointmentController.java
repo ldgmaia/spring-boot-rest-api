@@ -1,6 +1,6 @@
 package com.example.api.controller;
 
-import com.example.api.domain.appointments.AppointmentBooking;
+import com.example.api.domain.appointments.AppointmentBookingService;
 import com.example.api.domain.appointments.AppointmentCreateDTO;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.transaction.Transactional;
@@ -18,13 +18,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class AppointmentController {
 
     @Autowired
-    private AppointmentBooking appointmentBooking;
+    private AppointmentBookingService appointmentBookingService;
 
     @PostMapping
     @Transactional
     public ResponseEntity bookAppointment(@RequestBody @Valid AppointmentCreateDTO data) {
 
-        var appointment = appointmentBooking.booking(data);
+        var appointment = appointmentBookingService.booking(data);
 
         return ResponseEntity.ok(appointment);
     }

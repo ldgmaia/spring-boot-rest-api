@@ -1,6 +1,6 @@
 package com.example.api.controller;
 
-import com.example.api.domain.appointments.AppointmentBooking;
+import com.example.api.domain.appointments.AppointmentBookingService;
 import com.example.api.domain.appointments.AppointmentCreateDTO;
 import com.example.api.domain.appointments.AppointmentDetailsDTO;
 import com.example.api.domain.doctors.Specialty;
@@ -16,7 +16,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+
 import java.time.LocalDateTime;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -37,7 +39,7 @@ class AppointmentControllerTest {
     private JacksonTester<AppointmentDetailsDTO> appointmentDetailsJson;
 
     @MockBean
-    private AppointmentBooking appointmentBooking;
+    private AppointmentBookingService appointmentBookingService;
 
     @Test
     @DisplayName("It should return http code 400 when data is invalid")
@@ -58,7 +60,7 @@ class AppointmentControllerTest {
 
         var appointmentDetails = new AppointmentDetailsDTO(null, 2L, 5L, date);
 
-        when(appointmentBooking.booking(any())).thenReturn(appointmentDetails);
+        when(appointmentBookingService.booking(any())).thenReturn(appointmentDetails);
 
         var response = mvc
                 .perform(post("/appointments")

@@ -32,4 +32,6 @@ public interface DoctorRepository extends JpaRepository<Doctor, Long> {
             where d.id = :doctorId
             """)
     Boolean findActiveById(Long doctorId);
+
+    Boolean existsByName(String name);
 }

@@ -13,6 +13,8 @@ public class InactivePatient implements AppointmentBookingValidator {
     private PatientRepository patientRepository;
 
     public void validate(AppointmentCreateDTO data) {
+
+        System.out.println("I am here");
         var patient = patientRepository.findActiveById(data.patientId());
 
         if (!patient) {

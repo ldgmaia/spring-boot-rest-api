@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotNull;
 public record PatientRegisterDTO(
         @NotBlank
         String name,
+
         @Email
         String email,
 
