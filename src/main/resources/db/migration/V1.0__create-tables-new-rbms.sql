@@ -1,96 +1,117 @@
 CREATE TABLE IF NOT EXISTS users (
-    id BIGINT unsigned NOT NULL AUTO_INCREMENT ,
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT ,
     first_name VARCHAR(255) NOT NULL,
     last_name VARCHAR(255) NOT NULL,
-    enabled bit DEFAULT 1 NOT NULL,
-    username VARCHAR(255) NOT NULL,
+    enabled BIT DEFAULT 1 NOT NULL,
+    username VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    created_at TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     PRIMARY KEY (id),
-    UNIQUE uc_username (username),
     INDEX idx_username (username)
 );
 
 CREATE TABLE IF NOT EXISTS roles (
-	id BIGINT unsigned NOT NULL AUTO_INCREMENT,
-	name VARCHAR(100) NOT NULL,
-	created_at TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP NOT NULL,
+	id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+	name VARCHAR(100) NOT NULL UNIQUE,
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
-    primary key (id),
-    unique uc_name (name),
+    PRIMARY KEY (id),
     INDEX idx_name (name)
 );
 
 CREATE TABLE IF NOT EXISTS users_roles (
-    id BIGINT unsigned NOT NULL AUTO_INCREMENT,
-	role_id BIGINT unsigned NOT NULL,
-	user_id BIGINT unsigned NOT NULL,
-	created_at TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP NOT NULL,
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+	role_id BIGINT UNSIGNED NOT NULL,
+	user_id BIGINT UNSIGNED NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     PRIMARY KEY (id),
-	FOREIGN KEY (role_id) REFERENCES roles (id),
-	FOREIGN KEY (user_id) REFERENCES users (id),
-	unique uc_role_id_user_id (role_id, user_id),
+	FOREIGN KEY (role_id) REFERENCES roles (id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE ON UPDATE CASCADE,
+	UNIQUE uc_role_id_user_id (role_id, user_id),
 	INDEX idx_role_id_user_id (role_id, user_id)
 );
 
 CREATE TABLE IF NOT EXISTS permissions (
-	id BIGINT unsigned NOT NULL AUTO_INCREMENT,
-	route VARCHAR(100) NOT NULL,
+	id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+	route VARCHAR(100) NOT NULL UNIQUE,
 	description VARCHAR(100) NOT NULL,
-	created_at TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     PRIMARY KEY (id),
-    unique uc_route (route),
     INDEX idx_route (route)
 );
 
 CREATE TABLE IF NOT EXISTS permissions_roles (
-    id BIGINT unsigned NOT NULL AUTO_INCREMENT,
-	permission_id BIGINT unsigned NOT NULL,
-	role_id BIGINT unsigned NOT NULL,
-	created_at TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP NOT NULL,
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+	permission_id BIGINT UNSIGNED NOT NULL,
+	role_id BIGINT UNSIGNED NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     PRIMARY KEY (id),
-	FOREIGN KEY (permission_id) REFERENCES permissions (id),
-	FOREIGN KEY (role_id) REFERENCES roles (id),
-	unique uc_role_id_permission_id (role_id, permission_id),
+	FOREIGN KEY (permission_id) REFERENCES permissions (id) ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (role_id) REFERENCES roles (id) ON DELETE CASCADE ON UPDATE CASCADE,
+	UNIQUE uc_role_id_permission_id (role_id, permission_id),
 	INDEX idx_role_id_permission_id (role_id, permission_id)
 );
 
 CREATE TABLE IF NOT EXISTS field_groups (
-    id BIGINT unsigned NOT NULL AUTO_INCREMENT,
-    name varchar(255) NOT NULL,
-    enabled bit DEFAULT 1 NOT NULL,
-    created_at TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP NOT NULL,
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL UNIQUE,
+    enabled BIT DEFAULT 1 NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     PRIMARY KEY (id),
-    unique uc_name (name),
-    index idx_name (name)
+    INDEX idx_name (name)
 );
 
 CREATE TABLE IF NOT EXISTS fields (
-    id BIGINT unsigned NOT NULL AUTO_INCREMENT,
-    name varchar(255) NOT NULL,
-    data_type varchar(255) NOT NULL,
-    field_type varchar(255) NOT NULL,
-    field_groups_id BIGINT unsigned NOT NULL,
-    is_multiple bit DEFAULT 0 NOT NULL,
-    enabled bit DEFAULT 1 NOT NULL,
-    created_at TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP NOT NULL,
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL UNIQUE,
+    data_type VARCHAR(255) NOT NULL,
+    field_type VARCHAR(255) NOT NULL,
+    field_groups_id BIGINT UNSIGNED NOT NULL,
+    is_multiple BIT DEFAULT 0 NOT NULL,
+    enabled BIT DEFAULT 1 NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     PRIMARY KEY (id),
-    UNIQUE uc_name (name),
     INDEX idx_field_groups_id (field_groups_id),
-    FOREIGN KEY (field_groups_id) REFERENCES field_groups (id)
+    FOREIGN KEY (field_groups_id) REFERENCES field_groups (id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS values_data (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    value_data VARCHAR(255) NOT NULL UNIQUE,
+    enabled BIT DEFAULT 1 NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS fields_values (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    values_data_id BIGINT DEFAULT NULL,
+    fields_id BIGINT UNSIGNED DEFAULT NULL,
+    score DOUBLE DEFAULT NULL,
+    enabled BIT DEFAULT 1 NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (id),
+    INDEX (fields_id),
+    INDEX (values_data_id),
+    FOREIGN KEY (fields_id) REFERENCES fields (id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (values_data_id) REFERENCES values_data (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- From here on up has been rewritten and updated
@@ -98,7 +119,7 @@ CREATE TABLE IF NOT EXISTS fields (
 --CREATE TABLE IF NOT EXISTS `role` (
 --  `role_id` BIGINT NOT NULL AUTO_INCREMENT,
 --  `name` VARCHAR(255) NOT NULL,
---  `user_id` BIGINT unsigned,
+--  `user_id` BIGINT UNSIGNED,
 --  PRIMARY KEY (`role_id`),
 --  CONSTRAINT fk_role_user_unique_name FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 --);
@@ -114,8 +135,8 @@ CREATE TABLE IF NOT EXISTS fields (
 --  `role_functionality_mapping_id` BIGINT NOT NULL AUTO_INCREMENT,
 --  `role_id` BIGINT NOT NULL,
 --  `functionality_id` BIGINT NOT NULL,
---    `can_read` bit DEFAULT NULL,
---    `can_update` bit DEFAULT NULL,
+--    `can_read` BIT DEFAULT NULL,
+--    `can_update` BIT DEFAULT NULL,
 --    `can_create` bit DEFAULT NULL,
 --    `can_delete` bit DEFAULT NULL,
 --  PRIMARY KEY (`role_functionality_mapping_id`),
@@ -130,41 +151,18 @@ CREATE TABLE IF NOT EXISTS fields (
 --  `last_updated` TIMESTAMP DEFAULT NULL,
 --  `qr_text` VARCHAR(255) NOT NULL,
 --  `status` VARCHAR(255) DEFAULT NULL,
---  `user_id` BIGINT unsigned NOT NULL,
+--  `user_id` BIGINT UNSIGNED NOT NULL,
 --  PRIMARY KEY (`qr_data_id`),
 --  UNIQUE (`user_id`),
 --  INDEX (`user_id`),
 --  CONSTRAINT fk_qr_data_entity_user FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
 --);
 --
---CREATE TABLE IF NOT EXISTS `values_data` (
---  `id` bigint NOT NULL AUTO_INCREMENT,
---  `value_data` varchar(255) NOT NULL,
---  `creation_date` TIMESTAMP DEFAULT NULL,
---  `last_updated` TIMESTAMP DEFAULT NULL,
---  PRIMARY KEY (`id`),
---  UNIQUE (`value_data`)
---);
---
---CREATE TABLE IF NOT EXISTS `fields_values` (
---  `id` bigint NOT NULL AUTO_INCREMENT,
---  `values_data_id` bigint DEFAULT NULL,
---  `fields_id` bigint DEFAULT NULL,
---  `creation_date` TIMESTAMP DEFAULT NULL,
---  `last_updated` TIMESTAMP DEFAULT NULL,
---  `score` DOUBLE DEFAULT NULL,
---  PRIMARY KEY (`id`),
---  INDEX (`fields_id`),
---  INDEX (`values_data_id`),
---  CONSTRAINT `fk_fields_values_fields_id` FOREIGN KEY (`fields_id`) REFERENCES `fields` (`id`),
---  CONSTRAINT `fk_fields_values_values_data_id` FOREIGN KEY (`values_data_id`) REFERENCES `values_data` (`id`)
---);
---
 --CREATE TABLE IF NOT EXISTS `storage_zone` (
 --  `zone_id` bigint NOT NULL AUTO_INCREMENT,
---  `status` varchar(255) DEFAULT NULL,
---  `zone_description` varchar(255) DEFAULT NULL,
---  `zone_name` varchar(255) NOT NULL,
+--  `status` VARCHAR(255) DEFAULT NULL,
+--  `zone_description` VARCHAR(255) DEFAULT NULL,
+--  `zone_name` VARCHAR(255) NOT NULL,
 --  `creation_date` TIMESTAMP DEFAULT NULL,
 --  `last_updated` TIMESTAMP DEFAULT NULL,
 --  PRIMARY KEY (`zone_id`),
@@ -173,9 +171,9 @@ CREATE TABLE IF NOT EXISTS fields (
 --
 --CREATE TABLE IF NOT EXISTS `storage_area` (
 --  `area_id` bigint NOT NULL AUTO_INCREMENT,
---  `area_description` varchar(255) DEFAULT NULL,
---  `area_name` varchar(255) NOT NULL,
---  `status` varchar(255) DEFAULT NULL,
+--  `area_description` VARCHAR(255) DEFAULT NULL,
+--  `area_name` VARCHAR(255) NOT NULL,
+--  `status` VARCHAR(255) DEFAULT NULL,
 --  `storage_zone_id` bigint DEFAULT NULL,
 --  `creation_date` TIMESTAMP DEFAULT NULL,
 --  `last_updated` TIMESTAMP DEFAULT NULL,
@@ -187,9 +185,9 @@ CREATE TABLE IF NOT EXISTS fields (
 --
 --CREATE TABLE IF NOT EXISTS `storage_location` (
 --  `location_id` bigint NOT NULL AUTO_INCREMENT,
---  `location_description` varchar(255) DEFAULT NULL,
---  `location_name` varchar(255) NOT NULL,
---  `status` varchar(255) DEFAULT NULL,
+--  `location_description` VARCHAR(255) DEFAULT NULL,
+--  `location_name` VARCHAR(255) NOT NULL,
+--  `status` VARCHAR(255) DEFAULT NULL,
 --  `storage_area_id` bigint DEFAULT NULL,
 --  `creation_date` TIMESTAMP DEFAULT NULL,
 --  `last_updated` TIMESTAMP DEFAULT NULL,
@@ -201,9 +199,9 @@ CREATE TABLE IF NOT EXISTS fields (
 --
 --CREATE TABLE IF NOT EXISTS `storage_level` (
 --  `level_id` bigint NOT NULL AUTO_INCREMENT,
---  `level_description` varchar(255) DEFAULT NULL,
---  `level_name` varchar(255) NOT NULL,
---  `status` varchar(255) DEFAULT NULL,
+--  `level_description` VARCHAR(255) DEFAULT NULL,
+--  `level_name` VARCHAR(255) NOT NULL,
+--  `status` VARCHAR(255) DEFAULT NULL,
 --  `creation_date` TIMESTAMP DEFAULT NULL,
 --  `last_updated` TIMESTAMP DEFAULT NULL,
 --  `storage_location_id` bigint DEFAULT NULL,
@@ -217,14 +215,14 @@ CREATE TABLE IF NOT EXISTS fields (
 --  `id` bigint NOT NULL AUTO_INCREMENT,
 --  `creation_date` TIMESTAMP DEFAULT NULL,
 --  `last_updated` TIMESTAMP DEFAULT NULL,
---  `name` varchar(255) NOT NULL,
+--  `name` VARCHAR(255) NOT NULL,
 --  PRIMARY KEY (`id`),
 --  UNIQUE (`name`)
 --);
 --
 --CREATE TABLE IF NOT EXISTS `categories` (
 --  `id` bigint NOT NULL AUTO_INCREMENT,
---  `category_name` varchar(255) NOT NULL,
+--  `category_name` VARCHAR(255) NOT NULL,
 --  `creation_date` TIMESTAMP DEFAULT NULL,
 --  `last_updated` TIMESTAMP DEFAULT NULL,
 --  `needs_post` bit DEFAULT NULL,
@@ -251,7 +249,7 @@ CREATE TABLE IF NOT EXISTS fields (
 --
 --CREATE TABLE IF NOT EXISTS `category_fields` (
 --  `id` bigint NOT NULL AUTO_INCREMENT,
---  `data_level` varchar(255) NOT NULL,
+--  `data_level` VARCHAR(255) NOT NULL,
 --  `creation_date` TIMESTAMP DEFAULT NULL,
 --  `last_updated` TIMESTAMP DEFAULT NULL,
 --  `category_id` bigint DEFAULT NULL,
@@ -268,15 +266,15 @@ CREATE TABLE IF NOT EXISTS fields (
 --
 --CREATE TABLE IF NOT EXISTS `models` (
 --  `id` bigint NOT NULL AUTO_INCREMENT,
---  `description` varchar(255) DEFAULT NULL,
---  `identifier` varchar(255) DEFAULT NULL,
+--  `description` VARCHAR(255) DEFAULT NULL,
+--  `identifier` VARCHAR(255) DEFAULT NULL,
 --  `is_active` bit DEFAULT NULL,
---  `name` varchar(255) NOT NULL,
+--  `name` VARCHAR(255) NOT NULL,
 --  `needs_mpn` bit DEFAULT NULL,
---  `status` varchar(255) DEFAULT NULL,
---  `approved_by` bigint unsigned DEFAULT NULL,
+--  `status` VARCHAR(255) DEFAULT NULL,
+--  `approved_by` bigint UNSIGNED DEFAULT NULL,
 --  `categories_id` bigint DEFAULT NULL,
---  `created_by` bigint unsigned DEFAULT NULL,
+--  `created_by` bigint UNSIGNED DEFAULT NULL,
 --  `created_at` TIMESTAMP DEFAULT NULL,
 --  `updated_at` TIMESTAMP DEFAULT NULL,
 --  `deleted_at` TIMESTAMP DEFAULT NULL,
@@ -319,10 +317,10 @@ CREATE TABLE IF NOT EXISTS fields (
 --
 --CREATE TABLE IF NOT EXISTS `manufacturer_part_number` (
 --  `id` bigint NOT NULL AUTO_INCREMENT,
---  `description` varchar(255) DEFAULT NULL,
+--  `description` VARCHAR(255) DEFAULT NULL,
 --  `is_active` bit DEFAULT NULL,
---  `mpn` varchar(255) NOT NULL,
---  `status` varchar(255) DEFAULT NULL,
+--  `mpn` VARCHAR(255) NOT NULL,
+--  `status` VARCHAR(255) DEFAULT NULL,
 --  `approved_by` bigint unsigned DEFAULT NULL,
 --  `created_by` bigint unsigned DEFAULT NULL,
 --  `models_id` bigint DEFAULT NULL,
@@ -354,13 +352,13 @@ CREATE TABLE IF NOT EXISTS fields (
 --
 --CREATE TABLE IF NOT EXISTS `receivings` (
 --  `id` bigint NOT NULL AUTO_INCREMENT,
---  `tracking_lading` varchar(255) DEFAULT NULL,
---  `carrier` varchar(255) DEFAULT NULL,
---  `type` varchar(255) DEFAULT NULL,
---  `supplier` varchar(255) DEFAULT NULL,
+--  `tracking_lading` VARCHAR(255) DEFAULT NULL,
+--  `carrier` VARCHAR(255) DEFAULT NULL,
+--  `type` VARCHAR(255) DEFAULT NULL,
+--  `supplier` VARCHAR(255) DEFAULT NULL,
 --  `identifier` bigint DEFAULT NULL,
---  `parcels` varchar(255) DEFAULT NULL,
---  `notes` varchar(255) DEFAULT NULL,
+--  `parcels` VARCHAR(255) DEFAULT NULL,
+--  `notes` VARCHAR(255) DEFAULT NULL,
 --  `is_po_fully_received` bit DEFAULT NULL,
 --  `created_by` bigint unsigned DEFAULT NULL,
 --  `created_at` TIMESTAMP DEFAULT NULL,
@@ -374,7 +372,7 @@ CREATE TABLE IF NOT EXISTS fields (
 --  `id` bigint NOT NULL AUTO_INCREMENT,
 --  `receiving_id` bigint DEFAULT NULL,
 --  `quantity` bigint DEFAULT NULL,
---  `description` varchar(255) DEFAULT NULL,
+--  `description` VARCHAR(255) DEFAULT NULL,
 --  `quantity_to_receive` bigint DEFAULT NULL,
 --  `created_by` bigint unsigned DEFAULT NULL,
 --  `created_at` TIMESTAMP DEFAULT NULL,
@@ -456,16 +454,16 @@ CREATE TABLE IF NOT EXISTS fields (
 --
 --CREATE TABLE IF NOT EXISTS `inventory_items` (
 --  `id` bigint NOT NULL AUTO_INCREMENT,
---  `item_condition` varchar(255) DEFAULT NULL,
+--  `item_condition` VARCHAR(255) DEFAULT NULL,
 --  `receiving_item_id` bigint DEFAULT NULL,
---  `grade` varchar(255) DEFAULT NULL,
---  `location` varchar(255) DEFAULT NULL,
---  `post` varchar(255) DEFAULT NULL,
---  `main_rbid` varchar(255) DEFAULT NULL,
---  `serial_number` varchar(255) DEFAULT NULL,
+--  `grade` VARCHAR(255) DEFAULT NULL,
+--  `location` VARCHAR(255) DEFAULT NULL,
+--  `post` VARCHAR(255) DEFAULT NULL,
+--  `main_rbid` VARCHAR(255) DEFAULT NULL,
+--  `serial_number` VARCHAR(255) DEFAULT NULL,
 --  `pulled` bit DEFAULT NULL,
 --  `assessed_separately` bit DEFAULT NULL,
---  `status` varchar(255) DEFAULT NULL,
+--  `status` VARCHAR(255) DEFAULT NULL,
 --  `manufacture_part_number_id` bigint DEFAULT NULL,
 --  `section_area_id` bigint DEFAULT NULL,
 --  `models_id` bigint DEFAULT NULL,
@@ -473,8 +471,8 @@ CREATE TABLE IF NOT EXISTS fields (
 --  `created_at` TIMESTAMP DEFAULT NULL,
 --  `updated_at` TIMESTAMP DEFAULT NULL,
 --  `last_inspected_by` bigint unsigned DEFAULT NULL,
---  `cosmetic_grade` varchar(255) DEFAULT NULL,
---  `functional_grade` varchar(255) DEFAULT NULL,
+--  `cosmetic_grade` VARCHAR(255) DEFAULT NULL,
+--  `functional_grade` VARCHAR(255) DEFAULT NULL,
 --  PRIMARY KEY (`id`),
 --  INDEX (`manufacture_part_number_id`),
 --  INDEX (`section_area_id`),
@@ -543,7 +541,7 @@ CREATE TABLE IF NOT EXISTS fields (
 --
 --CREATE TABLE IF NOT EXISTS `marketplaces` (
 --  `id` bigint NOT NULL AUTO_INCREMENT,
---  `name` varchar(255) DEFAULT NULL,
+--  `name` VARCHAR(255) DEFAULT NULL,
 --  `created_at` TIMESTAMP DEFAULT NULL,
 --  `updated_at` TIMESTAMP DEFAULT NULL,
 --  PRIMARY KEY (`id`)
@@ -552,7 +550,7 @@ CREATE TABLE IF NOT EXISTS fields (
 --CREATE TABLE IF NOT EXISTS `countries` (
 --  `id` bigint NOT NULL AUTO_INCREMENT,
 --  `country_code` bigint DEFAULT NULL,
---  `name` varchar(255) DEFAULT NULL,
+--  `name` VARCHAR(255) DEFAULT NULL,
 --  `created_at` TIMESTAMP DEFAULT NULL,
 --  `updated_at` TIMESTAMP DEFAULT NULL,
 --  PRIMARY KEY (`id`)
@@ -560,7 +558,7 @@ CREATE TABLE IF NOT EXISTS fields (
 --
 --CREATE TABLE IF NOT EXISTS `provinces_states` (
 --  `id` bigint NOT NULL AUTO_INCREMENT,
---  `name` varchar(255) DEFAULT NULL,
+--  `name` VARCHAR(255) DEFAULT NULL,
 --  `countries_id` bigint NOT NULL,
 --  `created_at` TIMESTAMP DEFAULT NULL,
 --  `updated_at` TIMESTAMP DEFAULT NULL,
@@ -571,15 +569,15 @@ CREATE TABLE IF NOT EXISTS fields (
 --
 --CREATE TABLE IF NOT EXISTS `customers` (
 --  `id` bigint NOT NULL AUTO_INCREMENT,
---  `customer_name` varchar(255) DEFAULT NULL,
---  `company_name` varchar(255) DEFAULT NULL,
+--  `customer_name` VARCHAR(255) DEFAULT NULL,
+--  `company_name` VARCHAR(255) DEFAULT NULL,
 --  `created_at` TIMESTAMP DEFAULT NULL,
 --  `updated_at` TIMESTAMP DEFAULT NULL,
---  `zip_code` varchar(255) DEFAULT NULL,
---  `address` varchar(255) DEFAULT NULL,
---  `city` varchar(255) DEFAULT NULL,
---  `phone_number` varchar(255) DEFAULT NULL,
---  `email` varchar(255) DEFAULT NULL,
+--  `zip_code` VARCHAR(255) DEFAULT NULL,
+--  `address` VARCHAR(255) DEFAULT NULL,
+--  `city` VARCHAR(255) DEFAULT NULL,
+--  `phone_number` VARCHAR(255) DEFAULT NULL,
+--  `email` VARCHAR(255) DEFAULT NULL,
 --  `provinces_states_id` bigint NOT NULL,
 --  PRIMARY KEY (`id`),
 --  INDEX (provinces_states_id),
@@ -588,9 +586,9 @@ CREATE TABLE IF NOT EXISTS fields (
 --
 --CREATE TABLE IF NOT EXISTS `orders` (
 --  `id` bigint NOT NULL AUTO_INCREMENT,
---  `order_number` varchar(255) DEFAULT NULL,
---  `notes` varchar(255) DEFAULT NULL,
---  `status` varchar(255) DEFAULT NULL,
+--  `order_number` VARCHAR(255) DEFAULT NULL,
+--  `notes` VARCHAR(255) DEFAULT NULL,
+--  `status` VARCHAR(255) DEFAULT NULL,
 --  `shipped_at` TIMESTAMP DEFAULT NULL,
 --  `marketplaces_id` bigint DEFAULT NULL,
 --  `customers_id` bigint DEFAULT NULL,
@@ -605,7 +603,7 @@ CREATE TABLE IF NOT EXISTS fields (
 --
 --CREATE TABLE IF NOT EXISTS `currencies` (
 --  `id` bigint NOT NULL AUTO_INCREMENT,
---  `name` varchar(255) DEFAULT NULL,
+--  `name` VARCHAR(255) DEFAULT NULL,
 --  `created_at` TIMESTAMP DEFAULT NULL,
 --  `updated_at` TIMESTAMP DEFAULT NULL,
 --  PRIMARY KEY (`id`)
@@ -613,11 +611,11 @@ CREATE TABLE IF NOT EXISTS fields (
 --
 --CREATE TABLE IF NOT EXISTS `order_items` (
 --  `id` bigint NOT NULL AUTO_INCREMENT,
---  `name` varchar(255) DEFAULT NULL,
---  `description` varchar(255) DEFAULT NULL,
---  `unit_price` varchar(255) DEFAULT NULL,
+--  `name` VARCHAR(255) DEFAULT NULL,
+--  `description` VARCHAR(255) DEFAULT NULL,
+--  `unit_price` VARCHAR(255) DEFAULT NULL,
 --  `quantity` bigint NOT NULL,
---  `notes` varchar(255) DEFAULT NULL,
+--  `notes` VARCHAR(255) DEFAULT NULL,
 --  `orders_id` bigint NOT NULL,
 --  `currencies_id` bigint NOT NULL,
 --  `created_at` TIMESTAMP DEFAULT NULL,
@@ -633,12 +631,12 @@ CREATE TABLE IF NOT EXISTS fields (
 --  `id` bigint NOT NULL AUTO_INCREMENT,
 --  `order_items_id` bigint NOT NULL,
 --  `inventory_items_id` bigint NOT NULL,
---  `status` varchar(255) DEFAULT NULL,
+--  `status` VARCHAR(255) DEFAULT NULL,
 --  `created_at` TIMESTAMP DEFAULT NULL,
 --  `updated_at` TIMESTAMP DEFAULT NULL,
 --  `supervisor_qc` bit DEFAULT NULL,
---  `supervisor` varchar(255) DEFAULT NULL,
---  `item_notes` varchar(255) DEFAULT NULL,
+--  `supervisor` VARCHAR(255) DEFAULT NULL,
+--  `item_notes` VARCHAR(255) DEFAULT NULL,
 --  PRIMARY KEY (`id`),
 --  INDEX (`inventory_items_id`),
 --  INDEX (`order_items_id`),
@@ -707,21 +705,21 @@ CREATE TABLE IF NOT EXISTS fields (
 --
 --CREATE TABLE IF NOT EXISTS `first_assessment` (
 --  `id` bigint NOT NULL AUTO_INCREMENT,
---  `item_condition` varchar(255) DEFAULT NULL,
+--  `item_condition` VARCHAR(255) DEFAULT NULL,
 --  `receiving_item_id` bigint DEFAULT NULL,
---  `grade` varchar(255) DEFAULT NULL,
---  `location` varchar(255) DEFAULT NULL,
---  `post` varchar(255) DEFAULT NULL,
---  `main_rbid` varchar(255) DEFAULT NULL,
---  `serial_number` varchar(255) DEFAULT NULL,
+--  `grade` VARCHAR(255) DEFAULT NULL,
+--  `location` VARCHAR(255) DEFAULT NULL,
+--  `post` VARCHAR(255) DEFAULT NULL,
+--  `main_rbid` VARCHAR(255) DEFAULT NULL,
+--  `serial_number` VARCHAR(255) DEFAULT NULL,
 --  `pulled` bit DEFAULT NULL,
 --  `assessed_separately` bit DEFAULT NULL,
---  `cosmetic_grade` varchar(255) DEFAULT NULL,
---  `functional_grade` varchar(255) DEFAULT NULL,
+--  `cosmetic_grade` VARCHAR(255) DEFAULT NULL,
+--  `functional_grade` VARCHAR(255) DEFAULT NULL,
 --  `last_inspected_by` bigint unsigned DEFAULT NULL,
---  `status` varchar(255) DEFAULT NULL,
+--  `status` VARCHAR(255) DEFAULT NULL,
 --  `manufacture_part_number_id` bigint DEFAULT NULL,
---  `section_area_name` varchar(255) DEFAULT NULL,
+--  `section_area_name` VARCHAR(255) DEFAULT NULL,
 --  `models_id` bigint DEFAULT NULL,
 --  `parent_inventory_items_id` bigint DEFAULT NULL,
 --  `created_at` TIMESTAMP DEFAULT NULL,

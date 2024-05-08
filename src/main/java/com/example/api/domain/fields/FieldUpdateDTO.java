@@ -12,8 +12,8 @@ public record FieldUpdateDTO(
 
         Boolean isMultiple,
 
-        @NotNull
-        DataType dataType,
+//        @NotNull
+//        DataType dataType,
 
         @NotNull
         FieldType fieldType,

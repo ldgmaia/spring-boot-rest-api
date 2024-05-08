@@ -23,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+// the line above is to set the test database to use the same connection as production
 @ActiveProfiles("test")
 class DoctorRepositoryTest {
 

@@ -1,5 +1,6 @@
 package com.example.api.domain.fields;
 
+import com.example.api.domain.ValidationException;
 import com.example.api.domain.fields.validations.FieldValidator;
 import com.example.api.repositories.FieldGroupRepository;
 import com.example.api.repositories.FieldRepository;
@@ -24,6 +25,11 @@ public class FieldService {
     public FieldInfoDTO register(FieldRequestDTO data) {
 
         validators.forEach(v -> v.validate(data));
+
+        if (!fieldGroupRepository.existsById(data.fieldGroupId())) {
+            throw new ValidationException("Field Group ID not found");
+        }
+
         var fieldGroup = fieldGroupRepository.getReferenceById(data.fieldGroupId());
 
         var field = new Field(new FieldRegisterDTO(data.name(), data.isMultiple(), data.dataType(), data.fieldType(), fieldGroup));
@@ -39,7 +45,7 @@ public class FieldService {
 
         field.setName(data.name());
         field.setFieldType(data.fieldType());
-        field.setDataType(data.dataType());
+//        field.setDataType(data.dataType());
         field.setUpdatedAt(LocalDateTime.now());
         field.setFieldGroup(fieldGroup);
         field.setIsMultiple(data.isMultiple() != null ? data.isMultiple() : false);
