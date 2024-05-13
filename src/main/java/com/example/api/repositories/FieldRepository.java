@@ -6,10 +6,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
+
 public interface FieldRepository extends JpaRepository<Field, Long> {
 
     Page<Field> findAllByEnabledTrue(Pageable pagination);
 
+//    Page<Field> findAllByEnabledTrueAndFieldGroup_Id(Long fieldGroupId, Pageable pageable);
+
+    List<Field> findByEnabledTrueAndFieldGroup_Id(Long fieldGroupId);
 //    @Query("""
 //            select d from Doctor d
 //            where d.active = true

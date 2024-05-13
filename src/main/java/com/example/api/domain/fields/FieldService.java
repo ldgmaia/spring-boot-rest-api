@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class FieldService {
@@ -51,5 +52,21 @@ public class FieldService {
         field.setIsMultiple(data.isMultiple() != null ? data.isMultiple() : false);
 
         return new FieldInfoDTO(field);
+    }
+
+//    public Page<Field> getAllEnabledFieldsByFieldGroupId(Long fieldGroupId, Pageable pageable) {
+//        return fieldRepository.findByEnabledTrueAndFieldGroup_Id(fieldGroupId, pageable);
+//    }
+
+    public FieldsByGroupDTO getEnabledFieldsByFieldGroupId(Long fieldGroupId) {
+        var fieldGroup = fieldGroupRepository.findById(fieldGroupId).orElse(null);
+        if (fieldGroup == null) {
+            throw new ValidationException("Field Group ID not found");
+        }
+
+        List<Field> fields = fieldRepository.findByEnabledTrueAndFieldGroup_Id(fieldGroupId);
+        List<FieldListDTO> fieldsListDTO = fields.stream().map(FieldListDTO::new).collect(Collectors.toList());
+        
+        return new FieldsByGroupDTO(fieldGroup.getName(), fieldsListDTO);
     }
 }

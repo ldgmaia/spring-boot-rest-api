@@ -71,4 +71,21 @@ public class FieldsController {
         var field = fieldRepository.getReferenceById(id);
         return ResponseEntity.ok(new FieldInfoDTO(field));
     }
+
+    @GetMapping("/field-group/{fieldGroupId}")
+    public ResponseEntity<FieldsByGroupDTO> getEnabledFieldsByFieldGroupId(
+            @PathVariable Long fieldGroupId
+    ) {
+        FieldsByGroupDTO response = fieldService.getEnabledFieldsByFieldGroupId(fieldGroupId);
+        return ResponseEntity.ok(response);
+    }
+
+//    public ResponseEntity<Page<FieldListDTO>> getFieldsByGroup(
+//            @PathVariable Long fieldGroupId,
+//            Pageable pageable
+//    ) {
+//        Page<Field> fieldsPage = fieldService.getEnabledFieldsByFieldGroupId(fieldGroupId, pageable);
+//        Page<FieldListDTO> fieldsListDTOPage = fieldsPage.map(FieldListDTO::new);
+//        return ResponseEntity.ok(fieldsListDTOPage);
+//    }
 }
