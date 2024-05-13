@@ -92,7 +92,7 @@ public class DoctorsController {
         var doctor = doctorRepository.getReferenceById(id);
 
         if (!doctor.getActive()) {
-            return ResponseEntity.status(304).header("X-Custom-Message", "Doctor is already disabled").build();
+            return ResponseEntity.status(409).header("X-Custom-Message", "Doctor is already disabled").build();
         }
 
         doctor.deactivate();

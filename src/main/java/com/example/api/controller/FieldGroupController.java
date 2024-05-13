@@ -13,9 +13,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("field-groups")
@@ -35,7 +38,18 @@ public class FieldGroupController {
     @Transactional
     public ResponseEntity register(@RequestBody @Valid FieldGroupRegisterDTO data, UriComponentsBuilder uriBuilder) {
 
+        var fieldGroupExists = fieldGroupRepository.existsByName(data.name());
+
+        if (fieldGroupExists) {
+//            return ResponseEntity.status(409).header("X-Custom-Message", "Filed group " + data.name() + " is already registered").build();
+//            return ResponseEntity.status(HttpStatus.CONFLICT).header(HttpHeaders.LOCATION, "http://resource/id").build();
+//            return ResponseEntity.status(HttpStatus.CONFLICT).header(HttpHeaders.LOCATION, "http://resource/id").body("Filed group " + data.name() + " is already registered");
+            Map<String, String> jsonResponse = Map.of("message", "Field group " + data.name() + " is already registered");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(jsonResponse);
+        }
+
         var fieldGroup = new FieldGroup(data);
+
         fieldGroupRepository.save(fieldGroup);
 
         var uri = uriBuilder.path("/field-groups/{id}").buildAndExpand(fieldGroup.getId()).toUri();
@@ -53,6 +67,14 @@ public class FieldGroupController {
     @PutMapping
     @Transactional
     public ResponseEntity update(@RequestBody @Valid FieldGroupUpdateDTO data) {
+
+        var fieldGroupExists = fieldGroupRepository.existsById(data.id());
+
+        if (!fieldGroupExists) {
+            Map<String, String> jsonResponse = Map.of("message", "Field group " + data.name() + " not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(jsonResponse);
+        }
+
         var fieldGroup = fieldGroupRepository.getReferenceById(data.id());
         fieldGroup.updateInfo(data);
 

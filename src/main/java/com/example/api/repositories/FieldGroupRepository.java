@@ -10,6 +10,8 @@ public interface FieldGroupRepository extends JpaRepository<FieldGroup, Long> {
 
     Page<FieldGroup> findAllByEnabledTrue(Pageable pagination);
 
+    Boolean existsByName(String name);
+
 //    @Query("""
 //            select d from Doctor d
 //            where d.active = true
