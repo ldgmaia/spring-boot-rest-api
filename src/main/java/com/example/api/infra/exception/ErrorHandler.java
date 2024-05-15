@@ -2,11 +2,14 @@ package com.example.api.infra.exception;
 
 import com.example.api.domain.ValidationException;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.Map;
 
 @RestControllerAdvice
 public class ErrorHandler {
@@ -25,7 +28,9 @@ public class ErrorHandler {
 
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity handleBusinessRuleError(ValidationException exception) {
-        return ResponseEntity.badRequest().body(exception.getMessage());
+        Map<String, String> jsonResponse = Map.of("message", exception.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(jsonResponse);
+//        return ResponseEntity.badRequest().body(exception.getMessage());
     }
 
     private record ErrorDataValidation(String field, String message) {

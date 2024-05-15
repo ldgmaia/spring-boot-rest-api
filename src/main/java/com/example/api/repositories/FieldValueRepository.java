@@ -31,7 +31,7 @@ public interface FieldValueRepository extends JpaRepository<FieldValue, Long> {
     }
 
     @Query(value = """
-                SELECT NEW com.example.api.domain.values.ValueInfoDTO(vd.id, vd.valueData, vd.enabled)
+                SELECT NEW com.example.api.domain.values.ValueInfoDTO(vd.id, vd.valueData, vd.enabled, fv.score)
                 FROM Value vd
                 JOIN FieldValue fv ON vd.id = fv.valueData.id
                 WHERE fv.field.id = :fieldId
