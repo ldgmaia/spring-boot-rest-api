@@ -5,14 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -36,11 +33,11 @@ public class User implements UserDetails {
     private String lastName;
     private Boolean enabled;
 
-    @CreatedDate
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
+//    @CreatedDate
+//    private LocalDateTime createdAt;
+//
+//    @LastModifiedDate
+//    private LocalDateTime updatedAt;
 
     public User(UserRegisterDTO data) {
         this.username = data.username();
@@ -48,8 +45,8 @@ public class User implements UserDetails {
         this.firstName = data.firstName();
         this.lastName = data.lastName();
         this.enabled = true;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+//        this.createdAt = LocalDateTime.now();
+//        this.updatedAt = LocalDateTime.now();
     }
 
     @Override

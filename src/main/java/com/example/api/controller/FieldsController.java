@@ -3,6 +3,7 @@ package com.example.api.controller;
 import com.example.api.domain.fields.*;
 import com.example.api.repositories.FieldRepository;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -11,9 +12,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("fields")
@@ -68,8 +72,13 @@ public class FieldsController {
 
     @GetMapping("/{id}")
     public ResponseEntity detail(@PathVariable Long id) {
-        var field = fieldRepository.getReferenceById(id);
-        return ResponseEntity.ok(new FieldInfoDTO(field));
+        try {
+            var field = fieldRepository.getReferenceById(id);
+            return ResponseEntity.ok(new FieldInfoDTO(field));
+        } catch (EntityNotFoundException ex) {
+            Map<String, String> jsonResponse = Map.of("message", "Field not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(jsonResponse);
+        }
     }
 
     @GetMapping("/field-group/{fieldGroupId}")

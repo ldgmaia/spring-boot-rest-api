@@ -4,10 +4,6 @@ import com.example.api.domain.fields.Field;
 import com.example.api.domain.values.Value;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-
-import java.time.LocalDateTime;
 
 @Table(name = "fields_values")
 @Entity(name = "FieldValue")
@@ -33,11 +29,11 @@ public class FieldValue {
     private Double score;
     private Boolean enabled;
 
-    @CreatedDate
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
+//    @CreatedDate
+//    private LocalDateTime createdAt;
+//
+//    @LastModifiedDate
+//    private LocalDateTime updatedAt;
 
     public FieldValue(FieldValueRegisterDTO data) {
         this.valueData = data.valueData();
@@ -45,8 +41,8 @@ public class FieldValue {
         this.score = data.score();
 
         this.enabled = true;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+//        this.createdAt = LocalDateTime.now();
+//        this.updatedAt = LocalDateTime.now();
     }
 
     //    public void updateInfo(FieldUpdateDTO data) {

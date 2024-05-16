@@ -3,10 +3,6 @@ package com.example.api.domain.fields;
 import com.example.api.domain.fieldgroups.FieldGroup;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-
-import java.time.LocalDateTime;
 
 @Table(name = "fields")
 @Entity(name = "Field")
@@ -35,11 +31,11 @@ public class Field {
     @JoinColumn(name = "field_groups_id")
     private FieldGroup fieldGroup;
 
-    @CreatedDate
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
+//    @CreatedDate
+//    private LocalDateTime createdAt;
+//
+//    @LastModifiedDate
+//    private LocalDateTime updatedAt;
 
     public Field(FieldRegisterDTO data) {
         this.name = data.name();
@@ -48,8 +44,8 @@ public class Field {
         this.fieldType = data.fieldType();
         this.fieldGroup = data.fieldGroup();
         this.enabled = true;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+//        this.createdAt = LocalDateTime.now();
+//        this.updatedAt = LocalDateTime.now();
     }
 
     //    public void updateInfo(FieldUpdateDTO data) {

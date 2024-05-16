@@ -1,4 +1,4 @@
-package com.example.api.domain.fieldgroups;
+package com.example.api.domain.categorygroups;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -6,13 +6,13 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Table(name = "field_groups")
-@Entity(name = "FieldGroup")
+@Table(name = "category_groups")
+@Entity(name = "CategoryGroup")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
-public class FieldGroup {
+public class CategoryGroup {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,23 +21,15 @@ public class FieldGroup {
     private String name;
     private Boolean enabled;
 
-//    @CreatedDate
-//    private LocalDateTime createdAt;
-//
-//    @LastModifiedDate
-//    private LocalDateTime updatedAt;
 
-    public FieldGroup(FieldGroupRegisterDTO data) {
+    public CategoryGroup(CategoryGroupRegisterDTO data) {
         this.name = data.name();
         this.enabled = true;
-//        this.createdAt = LocalDateTime.now();
-//        this.updatedAt = LocalDateTime.now();
     }
 
-    public void updateInfo(FieldGroupUpdateDTO data) {
+    public void updateInfo(CategoryGroupUpdateDTO data) {
 
         this.name = (data.name() != null) ? data.name() : this.name;
-//        this.updatedAt = LocalDateTime.now();
     }
 
     public void deactivate() {

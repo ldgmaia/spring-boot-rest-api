@@ -5,6 +5,7 @@ import com.example.api.repositories.FieldGroupRepository;
 import com.example.api.repositories.UserPermissionRepository;
 import com.example.api.repositories.UserRepository;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -97,7 +98,12 @@ public class FieldGroupController {
 
     @GetMapping("/{id}")
     public ResponseEntity detail(@PathVariable Long id) {
-        var fieldGroup = fieldGroupRepository.getReferenceById(id);
-        return ResponseEntity.ok(new FieldGroupInfoDTO(fieldGroup));
+        try {
+            var fieldGroup = fieldGroupRepository.getReferenceById(id);
+            return ResponseEntity.ok(new FieldGroupInfoDTO(fieldGroup));
+        } catch (EntityNotFoundException ex) {
+            Map<String, String> jsonResponse = Map.of("message", "Field Group not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(jsonResponse);
+        }
     }
 }

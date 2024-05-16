@@ -7,7 +7,6 @@ import com.example.api.repositories.FieldRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,7 +46,7 @@ public class FieldService {
         field.setName(data.name());
         field.setFieldType(data.fieldType());
 //        field.setDataType(data.dataType());
-        field.setUpdatedAt(LocalDateTime.now());
+//        field.setUpdatedAt(LocalDateTime.now());
         field.setFieldGroup(fieldGroup);
         field.setIsMultiple(data.isMultiple() != null ? data.isMultiple() : false);
 
@@ -66,7 +65,7 @@ public class FieldService {
 
         List<Field> fields = fieldRepository.findByEnabledTrueAndFieldGroup_Id(fieldGroupId);
         List<FieldListDTO> fieldsListDTO = fields.stream().map(FieldListDTO::new).collect(Collectors.toList());
-        
+
         return new FieldsByGroupDTO(fieldGroup.getName(), fieldsListDTO);
     }
 }
