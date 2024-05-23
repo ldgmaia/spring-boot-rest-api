@@ -14,7 +14,7 @@ public interface FieldRepository extends JpaRepository<Field, Long> {
 
 //    Page<Field> findAllByEnabledTrueAndFieldGroup_Id(Long fieldGroupId, Pageable pageable);
 
-    List<Field> findByEnabledTrueAndFieldGroup_Id(Long fieldGroupId);
+    List<Field> findByEnabledTrueAndFieldGroupId(Long fieldGroupId);
 //    @Query("""
 //            select d from Doctor d
 //            where d.active = true

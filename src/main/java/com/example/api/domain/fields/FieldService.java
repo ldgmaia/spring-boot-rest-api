@@ -27,7 +27,7 @@ public class FieldService {
         validators.forEach(v -> v.validate(data));
 
         if (!fieldGroupRepository.existsById(data.fieldGroupId())) {
-            throw new ValidationException("Field Group ID not found");
+            throw new ValidationException("Field Group not found");
         }
 
         var fieldGroup = fieldGroupRepository.getReferenceById(data.fieldGroupId());
@@ -63,7 +63,7 @@ public class FieldService {
             throw new ValidationException("Field Group ID not found");
         }
 
-        List<Field> fields = fieldRepository.findByEnabledTrueAndFieldGroup_Id(fieldGroupId);
+        List<Field> fields = fieldRepository.findByEnabledTrueAndFieldGroupId(fieldGroupId);
         List<FieldListDTO> fieldsListDTO = fields.stream().map(FieldListDTO::new).collect(Collectors.toList());
 
         return new FieldsByGroupDTO(fieldGroup.getName(), fieldsListDTO);
