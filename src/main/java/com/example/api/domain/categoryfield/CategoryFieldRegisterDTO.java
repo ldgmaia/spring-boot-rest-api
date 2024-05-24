@@ -1,7 +1,6 @@
 package com.example.api.domain.categoryfield;
 
 import com.example.api.domain.categories.Category;
-import com.example.api.domain.categories.DataLevel;
 import com.example.api.domain.fields.Field;
 import jakarta.validation.constraints.NotNull;
 

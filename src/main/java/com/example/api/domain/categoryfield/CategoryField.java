@@ -1,10 +1,8 @@
 package com.example.api.domain.categoryfield;
 
 import com.example.api.domain.categories.Category;
-import com.example.api.domain.categories.DataLevel;
 import com.example.api.domain.fields.Field;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Table(name = "category_fields")
@@ -20,7 +18,7 @@ public class CategoryField {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
+    @Enumerated(EnumType.STRING)
     private DataLevel dataLevel;
 
     @ManyToOne(fetch = FetchType.LAZY)

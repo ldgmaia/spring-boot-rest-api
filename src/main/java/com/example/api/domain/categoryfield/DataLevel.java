@@ -1,4 +1,4 @@
-package com.example.api.domain.categories;
+package com.example.api.domain.categoryfield;
 
 public enum DataLevel {
     MODEL,

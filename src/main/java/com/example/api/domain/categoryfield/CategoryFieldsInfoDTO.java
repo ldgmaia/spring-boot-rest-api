@@ -1,9 +1,8 @@
 package com.example.api.domain.categoryfield;
 
-import com.example.api.domain.categories.DataLevel;
 import jakarta.validation.constraints.NotNull;
 
-public record CategoryFieldsDTO(
+public record CategoryFieldsInfoDTO(
 
         @NotNull
         DataLevel dataLevel,
@@ -11,10 +10,7 @@ public record CategoryFieldsDTO(
         @NotNull
         Long fieldId,
 
-        @NotNull
         Boolean printOnLabel,
-
-        @NotNull
         Boolean isMandatory
 ) {
 }

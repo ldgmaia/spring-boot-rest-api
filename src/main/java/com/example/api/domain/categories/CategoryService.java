@@ -45,7 +45,6 @@ public class CategoryService {
 
         // Handling fields
         List<CategoryFieldRequestDTO> fieldList = data.fields();
-        System.out.println("fieldList " + fieldList);
         if (fieldList != null) {
             for (CategoryFieldRequestDTO field : fieldList) {
 
@@ -65,7 +64,6 @@ public class CategoryService {
             var categoryComponent = new CategoryComponent(new CategoryComponentRegisterDTO(category, parentCategory));
             categoryComponentRepository.save(categoryComponent);
         }
-
 
         return new CategoryInfoDTO(category);
     }
@@ -108,15 +106,10 @@ public class CategoryService {
 
         }
 
+        // handling category fields
+        List<CategoryFieldRequestDTO> newfieldList = data.fields();
 
-//        var fieldGroup = fieldGroupRepository.getReferenceById(data.fieldGroupId());
-//
-//        field.setName(data.name());
-//        field.setFieldType(data.fieldType());
-////        field.setDataType(data.dataType());
-////        field.setUpdatedAt(LocalDateTime.now());
-//        field.setFieldGroup(fieldGroup);
-//        field.setIsMultiple(data.isMultiple() != null ? data.isMultiple() : false);
+        List<CategoryFieldRequestDTO> currentFieldList = categoryFieldsRepository.findAllByEnabledTrueAndCategoryId(id);
 
         return new CategoryInfoDTO(category);
     }
