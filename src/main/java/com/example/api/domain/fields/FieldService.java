@@ -1,6 +1,7 @@
 package com.example.api.domain.fields;
 
 import com.example.api.domain.ValidationException;
+import com.example.api.domain.fieldgroups.FieldGroup;
 import com.example.api.domain.fields.validations.FieldValidator;
 import com.example.api.repositories.FieldGroupRepository;
 import com.example.api.repositories.FieldRepository;
@@ -23,14 +24,17 @@ public class FieldService {
     private List<FieldValidator> validators; // Spring boot will automatically detect that a List is being ejected and will get all classes that implements this interface and will inject the validators automatically
 
     public FieldInfoDTO register(FieldRequestDTO data) {
-
         validators.forEach(v -> v.validate(data));
 
-        if (!fieldGroupRepository.existsById(data.fieldGroupId())) {
-            throw new ValidationException("Field Group not found");
-        }
+        FieldGroup fieldGroup = null;
 
-        var fieldGroup = fieldGroupRepository.getReferenceById(data.fieldGroupId());
+        Long fieldGroupId = data.fieldGroupId();
+        if (fieldGroupId != null) {
+            if (!fieldGroupRepository.existsById(fieldGroupId)) {
+                throw new ValidationException("Field Group not found");
+            }
+            fieldGroup = fieldGroupRepository.getReferenceById(fieldGroupId);
+        }
 
         var field = new Field(new FieldRegisterDTO(data.name(), data.isMultiple(), data.dataType(), data.fieldType(), fieldGroup));
         fieldRepository.save(field);

@@ -1,16 +1,20 @@
 package com.example.api.controller;
 
+import com.example.api.domain.categories.CategoryListDTO;
 import com.example.api.domain.categories.CategoryRequestDTO;
 import com.example.api.domain.categories.CategoryService;
+import com.example.api.repositories.CategoryRepository;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
@@ -21,8 +25,8 @@ public class CategoryController {
     @Autowired
     private CategoryService categoryService;
 
-//    @Autowired
-//    private FieldRepository fieldRepository;
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     @PostMapping
     @Transactional
@@ -36,21 +40,21 @@ public class CategoryController {
         return ResponseEntity.created(uri).body(category);
     }
 
-//    @GetMapping
-//    public ResponseEntity<Page<FieldListDTO>> list(HttpServletRequest request, @PageableDefault(size = 10, page = 0, sort = {"name"}) Pageable pagination, @RequestHeader HttpHeaders headers) {
-//        var page = fieldRepository.findAllByEnabledTrue(pagination).map(FieldListDTO::new);
-//        return ResponseEntity.ok(page);
-//    }
-//
-//    @PutMapping
+    @GetMapping
+    public ResponseEntity<Page<CategoryListDTO>> list(HttpServletRequest request, @PageableDefault(size = 10, page = 0, sort = {"name"}) Pageable pagination, @RequestHeader HttpHeaders headers) {
+        var page = categoryRepository.findAllByEnabledTrue(pagination).map(CategoryListDTO::new);
+        return ResponseEntity.ok(page);
+    }
+
+//    @PutMapping("/{id}")
 //    @Transactional
-//    public ResponseEntity update(@RequestBody @Valid FieldUpdateDTO data) {
+//    public ResponseEntity update(@RequestBody @Valid CategoryRequestDTO data, @PathVariable Long id) {
 ////        var field = fieldRepository.getReferenceById(data.id());
-//        var field = fieldService.updateInfo(data);
+//        var category = categoryService.update(data, id);
 //
-//        return ResponseEntity.ok(field);
+//        return ResponseEntity.ok(category);
 //    }
-//
+
 //    @DeleteMapping("/{id}")
 //    @Transactional
 //    public ResponseEntity delete(@PathVariable Long id) { // route is /doctors/1, for example

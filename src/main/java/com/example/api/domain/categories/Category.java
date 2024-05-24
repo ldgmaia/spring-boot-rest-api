@@ -23,8 +23,8 @@ public class Category {
     private String name;
 
     private Boolean enabled;
-    private Boolean needs_post;
-    private Boolean needs_serial_number;
+    private Boolean needsPost;
+    private Boolean needsSerialNumber;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_group_id")
@@ -33,8 +33,8 @@ public class Category {
     public Category(CategoryRegisterDTO data) {
         this.name = data.name();
         this.enabled = true;
-        this.needs_post = data.needsPost();
-        this.needs_serial_number = data.needsSerialNumber();
+        this.needsPost = data.needsPost();
+        this.needsSerialNumber = data.needsSerialNumber();
         this.categoryGroup = data.categoryGroup();
 
     }

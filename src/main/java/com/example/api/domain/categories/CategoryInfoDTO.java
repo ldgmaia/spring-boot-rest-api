@@ -17,8 +17,8 @@ public record CategoryInfoDTO(
                 category.getName(),
                 new CategoryGroupInfoDTO(category.getCategoryGroup()),
                 category.getEnabled(),
-                category.getNeeds_serial_number(),
-                category.getNeeds_post()
+                category.getNeedsSerialNumber(),
+                category.getNeedsPost()
         );
     }
 }
