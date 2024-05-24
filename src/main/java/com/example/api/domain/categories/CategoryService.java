@@ -38,6 +38,7 @@ public class CategoryService {
 
         validators.forEach(v -> v.validate(data));
 
+        // Handling category
         var categoryGroup = data.categoryGroupId() != null ? categoryGroupRepository.getReferenceById(data.categoryGroupId()) : null;
         var category = new Category(new CategoryRegisterDTO(data.name(), categoryGroup, data.needsPost(), data.needsSerialNumber()));
         categoryRepository.save(category);
@@ -67,12 +68,47 @@ public class CategoryService {
 
 
         return new CategoryInfoDTO(category);
-        //new CategoryInfoDTO(category, parentCategory != null ? parentCategory : null, categoryFields);
     }
 
-//    public CategoryInfoDTO updateInfo(CategoryUpdateDTO data) {
-//
-//        Category field = fieldRepository.getReferenceById(data.id());
+    public CategoryInfoDTO update(CategoryRequestDTO data, Long id) {
+
+        // handling category details
+        var category = categoryRepository.getReferenceById(id);
+        category.setName(data.name());
+        category.setNeedsPost(data.needsPost());
+        category.setNeedsSerialNumber(data.needsSerialNumber());
+
+        // handling Category Group
+        var categoryGroupExists = categoryGroupRepository.existsById(data.categoryGroupId());
+        if (categoryGroupExists) {
+            category.setCategoryGroup(categoryGroupRepository.getReferenceById(data.categoryGroupId()));
+        }
+
+        // handling parent category
+        var parentCategoryId = data.parentCategoryId();
+        if (parentCategoryId != null) {
+            var parentCategoryExists = categoryRepository.existsById(data.categoryGroupId());
+            if (parentCategoryExists) {
+                var parentCategory = categoryComponentRepository.findCategoryComponentByChildCategoryId(category.getId());
+                var newParentCategory = categoryRepository.findById(data.parentCategoryId())
+                        .orElseThrow(() -> new ValidationException("Parent Category not found"));
+
+                if (parentCategory != null) {
+                    parentCategory.setParentCategory(newParentCategory);
+                } else {
+                    var categoryComponent = new CategoryComponent(new CategoryComponentRegisterDTO(category, newParentCategory));
+                    categoryComponentRepository.save(categoryComponent);
+                }
+            }
+        } else {
+            var parentCategory = categoryComponentRepository.findCategoryComponentByChildCategoryId(category.getId());
+            if (parentCategory != null) {
+                categoryComponentRepository.deleteById(parentCategory.getId()); // hard delete from database
+            }
+
+        }
+
+
 //        var fieldGroup = fieldGroupRepository.getReferenceById(data.fieldGroupId());
 //
 //        field.setName(data.name());
@@ -81,10 +117,10 @@ public class CategoryService {
 ////        field.setUpdatedAt(LocalDateTime.now());
 //        field.setFieldGroup(fieldGroup);
 //        field.setIsMultiple(data.isMultiple() != null ? data.isMultiple() : false);
-//
-//        return new CategoryInfoDTO(field);
-//    }
-//
+
+        return new CategoryInfoDTO(category);
+    }
+
 ////    public Page<Field> getAllEnabledFieldsByFieldGroupId(Long fieldGroupId, Pageable pageable) {
 ////        return fieldRepository.findByEnabledTrueAndFieldGroup_Id(fieldGroupId, pageable);
 ////    }

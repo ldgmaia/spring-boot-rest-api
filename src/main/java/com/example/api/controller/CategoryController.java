@@ -46,14 +46,12 @@ public class CategoryController {
         return ResponseEntity.ok(page);
     }
 
-//    @PutMapping("/{id}")
-//    @Transactional
-//    public ResponseEntity update(@RequestBody @Valid CategoryRequestDTO data, @PathVariable Long id) {
-////        var field = fieldRepository.getReferenceById(data.id());
-//        var category = categoryService.update(data, id);
-//
-//        return ResponseEntity.ok(category);
-//    }
+    @PutMapping("/{id}")
+    @Transactional
+    public ResponseEntity update(@RequestBody @Valid CategoryRequestDTO data, @PathVariable Long id) {
+        var category = categoryService.update(data, id);
+        return ResponseEntity.ok(category);
+    }
 
 //    @DeleteMapping("/{id}")
 //    @Transactional
