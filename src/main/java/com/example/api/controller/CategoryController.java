@@ -13,9 +13,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("categories")
@@ -53,21 +56,22 @@ public class CategoryController {
         return ResponseEntity.ok(category);
     }
 
-//    @DeleteMapping("/{id}")
-//    @Transactional
-//    public ResponseEntity delete(@PathVariable Long id) { // route is /doctors/1, for example
-////        repository.deleteById(id); // hard delete from database
-//        var field = fieldRepository.getReferenceById(id);
-//
-//        if (!field.getEnabled()) {
-//            return ResponseEntity.status(304).header("X-Custom-Message", "Field is already disabled").build();
-//        }
-//
-//        field.deactivate();
-//
-//        return ResponseEntity.noContent().build();
-//    }
-//
+    @DeleteMapping("/{id}")
+    @Transactional
+    public ResponseEntity delete(@PathVariable Long id) {
+//        repository.deleteById(id); // hard delete from database
+        var category = categoryRepository.getReferenceById(id);
+
+        if (!category.getEnabled()) {
+            Map<String, String> jsonResponse = Map.of("message", "Category " + category.getName() + " is already deactivated");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(jsonResponse);
+        }
+
+        category.deactivate();
+
+        return ResponseEntity.noContent().build();
+    }
+
 //    @GetMapping("/{id}")
 //    public ResponseEntity detail(@PathVariable Long id) {
 //        try {
