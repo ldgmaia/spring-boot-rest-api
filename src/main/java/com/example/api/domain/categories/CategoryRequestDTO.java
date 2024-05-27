@@ -1,6 +1,6 @@
 package com.example.api.domain.categories;
 
-import com.example.api.domain.categoryfield.CategoryFieldRequestDTO;
+import com.example.api.domain.categoryfield.CategoryFieldUpdateDTO;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -20,6 +20,6 @@ public record CategoryRequestDTO(
         Boolean needsPost,
 
         @NotNull
-        List<CategoryFieldRequestDTO> fields
+        List<CategoryFieldUpdateDTO> fields
 ) {
 }

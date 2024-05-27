@@ -6,12 +6,15 @@ import com.example.api.domain.categorycomponent.CategoryComponent;
 import com.example.api.domain.categorycomponent.CategoryComponentRegisterDTO;
 import com.example.api.domain.categoryfield.CategoryField;
 import com.example.api.domain.categoryfield.CategoryFieldRegisterDTO;
-import com.example.api.domain.categoryfield.CategoryFieldRequestDTO;
+import com.example.api.domain.categoryfield.CategoryFieldUpdateDTO;
+import com.example.api.domain.fields.Field;
 import com.example.api.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class CategoryService {
@@ -44,9 +47,9 @@ public class CategoryService {
         categoryRepository.save(category);
 
         // Handling fields
-        List<CategoryFieldRequestDTO> fieldList = data.fields();
+        List<CategoryFieldUpdateDTO> fieldList = data.fields();
         if (fieldList != null) {
-            for (CategoryFieldRequestDTO field : fieldList) {
+            for (CategoryFieldUpdateDTO field : fieldList) {
 
                 var fieldExists = fieldRepository.findById(field.fieldId())
                         .orElseThrow(() -> new ValidationException("Field not found"));
@@ -107,9 +110,45 @@ public class CategoryService {
         }
 
         // handling category fields
-        List<CategoryFieldRequestDTO> newfieldList = data.fields();
+        List<CategoryFieldUpdateDTO> newFieldList = data.fields();
+        List<CategoryField> currentFieldList = categoryFieldsRepository.findAllByEnabledTrueAndCategoryId(id);
 
-        List<CategoryFieldRequestDTO> currentFieldList = categoryFieldsRepository.findAllByEnabledTrueAndCategoryId(id);
+        // Create a map of current fields by field ID for easy lookup
+        Map<Long, CategoryField> currentFieldMap = currentFieldList.stream()
+                .collect(Collectors.toMap(field -> field.getField().getId(), field -> field));
+
+        // Process new field list
+        for (CategoryFieldUpdateDTO newFieldDTO : newFieldList) {
+            Field field = fieldRepository.findById(newFieldDTO.fieldId())
+                    .orElseThrow(() -> new ValidationException("Field not found"));
+
+            CategoryField currentField = currentFieldMap.get(newFieldDTO.fieldId());
+            if (currentField != null) {
+                // Update existing field if the fields_id matches
+                currentField.setDataLevel(newFieldDTO.dataLevel());
+                currentField.setPrintOnLabel(newFieldDTO.printOnLabel());
+                currentField.setIsMandatory(newFieldDTO.isMandatory());
+                currentField.setEnabled(true);
+                categoryFieldsRepository.save(currentField);
+                currentFieldMap.remove(newFieldDTO.fieldId());
+            } else {
+                // Add new field
+                CategoryField newCategoryField = new CategoryField();
+                newCategoryField.setDataLevel(newFieldDTO.dataLevel());
+                newCategoryField.setCategory(category);
+                newCategoryField.setField(field);
+                newCategoryField.setIsMandatory(newFieldDTO.isMandatory());
+                newCategoryField.setPrintOnLabel(newFieldDTO.printOnLabel());
+                newCategoryField.setEnabled(true);
+                categoryFieldsRepository.save(newCategoryField);
+            }
+        }
+
+        // Disable remaining fields that were not updated or added
+        for (CategoryField remainingField : currentFieldMap.values()) {
+            remainingField.setEnabled(false);
+            categoryFieldsRepository.save(remainingField);
+        }
 
         return new CategoryInfoDTO(category);
     }
