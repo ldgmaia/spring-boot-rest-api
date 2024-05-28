@@ -54,7 +54,6 @@ public class CategoryService {
                 var fieldExists = fieldRepository.findById(field.fieldId())
                         .orElseThrow(() -> new ValidationException("Field not found"));
 
-                System.out.println("fieldExists " + fieldExists);
                 var categoryField = new CategoryField(new CategoryFieldRegisterDTO(field.dataLevel(), category, fieldExists, field.printOnLabel(), field.isMandatory()));
                 categoryFieldsRepository.save(categoryField);
             }
@@ -88,7 +87,7 @@ public class CategoryService {
         // handling parent category
         var parentCategoryId = data.parentCategoryId();
         if (parentCategoryId != null) {
-            var parentCategoryExists = categoryRepository.existsById(data.categoryGroupId());
+            var parentCategoryExists = categoryRepository.existsById(parentCategoryId);
             if (parentCategoryExists) {
                 var parentCategory = categoryComponentRepository.findCategoryComponentByChildCategoryId(category.getId());
                 var newParentCategory = categoryRepository.findById(data.parentCategoryId())
@@ -151,6 +150,69 @@ public class CategoryService {
         }
 
         return new CategoryInfoDTO(category);
+    }
+
+    public CategoryInfoDetailsDTO getCategoryDetails(Long id) {
+        // Fetch category details
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new ValidationException("Category not found"));
+
+        // handle parent category info
+        var categoryComponent = categoryComponentRepository.findCategoryComponentByChildCategoryId(id);
+        Category parentCategory = categoryComponent != null ? categoryComponent.getParentCategory() : null;
+        
+        // Fetch parent category details
+//        Category parentCategory = categoryComponentRepository.findCategoryComponentByChildCategoryId(id);
+//        CategoryComponentInfoDTO parentCategory = null;
+//        if (parentCategory != null) {
+//            parentCategory = new CategoryComponentInfoDTO(
+//                    parentCategory.getId(),
+//                    parentCategory.getName(),
+//                    parentCategory.getNeedsPost(),
+//                    parentCategory.getNeedsSerialNumber()
+//            );
+//        }
+
+        // Fetch components
+//        List<CategoryComponentInfoDTO> components = categoryComponentRepository.findByParentCategoryId(id).stream()
+//                .map(component -> new CategoryComponentInfoDTO(
+//                        component.id(),
+//                        component.name(),
+//                        component.needsPost(),
+//                        component.needsSerialNumber()
+//                ))
+//                .collect(Collectors.toList());
+
+        // Fetch category fields
+//        List<CategoryFieldsInfoDTO> categoryFields = categoryFieldsRepository.findAllByEnabledTrueAndCategoryId(id).stream()
+//                .map(field -> {
+//                    Field fieldDetails = field.getField();
+//                    return new CategoryFieldsInfoDTO(
+//                            field.getId(),
+//                            field.getDataLevel().name(),
+//                            field.getPrintOnLabel(),
+//                            field.getIsMandatory(),
+//                            fieldDetails.getId(),
+//                            fieldDetails.getName(),
+//                            fieldDetails.getDataType(),
+//                            fieldDetails.getFieldType(),
+//                            fieldDetails.getIsMultiple()
+//                    );
+//                })
+//                .collect(Collectors.toList());
+
+        // Assemble the final DTO
+        return new CategoryInfoDetailsDTO(
+                category.getId(),
+                category.getName(),
+                category.getNeedsPost(),
+                category.getNeedsSerialNumber(),
+                parentCategory != null ? new CategoryInfoDTO(parentCategory) : null
+//                new CategoryGroupInfoDTO(category.getCategoryGroup()),
+
+//                components,
+//                categoryFields
+        );
     }
 
 ////    public Page<Field> getAllEnabledFieldsByFieldGroupId(Long fieldGroupId, Pageable pageable) {

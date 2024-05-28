@@ -8,9 +8,8 @@ public record CategoryInfoDTO(
         CategoryGroupInfoDTO categoryGroup,
         Boolean enabled,
         Boolean needsSerialNumber,
-        Boolean needsPost) {
-
-
+        Boolean needsPost
+) {
     public CategoryInfoDTO(Category category) {
         this(
                 category.getId(),

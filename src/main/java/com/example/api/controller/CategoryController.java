@@ -1,5 +1,7 @@
 package com.example.api.controller;
 
+import com.example.api.domain.ValidationException;
+import com.example.api.domain.categories.Category;
 import com.example.api.domain.categories.CategoryListDTO;
 import com.example.api.domain.categories.CategoryRequestDTO;
 import com.example.api.domain.categories.CategoryService;
@@ -72,17 +74,15 @@ public class CategoryController {
         return ResponseEntity.noContent().build();
     }
 
-//    @GetMapping("/{id}")
-//    public ResponseEntity detail(@PathVariable Long id) {
-//        try {
-//            var field = fieldRepository.getReferenceById(id);
-//            return ResponseEntity.ok(new FieldInfoDTO(field));
-//        } catch (EntityNotFoundException ex) {
-//            Map<String, String> jsonResponse = Map.of("message", "Field not found");
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(jsonResponse);
-//        }
-//    }
-//
+    @GetMapping("/{id}")
+    public ResponseEntity detail(@PathVariable Long id) {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new ValidationException("Category not found"));
+
+        var categoryDetails = categoryService.getCategoryDetails(id);
+        return ResponseEntity.ok(categoryDetails);
+    }
+
 //    @GetMapping("/field-group/{fieldGroupId}")
 //    public ResponseEntity<FieldsByGroupDTO> getEnabledFieldsByFieldGroupId(
 //            @PathVariable Long fieldGroupId
