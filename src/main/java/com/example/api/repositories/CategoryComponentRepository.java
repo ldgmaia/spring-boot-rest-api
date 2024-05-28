@@ -4,6 +4,8 @@ import com.example.api.domain.categorycomponent.CategoryComponent;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
+
 public interface CategoryComponentRepository extends JpaRepository<CategoryComponent, Long> {
 
     //    Page<CategoryGroup> findAllByEnabledTrue(Pageable pagination);
@@ -25,4 +27,12 @@ public interface CategoryComponentRepository extends JpaRepository<CategoryCompo
             AND cc.childCategory.id = :childCategoryId
             """)
     CategoryComponent findCategoryComponentByChildCategoryId(Long childCategoryId);
+
+    @Query("""
+            SELECT cc
+            FROM CategoryComponent cc
+            WHERE cc.enabled = true
+            AND cc.parentCategory.id = :parentCategoryId
+            """)
+    List<CategoryComponent> findComponentsByParentCategoryId(Long parentCategoryId);
 }

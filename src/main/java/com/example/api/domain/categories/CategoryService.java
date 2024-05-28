@@ -157,21 +157,18 @@ public class CategoryService {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new ValidationException("Category not found"));
 
-        // handle parent category info
+        // Fetch parent category details
         var categoryComponent = categoryComponentRepository.findCategoryComponentByChildCategoryId(id);
         Category parentCategory = categoryComponent != null ? categoryComponent.getParentCategory() : null;
-        
-        // Fetch parent category details
-//        Category parentCategory = categoryComponentRepository.findCategoryComponentByChildCategoryId(id);
-//        CategoryComponentInfoDTO parentCategory = null;
-//        if (parentCategory != null) {
-//            parentCategory = new CategoryComponentInfoDTO(
-//                    parentCategory.getId(),
-//                    parentCategory.getName(),
-//                    parentCategory.getNeedsPost(),
-//                    parentCategory.getNeedsSerialNumber()
-//            );
-//        }
+
+        // Fetch components
+
+//        var componentList = categoryComponentRepository.findComponentsByParentCategoryId(id);
+//        System.out.println("componentList " + componentList);
+
+        var components = categoryComponentRepository.findComponentsByParentCategoryId(id).stream()
+                .map(component -> new CategoryInfoDTO(categoryRepository.getReferenceById(component.getChildCategory().getId())))
+                .collect(Collectors.toList());
 
         // Fetch components
 //        List<CategoryComponentInfoDTO> components = categoryComponentRepository.findByParentCategoryId(id).stream()
@@ -207,10 +204,11 @@ public class CategoryService {
                 category.getName(),
                 category.getNeedsPost(),
                 category.getNeedsSerialNumber(),
-                parentCategory != null ? new CategoryInfoDTO(parentCategory) : null
+                parentCategory != null ? new CategoryInfoDTO(parentCategory) : null,
+                components
 //                new CategoryGroupInfoDTO(category.getCategoryGroup()),
 
-//                components,
+
 //                categoryFields
         );
     }
