@@ -66,7 +66,6 @@ public class CategoryService {
             var categoryComponent = new CategoryComponent(new CategoryComponentRegisterDTO(category, parentCategory));
             categoryComponentRepository.save(categoryComponent);
         }
-
         return new CategoryInfoDTO(category);
     }
 
@@ -105,7 +104,6 @@ public class CategoryService {
             if (parentCategory != null) {
                 categoryComponentRepository.deleteById(parentCategory.getId()); // hard delete from database
             }
-
         }
 
         // handling category fields
@@ -161,42 +159,17 @@ public class CategoryService {
         var categoryComponent = categoryComponentRepository.findCategoryComponentByChildCategoryId(id);
         Category parentCategory = categoryComponent != null ? categoryComponent.getParentCategory() : null;
 
+        // NOTES: below are 2 ways of achieving the same outcome
+        // NOTES: Here I am getting just the category ID of the component, and then create a list of instances using the DTO that I need
         // Fetch components
-
-//        var componentList = categoryComponentRepository.findComponentsByParentCategoryId(id);
-//        System.out.println("componentList " + componentList);
-
         var components = categoryComponentRepository.findComponentsByParentCategoryId(id).stream()
                 .map(component -> new CategoryInfoDTO(categoryRepository.getReferenceById(component.getChildCategory().getId())))
                 .collect(Collectors.toList());
 
-        // Fetch components
-//        List<CategoryComponentInfoDTO> components = categoryComponentRepository.findByParentCategoryId(id).stream()
-//                .map(component -> new CategoryComponentInfoDTO(
-//                        component.id(),
-//                        component.name(),
-//                        component.needsPost(),
-//                        component.needsSerialNumber()
-//                ))
-//                .collect(Collectors.toList());
-
+        // NOTES: And in this example I defined the in the repository the format according to my DTO.
+        //        I prefer the first approach compared to this one, since is clear to understand what is happening, but this second way is less verbose in the service class
         // Fetch category fields
-//        List<CategoryFieldsInfoDTO> categoryFields = categoryFieldsRepository.findAllByEnabledTrueAndCategoryId(id).stream()
-//                .map(field -> {
-//                    Field fieldDetails = field.getField();
-//                    return new CategoryFieldsInfoDTO(
-//                            field.getId(),
-//                            field.getDataLevel().name(),
-//                            field.getPrintOnLabel(),
-//                            field.getIsMandatory(),
-//                            fieldDetails.getId(),
-//                            fieldDetails.getName(),
-//                            fieldDetails.getDataType(),
-//                            fieldDetails.getFieldType(),
-//                            fieldDetails.getIsMultiple()
-//                    );
-//                })
-//                .collect(Collectors.toList());
+        var categoryFields = categoryFieldsRepository.findAllEnabledByCategoryId(id);
 
         // Assemble the final DTO
         return new CategoryInfoDetailsDTO(
@@ -205,11 +178,8 @@ public class CategoryService {
                 category.getNeedsPost(),
                 category.getNeedsSerialNumber(),
                 parentCategory != null ? new CategoryInfoDTO(parentCategory) : null,
-                components
-//                new CategoryGroupInfoDTO(category.getCategoryGroup()),
-
-
-//                categoryFields
+                components,
+                categoryFields
         );
     }
 

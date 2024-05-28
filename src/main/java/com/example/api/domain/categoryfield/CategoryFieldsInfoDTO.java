@@ -1,16 +1,18 @@
 package com.example.api.domain.categoryfield;
 
-import jakarta.validation.constraints.NotNull;
+import com.example.api.domain.fields.DataType;
+import com.example.api.domain.fields.FieldType;
 
 public record CategoryFieldsInfoDTO(
-
-        @NotNull
+        Long id,
         DataLevel dataLevel,
-
-        @NotNull
-        Long fieldId,
-
+        Boolean isMandatory,
         Boolean printOnLabel,
-        Boolean isMandatory
+        Long fieldId,
+        String name,
+        DataType dataType,
+        FieldType fieldType,
+        Boolean isMultiple,
+        Boolean enabled
 ) {
 }

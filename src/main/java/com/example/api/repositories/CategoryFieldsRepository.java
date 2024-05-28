@@ -1,30 +1,23 @@
 package com.example.api.repositories;
 
 import com.example.api.domain.categoryfield.CategoryField;
+import com.example.api.domain.categoryfield.CategoryFieldsInfoDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
 public interface CategoryFieldsRepository extends JpaRepository<CategoryField, Long> {
 
-//    Page<CategoryGroup> findAllByEnabledTrue(Pageable pagination);
-//
-//    Boolean existsByName(String name);
-//
-//    @Query("""
-//            select fg.enabled
-//            from CategoryGroup fg
-//            where fg.id = :categoryGroupId
-//            """)
-//    Boolean findEnabledById(Long categoryGroupId);
-
-//    @Query(value = """
-//                select cf.dataLevel, cf.field.id, cf.printOnLabel, cf.isMandatory
-//                from CategoryField cf
-//                where cf.category.id = :categoryId
-//            """)
-//    List<CategoryFieldRequestDTO> findAllFieldsByCategoryId(Long categoryId);
-
-
     List<CategoryField> findAllByEnabledTrueAndCategoryId(Long categoryId);
+
+    @Query(value = """
+            select NEW com.example.api.domain.categoryfield.CategoryFieldsInfoDTO(cf.id, cf.dataLevel, cf.isMandatory, cf.printOnLabel, f.id, f.name, f.dataType, f.fieldType, f.isMultiple, f.enabled)
+            from CategoryField cf
+            join Field f on cf.field.id = f.id
+            where cf.category.id = :categoryId
+            and cf.enabled
+            """)
+    List<CategoryFieldsInfoDTO> findAllEnabledByCategoryId(Long categoryId);
+
 }
