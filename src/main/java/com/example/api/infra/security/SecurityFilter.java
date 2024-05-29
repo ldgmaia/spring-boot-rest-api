@@ -28,6 +28,12 @@ public class SecurityFilter extends OncePerRequestFilter {
         var tokenJWT = getToken(request);
 
         if (tokenJWT != null) {
+
+            if (tokenService.isTokenExpired(tokenJWT)) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
+            }
+            
             var subject = tokenService.getSubject(tokenJWT);
             var user = userRepository.findByUsername(subject);
 
