@@ -12,7 +12,5 @@ public record CategoryInfoDetailsDTO(
         CategoryInfoDTO parentCategory,
         List<CategoryInfoDTO> components,
         List<CategoryFieldsInfoDTO> categoryFields
-
-
 ) {
 }

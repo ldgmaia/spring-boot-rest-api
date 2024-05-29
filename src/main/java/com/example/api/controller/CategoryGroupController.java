@@ -1,10 +1,8 @@
 package com.example.api.controller;
 
-import com.example.api.domain.categorygroups.CategoryGroup;
-import com.example.api.domain.categorygroups.CategoryGroupInfoDTO;
-import com.example.api.domain.categorygroups.CategoryGroupRegisterDTO;
-import com.example.api.domain.categorygroups.CategoryGroupUpdateDTO;
+import com.example.api.domain.categorygroups.*;
 import com.example.api.repositories.CategoryGroupRepository;
+import com.example.api.repositories.CategoryRepository;
 import com.example.api.repositories.UserPermissionRepository;
 import com.example.api.repositories.UserRepository;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -36,6 +34,9 @@ public class CategoryGroupController {
     private UserRepository userRepository;
 
     @Autowired
+    private CategoryRepository categoryRepository;
+
+    @Autowired
     private UserPermissionRepository userPermissionRepository;
 
     @PostMapping
@@ -65,18 +66,18 @@ public class CategoryGroupController {
         return ResponseEntity.ok(page);
     }
 
-    @PutMapping
+    @PutMapping("/{id}")
     @Transactional
-    public ResponseEntity update(@RequestBody @Valid CategoryGroupUpdateDTO data) {
+    public ResponseEntity update(@RequestBody @Valid CategoryGroupUpdateDTO data, @PathVariable Long id) {
 
-        var categoryGroupExists = categoryGroupRepository.existsById(data.id());
+        var categoryGroupExists = categoryGroupRepository.existsById(id);
 
         if (!categoryGroupExists) {
             Map<String, String> jsonResponse = Map.of("message", "Category group " + data.name() + " not found");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(jsonResponse);
         }
 
-        var categoryGroup = categoryGroupRepository.getReferenceById(data.id());
+        var categoryGroup = categoryGroupRepository.getReferenceById(id);
         categoryGroup.updateInfo(data);
 
         return ResponseEntity.ok(new CategoryGroupInfoDTO(categoryGroup));
@@ -100,7 +101,10 @@ public class CategoryGroupController {
     public ResponseEntity detail(@PathVariable Long id) {
         try {
             var categoryGroup = categoryGroupRepository.getReferenceById(id);
-            return ResponseEntity.ok(new CategoryGroupInfoDTO(categoryGroup));
+
+            var categories = categoryRepository.findAllByCategoryGroupId(id);
+
+            return ResponseEntity.ok(new CategoryGroupInfoDetailsDTO(categoryGroup.getId(), categoryGroup.getName(), categoryGroup.getEnabled(), categories));
         } catch (EntityNotFoundException ex) {
             Map<String, String> jsonResponse = Map.of("message", "Category group not found");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(jsonResponse);
