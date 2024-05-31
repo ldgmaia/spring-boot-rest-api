@@ -12,8 +12,10 @@ import com.example.api.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -60,12 +62,26 @@ public class CategoryService {
         }
 
         // Handling parent category
-        if (data.parentCategoryId() != null) {
-            var parentCategory = categoryRepository.findById(data.parentCategoryId())
-                    .orElseThrow(() -> new ValidationException("Parent Category not found"));
-            var categoryComponent = new CategoryComponent(new CategoryComponentRegisterDTO(category, parentCategory));
-            categoryComponentRepository.save(categoryComponent);
+        List<Long> parentCategoryList = data.parentCategory();
+        if (parentCategoryList != null) {
+            for (Long categoryId : parentCategoryList) {
+
+                var parentCategory = categoryRepository.findById(categoryId)
+                        .orElseThrow(() -> new ValidationException("Parent Category not found"));
+
+                var categoryComponent = new CategoryComponent(new CategoryComponentRegisterDTO(category, parentCategory));
+                categoryComponentRepository.save(categoryComponent);
+            }
         }
+
+        // below is my old code when I was receiving only one category parent ID
+//        if (data.parentCategoryId() != null) {
+//            var parentCategory = categoryRepository.findById(data.parentCategoryId())
+//                    .orElseThrow(() -> new ValidationException("Parent Category not found"));
+//            var categoryComponent = new CategoryComponent(new CategoryComponentRegisterDTO(category, parentCategory));
+//            categoryComponentRepository.save(categoryComponent);
+//        }
+
         return new CategoryInfoDTO(category);
     }
 
@@ -83,28 +99,59 @@ public class CategoryService {
             category.setCategoryGroup(categoryGroupRepository.getReferenceById(data.categoryGroupId()));
         }
 
+        // Update the method below to achieve what was asked
         // handling parent category
-        var parentCategoryId = data.parentCategoryId();
-        if (parentCategoryId != null) {
-            var parentCategoryExists = categoryRepository.existsById(parentCategoryId);
-            if (parentCategoryExists) {
-                var parentCategory = categoryComponentRepository.findCategoryComponentByChildCategoryId(category.getId());
-                var newParentCategory = categoryRepository.findById(data.parentCategoryId())
-                        .orElseThrow(() -> new ValidationException("Parent Category not found"));
+        // handling parent categories
+        List<Long> newParentCategoryIds = data.parentCategory();
+        List<CategoryComponent> currentParentCategories = categoryComponentRepository.findByChildCategoryId(id);
 
-                if (parentCategory != null) {
-                    parentCategory.setParentCategory(newParentCategory);
+        if (newParentCategoryIds == null || newParentCategoryIds.isEmpty()) {
+            // If no parent categories are provided, delete all current parent categories
+            categoryComponentRepository.deleteAll(currentParentCategories);
+        } else {
+            // Create a set of new parent category IDs for easier lookup
+            Set<Long> newParentCategoryIdsSet = new HashSet<>(newParentCategoryIds);
+
+            // Iterate through current parent categories and remove those not in the new list
+            for (CategoryComponent currentParentCategory : currentParentCategories) {
+                if (!newParentCategoryIdsSet.contains(currentParentCategory.getParentCategory().getId())) {
+                    categoryComponentRepository.delete(currentParentCategory);
                 } else {
-                    var categoryComponent = new CategoryComponent(new CategoryComponentRegisterDTO(category, newParentCategory));
-                    categoryComponentRepository.save(categoryComponent);
+                    // Remove it from the set if it's already present
+                    newParentCategoryIdsSet.remove(currentParentCategory.getParentCategory().getId());
                 }
             }
-        } else {
-            var parentCategory = categoryComponentRepository.findCategoryComponentByChildCategoryId(category.getId());
-            if (parentCategory != null) {
-                categoryComponentRepository.deleteById(parentCategory.getId()); // hard delete from database
+
+            // Add the remaining new parent categories that were not in the current list
+            for (Long newParentCategoryId : newParentCategoryIdsSet) {
+                var newParentCategory = categoryRepository.findById(newParentCategoryId)
+                        .orElseThrow(() -> new ValidationException("Parent Category not found"));
+                var categoryComponent = new CategoryComponent(new CategoryComponentRegisterDTO(category, newParentCategory));
+                categoryComponentRepository.save(categoryComponent);
             }
         }
+
+//        var parentCategoryId = data.parentCategoryId();
+//        if (parentCategoryId != null) {
+//            var parentCategoryExists = categoryRepository.existsById(parentCategoryId);
+//            if (parentCategoryExists) {
+//                var parentCategory = categoryComponentRepository.findCategoryComponentByChildCategoryId(category.getId());
+//                var newParentCategory = categoryRepository.findById(data.parentCategoryId())
+//                        .orElseThrow(() -> new ValidationException("Parent Category not found"));
+//
+//                if (parentCategory != null) {
+//                    parentCategory.setParentCategory(newParentCategory);
+//                } else {
+//                    var categoryComponent = new CategoryComponent(new CategoryComponentRegisterDTO(category, newParentCategory));
+//                    categoryComponentRepository.save(categoryComponent);
+//                }
+//            }
+//        } else {
+//            var parentCategory = categoryComponentRepository.findCategoryComponentByChildCategoryId(category.getId());
+//            if (parentCategory != null) {
+//                categoryComponentRepository.deleteById(parentCategory.getId()); // hard delete from database
+//            }
+//        }
 
         // handling category fields
         List<CategoryFieldUpdateDTO> newFieldList = data.fields();

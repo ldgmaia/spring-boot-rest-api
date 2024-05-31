@@ -11,7 +11,8 @@ public record CategoryRequestDTO(
         String name,
 
         Long categoryGroupId,
-        Long parentCategoryId,
+
+        List<Long> parentCategory,
 
         @NotNull
         Boolean needsSerialNumber,

@@ -35,4 +35,6 @@ public interface CategoryComponentRepository extends JpaRepository<CategoryCompo
             AND cc.parentCategory.id = :parentCategoryId
             """)
     List<CategoryComponent> findComponentsByParentCategoryId(Long parentCategoryId);
+
+    List<CategoryComponent> findByChildCategoryId(Long id);
 }
