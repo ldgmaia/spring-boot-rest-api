@@ -9,7 +9,7 @@ public record CategoryInfoDetailsDTO(
         String name,
         Boolean needsPost,
         Boolean needsSerialNumber,
-        CategoryInfoDTO parentCategory,
+        List<CategoryInfoDTO> parentCategory,
         List<CategoryInfoDTO> components,
         List<CategoryFieldsInfoDTO> categoryFields
 ) {

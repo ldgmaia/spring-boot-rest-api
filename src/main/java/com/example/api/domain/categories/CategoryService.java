@@ -203,8 +203,11 @@ public class CategoryService {
                 .orElseThrow(() -> new ValidationException("Category not found"));
 
         // Fetch parent category details
-        var categoryComponent = categoryComponentRepository.findCategoryComponentByChildCategoryId(id);
-        Category parentCategory = categoryComponent != null ? categoryComponent.getParentCategory() : null;
+        var parentCategory = categoryComponentRepository.findCategoryComponentByChildCategoryId(id).stream()
+                .map(component -> new CategoryInfoDTO(categoryRepository.getReferenceById(component.getParentCategory().getId())))
+                .collect(Collectors.toList());
+        ;
+//        Category parentCategory = categoryComponent != null ? categoryComponent.getParentCategory() : null;
 
         // NOTES: below are 2 ways of achieving the same outcome
         // NOTES: Here I am getting just the category ID of the component, and then create a list of instances using the DTO that I need
@@ -224,7 +227,7 @@ public class CategoryService {
                 category.getName(),
                 category.getNeedsPost(),
                 category.getNeedsSerialNumber(),
-                parentCategory != null ? new CategoryInfoDTO(parentCategory) : null,
+                parentCategory,
                 components,
                 categoryFields
         );

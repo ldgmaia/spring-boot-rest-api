@@ -26,7 +26,7 @@ public interface CategoryComponentRepository extends JpaRepository<CategoryCompo
             WHERE cc.enabled = true
             AND cc.childCategory.id = :childCategoryId
             """)
-    CategoryComponent findCategoryComponentByChildCategoryId(Long childCategoryId);
+    List<CategoryComponent> findCategoryComponentByChildCategoryId(Long childCategoryId);
 
     @Query("""
             SELECT cc
