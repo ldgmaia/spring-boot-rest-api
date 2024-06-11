@@ -46,7 +46,7 @@ public class CategoryController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<CategoryListDTO>> list(HttpServletRequest request, @PageableDefault(size = 10, page = 0, sort = {"name"}) Pageable pagination, @RequestHeader HttpHeaders headers) {
+    public ResponseEntity<Page<CategoryListDTO>> list(HttpServletRequest request, @PageableDefault(size = 100, page = 0, sort = {"name"}) Pageable pagination, @RequestHeader HttpHeaders headers) {
         var page = categoryRepository.findAllByEnabledTrue(pagination).map(CategoryListDTO::new);
         return ResponseEntity.ok(page);
     }

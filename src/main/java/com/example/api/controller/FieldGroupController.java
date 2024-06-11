@@ -59,7 +59,7 @@ public class FieldGroupController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<FieldGroupListDTO>> list(HttpServletRequest request, @PageableDefault(size = 10, page = 0, sort = {"name"}) Pageable pagination, @RequestHeader HttpHeaders headers) {
+    public ResponseEntity<Page<FieldGroupListDTO>> list(HttpServletRequest request, @PageableDefault(size = 100, page = 0, sort = {"name"}) Pageable pagination, @RequestHeader HttpHeaders headers) {
 
         var page = fieldGroupRepository.findAllByEnabledTrue(pagination).map(FieldGroupListDTO::new);
         return ResponseEntity.ok(page);

@@ -7,6 +7,7 @@ import com.example.api.domain.categorycomponent.CategoryComponentRegisterDTO;
 import com.example.api.domain.categoryfield.CategoryField;
 import com.example.api.domain.categoryfield.CategoryFieldRegisterDTO;
 import com.example.api.domain.categoryfield.CategoryFieldUpdateDTO;
+import com.example.api.domain.categorygroups.CategoryGroupInfoDTO;
 import com.example.api.domain.fields.Field;
 import com.example.api.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -202,6 +203,9 @@ public class CategoryService {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new ValidationException("Category not found"));
 
+        // Get Category Group info
+        var categoryGroup = categoryGroupRepository.getReferenceById(category.getCategoryGroup().getId());
+
         // Fetch parent category details
         var parentCategory = categoryComponentRepository.findCategoryComponentByChildCategoryId(id).stream()
                 .map(component -> new CategoryInfoDTO(categoryRepository.getReferenceById(component.getParentCategory().getId())))
@@ -227,6 +231,7 @@ public class CategoryService {
                 category.getName(),
                 category.getNeedsPost(),
                 category.getNeedsSerialNumber(),
+                new CategoryGroupInfoDTO(categoryGroup),
                 parentCategory,
                 components,
                 categoryFields
