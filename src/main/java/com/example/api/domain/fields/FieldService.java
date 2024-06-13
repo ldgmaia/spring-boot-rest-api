@@ -45,14 +45,14 @@ public class FieldService {
     public FieldInfoDTO updateInfo(FieldUpdateDTO data) {
 
         Field field = fieldRepository.getReferenceById(data.id());
-        var fieldGroup = fieldGroupRepository.getReferenceById(data.fieldGroupId());
+//        var fieldGroup = fieldGroupRepository.getReferenceById(data.fieldGroupId());
 
         field.setName(data.name());
-        field.setFieldType(data.fieldType());
+//        field.setFieldType(data.fieldType());
 //        field.setDataType(data.dataType());
 //        field.setUpdatedAt(LocalDateTime.now());
-        field.setFieldGroup(fieldGroup);
-        field.setIsMultiple(data.isMultiple() != null ? data.isMultiple() : false);
+//        field.setFieldGroup(fieldGroup);
+//        field.setIsMultiple(data.isMultiple() != null ? data.isMultiple() : false);
 
         return new FieldInfoDTO(field);
     }

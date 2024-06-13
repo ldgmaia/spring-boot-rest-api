@@ -8,16 +8,13 @@ public record FieldUpdateDTO(
         Long id,
 
         @NotBlank
-        String name,
-
-        Boolean isMultiple,
-
+        String name
+//
+//        Boolean isMultiple,
+//
 //        @NotNull
-//        DataType dataType,
-
-        @NotNull
-        FieldType fieldType,
-
-        Long fieldGroupId
+//        FieldType fieldType,
+//
+//        Long fieldGroupId
 ) {
 }
