@@ -37,6 +37,7 @@ public class FieldService {
         }
 
         var field = new Field(new FieldRegisterDTO(data.name(), data.isMultiple(), data.dataType(), data.fieldType(), fieldGroup));
+        System.out.println(field);
         fieldRepository.save(field);
 
         return new FieldInfoDTO(field);
@@ -44,14 +45,21 @@ public class FieldService {
 
     public FieldInfoDTO updateInfo(FieldUpdateDTO data) {
 
+        // check if name is available
+        var fieldNewInfo = fieldRepository.findByName(data.name());
+        if (!fieldNewInfo.getId().equals(data.id())) {
+            throw new ValidationException("Field name already being used");
+        }
+
         Field field = fieldRepository.getReferenceById(data.id());
-//        var fieldGroup = fieldGroupRepository.getReferenceById(data.fieldGroupId());
+
+        var fieldGroup = fieldGroupRepository.getReferenceById(data.fieldGroupId());
 
         field.setName(data.name());
+        field.setFieldGroup(fieldGroup);
 //        field.setFieldType(data.fieldType());
 //        field.setDataType(data.dataType());
 //        field.setUpdatedAt(LocalDateTime.now());
-//        field.setFieldGroup(fieldGroup);
 //        field.setIsMultiple(data.isMultiple() != null ? data.isMultiple() : false);
 
         return new FieldInfoDTO(field);

@@ -36,4 +36,6 @@ public interface FieldRepository extends JpaRepository<Field, Long> {
     Boolean findEnabledById(Long fieldId);
 
     Boolean existsByName(String name);
+
+    Field findByName(String name);
 }

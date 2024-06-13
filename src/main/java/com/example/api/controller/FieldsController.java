@@ -1,6 +1,7 @@
 package com.example.api.controller;
 
 import com.example.api.domain.fields.*;
+import com.example.api.repositories.FieldGroupRepository;
 import com.example.api.repositories.FieldRepository;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.persistence.EntityNotFoundException;
@@ -30,9 +31,21 @@ public class FieldsController {
     @Autowired
     private FieldRepository fieldRepository;
 
+    @Autowired
+    private FieldGroupRepository fieldGroupRepository;
+
     @PostMapping
     @Transactional
     public ResponseEntity register(@RequestBody @Valid FieldRequestDTO data, UriComponentsBuilder uriBuilder) {
+
+        if (data.fieldGroupId() != null) {
+            var fieldGroupExists = fieldGroupRepository.existsById(data.fieldGroupId());
+
+            if (!fieldGroupExists) {
+                Map<String, String> jsonResponse = Map.of("message", "Field group not found");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(jsonResponse);
+            }
+        }
 
         var field = fieldService.register(data);
         var uri = uriBuilder.path("/fields/{id}").buildAndExpand(field.id()).toUri();
