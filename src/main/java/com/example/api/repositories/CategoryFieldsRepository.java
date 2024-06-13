@@ -20,4 +20,6 @@ public interface CategoryFieldsRepository extends JpaRepository<CategoryField, L
             """)
     List<CategoryFieldsInfoDTO> findAllEnabledByCategoryId(Long categoryId);
 
+    Boolean existsByCategoryId(Long categoryId);
+
 }

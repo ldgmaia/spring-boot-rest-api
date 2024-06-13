@@ -5,6 +5,7 @@ import com.example.api.domain.categories.Category;
 import com.example.api.domain.categories.CategoryListDTO;
 import com.example.api.domain.categories.CategoryRequestDTO;
 import com.example.api.domain.categories.CategoryService;
+import com.example.api.repositories.CategoryFieldsRepository;
 import com.example.api.repositories.CategoryRepository;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,6 +33,9 @@ public class CategoryController {
 
     @Autowired
     private CategoryRepository categoryRepository;
+
+    @Autowired
+    private CategoryFieldsRepository categoryFieldsRepository;
 
     @PostMapping
     @Transactional
@@ -61,6 +65,13 @@ public class CategoryController {
     @DeleteMapping("/{id}")
     @Transactional
     public ResponseEntity delete(@PathVariable Long id) {
+
+        var categoryHasFields = categoryFieldsRepository.existsByCategoryId(id);
+        if (categoryHasFields) {
+            Map<String, String> jsonResponse = Map.of("message", "Category has fields and cannot be deactivated");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(jsonResponse);
+        }
+
 //        repository.deleteById(id); // hard delete from database
         var category = categoryRepository.getReferenceById(id);
 
