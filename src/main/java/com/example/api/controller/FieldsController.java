@@ -62,7 +62,7 @@ public class FieldsController {
         var field = fieldRepository.getReferenceById(id);
 
         if (!field.getEnabled()) {
-            return ResponseEntity.status(304).header("X-Custom-Message", "Field is already disabled").build();
+            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).header("X-Custom-Message", "Field is already disabled").build();
         }
 
         field.deactivate();

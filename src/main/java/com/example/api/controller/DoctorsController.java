@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -63,7 +64,7 @@ public class DoctorsController {
 //        System.out.println(uri);
 //
 //        if (!userPermissionRepository.existsByUserIdAndPermission(userDetails.getId(), method + " " + uri)) { // the value is "GET /api/v1/doctors"
-//            return ResponseEntity.status(403).build();
+//            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 //        }
 
         // Now you can use the username to retrieve the user's data from the repository
@@ -92,7 +93,7 @@ public class DoctorsController {
         var doctor = doctorRepository.getReferenceById(id);
 
         if (!doctor.getActive()) {
-            return ResponseEntity.status(409).header("X-Custom-Message", "Doctor is already disabled").build();
+            return ResponseEntity.status(HttpStatus.CONFLICT).header("X-Custom-Message", "Doctor is already disabled").build();
         }
 
         doctor.deactivate();

@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -58,7 +59,7 @@ public class FieldValuesController {
         var fieldValue = fieldValueRepository.getReferenceById(id);
 
         if (!fieldValue.getEnabled()) {
-            return ResponseEntity.status(304).header("X-Custom-Message", "Field is already disabled").build();
+            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).header("X-Custom-Message", "Field is already disabled").build();
         }
 
         fieldValue.deactivate();

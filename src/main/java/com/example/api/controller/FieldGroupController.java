@@ -42,7 +42,7 @@ public class FieldGroupController {
         var fieldGroupExists = fieldGroupRepository.existsByName(data.name());
 
         if (fieldGroupExists) {
-//            return ResponseEntity.status(409).header("X-Custom-Message", "Filed group " + data.name() + " is already registered").build();
+//            return ResponseEntity.status(HttpStatus.CONFLICT).header("X-Custom-Message", "Filed group " + data.name() + " is already registered").build();
 //            return ResponseEntity.status(HttpStatus.CONFLICT).header(HttpHeaders.LOCATION, "http://resource/id").build();
 //            return ResponseEntity.status(HttpStatus.CONFLICT).header(HttpHeaders.LOCATION, "http://resource/id").body("Filed group " + data.name() + " is already registered");
             Map<String, String> jsonResponse = Map.of("message", "Field group " + data.name() + " is already registered");
@@ -89,7 +89,7 @@ public class FieldGroupController {
         var fieldGroup = fieldGroupRepository.getReferenceById(id);
 
         if (!fieldGroup.getEnabled()) {
-            return ResponseEntity.status(304).header("X-Custom-Message", "Field group is already disabled").build();
+            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).header("X-Custom-Message", "Field group is already disabled").build();
         }
 
         fieldGroup.deactivate();

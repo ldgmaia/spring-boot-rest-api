@@ -86,11 +86,18 @@ public class CategoryGroupController {
     @DeleteMapping("/{id}")
     @Transactional
     public ResponseEntity delete(@PathVariable Long id) { // route is /doctors/1, for example
+
+        var categoryGroupHasCategories = categoryRepository.existsByCategoryGroupId(id);
+        if (categoryGroupHasCategories) {
+            Map<String, String> jsonResponse = Map.of("message", "Category group has categories under it and cannot be deactivated");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(jsonResponse);
+        }
+
         //        repository.deleteById(id); // hard delete from database
         var categoryGroup = categoryGroupRepository.getReferenceById(id);
 
         if (!categoryGroup.getEnabled()) {
-            return ResponseEntity.status(304).header("X-Custom-Message", "Category group is already disabled").build();
+            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).header("X-Custom-Message", "Category group is already disabled").build();
         }
 
         categoryGroup.deactivate();
