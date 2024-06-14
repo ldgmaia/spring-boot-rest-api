@@ -28,9 +28,6 @@ public class ValidateFieldDataTypeForValue implements FieldValueValidator {
         DataType dataType = field.getDataType();
         String value = data.valueData();
 
-        System.out.println(dataType); // Data Type
-        System.out.println(value); // Value
-
         switch (dataType) {
             case BOOLEAN:
                 if (!value.equalsIgnoreCase("true") && !value.equalsIgnoreCase("false")) {

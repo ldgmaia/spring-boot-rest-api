@@ -37,7 +37,7 @@ public class FieldService {
         }
 
         var field = new Field(new FieldRegisterDTO(data.name(), data.isMultiple(), data.dataType(), data.fieldType(), fieldGroup));
-        System.out.println(field);
+
         fieldRepository.save(field);
 
         return new FieldInfoDTO(field);

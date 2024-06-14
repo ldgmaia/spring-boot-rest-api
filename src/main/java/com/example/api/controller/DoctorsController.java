@@ -54,15 +54,9 @@ public class DoctorsController {
 
         // Retrieve the authenticated user's username
 //        String username = userDetails.getId()
-//        System.out.println(userDetails.getId());
-//        System.out.println(headers.entrySet());
-
 //        String method = request.getMethod();
 //        String uri = request.getRequestURI();
-//
-//        System.out.println(method);
-//        System.out.println(uri);
-//
+
 //        if (!userPermissionRepository.existsByUserIdAndPermission(userDetails.getId(), method + " " + uri)) { // the value is "GET /api/v1/doctors"
 //            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 //        }
@@ -71,7 +65,6 @@ public class DoctorsController {
 //        User user = userRepository.findByUsername(username);
 
         // You can access the user's properties such as id, name, etc.
-//        System.out.println(user.getId());
 
         var page = doctorRepository.findAllByActiveTrue(pagination).map(DoctorListDTO::new); // add pagination with only active doctors to the query. Return of method must be Page
         return ResponseEntity.ok(page);

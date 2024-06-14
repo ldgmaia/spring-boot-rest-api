@@ -28,11 +28,9 @@ public class UserController {
     @Transactional
     public ResponseEntity register(@RequestBody @Valid UserRegisterDTO data, UriComponentsBuilder uriBuilder) {
 
-        System.out.println("before");
         if (repository.findByUsername(data.username()) != null) {
             throw new ValidationException("User already registered");
         }
-        System.out.println("after");
 
         var user = new User(data);
         repository.save(user);

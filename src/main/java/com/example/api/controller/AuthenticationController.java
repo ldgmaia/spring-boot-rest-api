@@ -42,8 +42,6 @@ public class AuthenticationController {
         var authenticationToken = new UsernamePasswordAuthenticationToken(data.username(), data.password());
         var authentication = manager.authenticate(authenticationToken);
 
-        System.out.println(authentication);
-
         var tokenJWT = tokenService.generateToken((User) authentication.getPrincipal());
 
         var user = userRepository.findByUsername(data.username());
