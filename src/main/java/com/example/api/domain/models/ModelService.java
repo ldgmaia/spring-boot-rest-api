@@ -2,14 +2,14 @@ package com.example.api.domain.models;
 
 import com.example.api.domain.modelfieldsvalues.ModelFieldValueRegisterDTO;
 import com.example.api.domain.modelfieldsvalues.ModelFieldsValues;
-import com.example.api.repositories.CategoryRepository;
-import com.example.api.repositories.FieldValueRepository;
-import com.example.api.repositories.ModelFieldValueRepository;
-import com.example.api.repositories.ModelRepository;
+import com.example.api.domain.sectionareas.SectionArea;
+import com.example.api.domain.sectionareas.SectionAreaRegisterDTO;
+import com.example.api.domain.sections.Section;
+import com.example.api.domain.sections.SectionRegisterDTO;
+import com.example.api.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-
-import java.util.stream.Collectors;
 
 @Service
 public class ModelService {
@@ -26,26 +26,47 @@ public class ModelService {
     @Autowired
     private ModelFieldValueRepository modelFieldValueRepository;
 
+    @Autowired
+    private SectionRepository sectionRepository;
+
+    @Autowired
+    private SectionAreaRepository sectionAreaRepository;
+
 //    @Autowired
 //    private List<FieldValidator> validators; // Spring boot will automatically detect that a List is being ejected and will get all classes that implements this interface and will inject the validators automatically
 
 
     public ModelInfoDTO register(ModelRequestDTO data) {
 //        validators.forEach(v -> v.validate(data));
+        try {
+            var category = categoryRepository.getReferenceById(data.categoryId());
 
-        var category = categoryRepository.getReferenceById(data.categoryId());
+            var model = new Model(new ModelRegisterDTO(data.name(), data.description(), data.identifier(), data.needsMpn(), category));
+            modelRepository.save(model);
 
-        var model = new Model(new ModelRegisterDTO(data.name(), data.description(), data.identifier(), data.needsMpn(), category));
-        modelRepository.save(model);
-        
-        data.modelFieldsValues().stream()
-                .map(mfv -> {
-                    var modelFieldValue = new ModelFieldsValues(new ModelFieldValueRegisterDTO(fieldValueRepository.findByFieldIdAndValueDataId(mfv.fieldId(), mfv.valueDataId()), model));
-                    return modelFieldValueRepository.save(modelFieldValue);
-                })
-                .collect(Collectors.toList());
+            data.modelFieldsValues().stream()
+                    .forEach(mfv -> {
+                        var modelFieldValue = new ModelFieldsValues(new ModelFieldValueRegisterDTO(fieldValueRepository.findByFieldIdAndValueDataId(mfv.fieldId(), mfv.valueDataId()), model));
+                        modelFieldValueRepository.save(modelFieldValue);
+                    });
 
-        return new ModelInfoDTO(model);
+            data.sections().stream().forEach(s -> {
+                var section = new Section(new SectionRegisterDTO(s.name(), s.sectionOrder(), model));
+                sectionRepository.save(section);
+                s.areas().stream().forEach(sa -> {
+                    var sectionArea = new SectionArea(new SectionAreaRegisterDTO(sa.name(), section, sa.areaOrder(), sa.printOnLabel(), sa.printAreaNameOnLabel(), sa.orderOnLabel(), sa.isCritical()));
+                    sectionAreaRepository.save(sectionArea);
+                });
+
+            });
+
+            return new ModelInfoDTO(model);
+        } catch (
+                DataIntegrityViolationException ex) {
+            throw new DataIntegrityViolationException("Database error: " + ex.getMostSpecificCause().getMessage());
+//            throw new UniqueConstraintViolationException("A unique constraint was violated: " + ex.getMostSpecificCause().getMessage());
+        }
+
     }
 
 //    public FieldInfoDTO updateInfo(FieldUpdateDTO data) {

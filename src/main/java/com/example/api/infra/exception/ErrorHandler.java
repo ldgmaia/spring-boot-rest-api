@@ -2,6 +2,7 @@ package com.example.api.infra.exception;
 
 import com.example.api.domain.ValidationException;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -33,6 +34,18 @@ public class ErrorHandler {
 //        return ResponseEntity.badRequest().body(exception.getMessage());
     }
 
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity handleDataIntegrityViolationException(DataIntegrityViolationException exception) {
+        Map<String, String> jsonResponse = Map.of("message", exception.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(jsonResponse);
+    }
+
+    @ExceptionHandler(UniqueConstraintViolationException.class)
+    public ResponseEntity handleUniqueConstraintViolationException(UniqueConstraintViolationException exception) {
+        Map<String, String> jsonResponse = Map.of("message", exception.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(jsonResponse);
+    }
+
     private record ErrorDataValidation(String field, String message) {
 
         public ErrorDataValidation(FieldError error) {
@@ -40,4 +53,6 @@ public class ErrorHandler {
         }
 
     }
+
+
 }
