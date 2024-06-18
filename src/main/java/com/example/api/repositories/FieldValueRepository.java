@@ -39,4 +39,5 @@ public interface FieldValueRepository extends JpaRepository<FieldValue, Long> {
             """)
     List<ValueInfoDTO> findAllEnabledValuesByFieldId(Long fieldId);
 
+    FieldValue findByFieldIdAndValueDataId(Long fieldId, Long valueDataId);
 }

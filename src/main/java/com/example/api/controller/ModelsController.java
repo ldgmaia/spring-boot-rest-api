@@ -30,7 +30,9 @@ public class ModelsController {
     @PostMapping
     @Transactional
     public ResponseEntity register(@RequestBody @Valid ModelRequestDTO data, UriComponentsBuilder uriBuilder) {
-        System.out.println(data);
+//        System.out.println(data.modelFieldsValues());
+
+//        return ResponseEntity.ok().body(data.modelFieldsValues());
 
 //        if (data.fieldGroupId() != null) {
 //            var fieldGroupExists = fieldGroupRepository.existsById(data.fieldGroupId());
@@ -41,6 +43,7 @@ public class ModelsController {
 //            }
 //        }
 //
+
         var model = modelService.register(data);
         var uri = uriBuilder.path("/models/{id}").buildAndExpand(model.id()).toUri();
 

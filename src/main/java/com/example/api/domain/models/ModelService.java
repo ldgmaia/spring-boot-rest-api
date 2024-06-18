@@ -1,9 +1,15 @@
 package com.example.api.domain.models;
 
+import com.example.api.domain.modelfieldsvalues.ModelFieldValueRegisterDTO;
+import com.example.api.domain.modelfieldsvalues.ModelFieldsValues;
 import com.example.api.repositories.CategoryRepository;
+import com.example.api.repositories.FieldValueRepository;
+import com.example.api.repositories.ModelFieldValueRepository;
 import com.example.api.repositories.ModelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.stream.Collectors;
 
 @Service
 public class ModelService {
@@ -13,6 +19,12 @@ public class ModelService {
 
     @Autowired
     private ModelRepository modelRepository;
+
+    @Autowired
+    private FieldValueRepository fieldValueRepository;
+
+    @Autowired
+    private ModelFieldValueRepository modelFieldValueRepository;
 
 //    @Autowired
 //    private List<FieldValidator> validators; // Spring boot will automatically detect that a List is being ejected and will get all classes that implements this interface and will inject the validators automatically
@@ -24,8 +36,14 @@ public class ModelService {
         var category = categoryRepository.getReferenceById(data.categoryId());
 
         var model = new Model(new ModelRegisterDTO(data.name(), data.description(), data.identifier(), data.needsMpn(), category));
-
         modelRepository.save(model);
+        
+        data.modelFieldsValues().stream()
+                .map(mfv -> {
+                    var modelFieldValue = new ModelFieldsValues(new ModelFieldValueRegisterDTO(fieldValueRepository.findByFieldIdAndValueDataId(mfv.fieldId(), mfv.valueDataId()), model));
+                    return modelFieldValueRepository.save(modelFieldValue);
+                })
+                .collect(Collectors.toList());
 
         return new ModelInfoDTO(model);
     }
