@@ -67,10 +67,10 @@ public class FieldValuesController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity list(@PathVariable Long id) {
+    @GetMapping("/{fieldId}")
+    public ResponseEntity list(@PathVariable Long fieldId) {
 
-        var list = fieldValueService.findAllValuesByFieldId(id);
+        var list = fieldValueService.findAllValuesByFieldId(fieldId);
 
         return ResponseEntity.ok(list);
     }

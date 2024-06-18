@@ -42,5 +42,4 @@ public class CategoryField {
         this.isMandatory = data.isMandatory();
         this.printOnLabel = data.printOnLabel();
     }
-
 }

@@ -7,8 +7,10 @@ import com.example.api.domain.categorycomponent.CategoryComponentRegisterDTO;
 import com.example.api.domain.categoryfield.CategoryField;
 import com.example.api.domain.categoryfield.CategoryFieldRegisterDTO;
 import com.example.api.domain.categoryfield.CategoryFieldUpdateDTO;
+import com.example.api.domain.categoryfield.CategoryFieldsValuesInfoDTO;
 import com.example.api.domain.categorygroups.CategoryGroupInfoDTO;
 import com.example.api.domain.fields.Field;
+import com.example.api.domain.values.ValueInfoDTO;
 import com.example.api.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,6 +35,9 @@ public class CategoryService {
 
     @Autowired
     private CategoryComponentRepository categoryComponentRepository;
+
+    @Autowired
+    private FieldValueRepository fieldValueRepository;
 
     @Autowired
     private FieldRepository fieldRepository;
@@ -223,7 +228,13 @@ public class CategoryService {
         // NOTES: And in this example I defined the in the repository the format according to my DTO.
         //        I prefer the first approach compared to this one, since is clear to understand what is happening, but this second way is less verbose in the service class
         // Fetch category fields
-        var categoryFields = categoryFieldsRepository.findAllEnabledByCategoryId(id);
+//        var categoryFields = categoryFieldsRepository.findAllEnabledByCategoryId(id);
+        var categoryFields = categoryFieldsRepository.findAllEnabledByCategoryId(id).stream()
+                .map(categoryField -> {
+                    List<ValueInfoDTO> values = fieldValueRepository.findAllEnabledValuesByFieldId(categoryField.fieldId());
+                    return new CategoryFieldsValuesInfoDTO(categoryFieldsRepository.getReferenceById(categoryField.id()), values);
+                })
+                .toList();
 
         // Assemble the final DTO
         return new CategoryInfoDetailsDTO(
