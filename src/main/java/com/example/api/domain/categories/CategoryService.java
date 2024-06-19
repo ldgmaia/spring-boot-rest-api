@@ -137,28 +137,6 @@ public class CategoryService {
             }
         }
 
-//        var parentCategoryId = data.parentCategoryId();
-//        if (parentCategoryId != null) {
-//            var parentCategoryExists = categoryRepository.existsById(parentCategoryId);
-//            if (parentCategoryExists) {
-//                var parentCategory = categoryComponentRepository.findCategoryComponentByChildCategoryId(category.getId());
-//                var newParentCategory = categoryRepository.findById(data.parentCategoryId())
-//                        .orElseThrow(() -> new ValidationException("Parent Category not found"));
-//
-//                if (parentCategory != null) {
-//                    parentCategory.setParentCategory(newParentCategory);
-//                } else {
-//                    var categoryComponent = new CategoryComponent(new CategoryComponentRegisterDTO(category, newParentCategory));
-//                    categoryComponentRepository.save(categoryComponent);
-//                }
-//            }
-//        } else {
-//            var parentCategory = categoryComponentRepository.findCategoryComponentByChildCategoryId(category.getId());
-//            if (parentCategory != null) {
-//                categoryComponentRepository.deleteById(parentCategory.getId()); // hard delete from database
-//            }
-//        }
-
         // handling category fields
         List<CategoryFieldUpdateDTO> newFieldList = data.fields();
         List<CategoryField> currentFieldList = categoryFieldsRepository.findAllByEnabledTrueAndCategoryId(id);

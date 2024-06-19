@@ -1,7 +1,6 @@
 package com.example.api.controller;
 
 import com.example.api.domain.ValidationException;
-import com.example.api.domain.categories.Category;
 import com.example.api.domain.categories.CategoryListDTO;
 import com.example.api.domain.categories.CategoryRequestDTO;
 import com.example.api.domain.categories.CategoryService;
@@ -87,7 +86,7 @@ public class CategoryController {
 
     @GetMapping("/{id}")
     public ResponseEntity detail(@PathVariable Long id) {
-        Category category = categoryRepository.findById(id)
+        categoryRepository.findById(id)
                 .orElseThrow(() -> new ValidationException("Category not found"));
 
         var categoryDetails = categoryService.getCategoryDetails(id);

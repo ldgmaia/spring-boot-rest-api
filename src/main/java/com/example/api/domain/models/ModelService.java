@@ -1,15 +1,23 @@
 package com.example.api.domain.models;
 
+import com.example.api.domain.ValidationException;
+import com.example.api.domain.categories.CategoryInfoDTO;
+import com.example.api.domain.modelfieldsvalues.ModelFieldValueInfoDTO;
 import com.example.api.domain.modelfieldsvalues.ModelFieldValueRegisterDTO;
 import com.example.api.domain.modelfieldsvalues.ModelFieldsValues;
 import com.example.api.domain.sectionareas.SectionArea;
+import com.example.api.domain.sectionareas.SectionAreaInfoDTO;
 import com.example.api.domain.sectionareas.SectionAreaRegisterDTO;
 import com.example.api.domain.sections.Section;
 import com.example.api.domain.sections.SectionRegisterDTO;
+import com.example.api.domain.sections.SectionWithAreasDTO;
 import com.example.api.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ModelService {
@@ -44,53 +52,172 @@ public class ModelService {
             var model = new Model(new ModelRegisterDTO(data.name(), data.description(), data.identifier(), data.needsMpn(), category));
             modelRepository.save(model);
 
-            data.modelFieldsValues().stream()
-                    .forEach(mfv -> {
-                        var modelFieldValue = new ModelFieldsValues(new ModelFieldValueRegisterDTO(fieldValueRepository.findByFieldIdAndValueDataId(mfv.fieldId(), mfv.valueDataId()), model));
-                        modelFieldValueRepository.save(modelFieldValue);
-                    });
+            if (data.modelFieldsValues() != null) {
+                data.modelFieldsValues()
+                        .forEach(mfv -> {
+                            var modelFieldValue = new ModelFieldsValues(new ModelFieldValueRegisterDTO(fieldValueRepository.findByFieldIdAndValueDataId(mfv.fieldId(), mfv.valueDataId()), model));
+                            modelFieldValueRepository.save(modelFieldValue);
+                        });
+            }
+            if (data.sections() != null) {
+                data.sections().forEach(s -> {
+                    var section = new Section(new SectionRegisterDTO(s.name(), s.sectionOrder(), model));
+                    sectionRepository.save(section);
 
-            data.sections().stream().forEach(s -> {
-                var section = new Section(new SectionRegisterDTO(s.name(), s.sectionOrder(), model));
-                sectionRepository.save(section);
-                s.areas().stream().forEach(sa -> {
-                    var sectionArea = new SectionArea(new SectionAreaRegisterDTO(sa.name(), section, sa.areaOrder(), sa.printOnLabel(), sa.printAreaNameOnLabel(), sa.orderOnLabel(), sa.isCritical()));
-                    sectionAreaRepository.save(sectionArea);
+                    if (s.areas() != null) {
+                        s.areas().forEach(sa -> {
+                            var sectionArea = new SectionArea(new SectionAreaRegisterDTO(sa.name(), section, sa.areaOrder(), sa.printOnLabel(), sa.printAreaNameOnLabel(), sa.orderOnLabel(), sa.isCritical()));
+                            sectionAreaRepository.save(sectionArea);
+                        });
+                    }
+
                 });
-
-            });
+            }
 
             return new ModelInfoDTO(model);
         } catch (
                 DataIntegrityViolationException ex) {
             throw new DataIntegrityViolationException("Database error: " + ex.getMostSpecificCause().getMessage());
-//            throw new UniqueConstraintViolationException("A unique constraint was violated: " + ex.getMostSpecificCause().getMessage());
         }
-
     }
 
-//    public FieldInfoDTO updateInfo(FieldUpdateDTO data) {
+    public ModelInfoDetailsDTO getModelDetails(Long id) {
+        // Fetch category details
+        var model = modelRepository.findById(id)
+                .orElseThrow(() -> new ValidationException("Model not found"));
+
+        List<SectionWithAreasDTO> sections = sectionRepository.findAllByModelId(id).stream().map(s -> {
+            List<SectionAreaInfoDTO> areas = sectionAreaRepository.findAllBySectionId(s.getId());
+            return new SectionWithAreasDTO(s, areas);
+        }).collect(Collectors.toList());
+
+        List<ModelFieldValueInfoDTO> fields = modelFieldValueRepository.findFieldsValuesByModelId(id);
+
+        // Assemble the final DTO
+        return new ModelInfoDetailsDTO(
+                model.getId(),
+                model.getName(),
+                model.getDescription(),
+                model.getIdentifier(),
+                model.getEnabled(),
+                model.getNeedsMpn(),
+                new CategoryInfoDTO(model.getCategory()),
+                fields,
+                sections
+        );
+    }
+
+    public ModelInfoDTO update(ModelRequestDTO data, Long id) {
+        var model = modelRepository.findById(id).orElseThrow(() -> new RuntimeException("Model not found"));
+
+        model.setName(data.name());
+        model.setDescription(data.description());
+        model.setIdentifier(data.identifier());
+        model.setNeedsMpn(data.needsMpn());
+
+        var category = categoryRepository.getReferenceById(data.categoryId());
+        model.setCategory(category);
+
+//        // Handle model fields values
+//        Map<ModelFieldId, ModelFieldsValues> existingFieldValuesMap = model.getModelFieldsValues().stream()
+//                .collect(Collectors.toMap(
+//                        mfv -> new ModelFieldId(mfv.getField().getId(), mfv.getValueData().getId()),
+//                        mfv -> mfv
+//                ));
 //
-//        // check if name is available
-//        var fieldNewInfo = fieldRepository.findByName(data.name());
-//        if (!fieldNewInfo.getId().equals(data.id())) {
-//            throw new ValidationException("Field name already being used");
+//        var newFieldValuesMap = data.modelFieldsValues().stream()
+//                .collect(Collectors.toMap(
+//                        mfv -> new ModelFieldId(mfv.fieldId(), mfv.valueDataId()),
+//                        mfv -> new ModelFieldsValues(new ModelFieldValueRegisterDTO(
+//                                fieldValueRepository.findByFieldIdAndValueDataId(mfv.fieldId(), mfv.valueDataId()),
+//                                model
+//                        ))
+//                ));
+//
+//        // Remove old field values not present in the new data
+//        for (var key : existingFieldValuesMap.keySet()) {
+//            if (!newFieldValuesMap.containsKey(key)) {
+//                modelFieldValueRepository.delete(existingFieldValuesMap.get(key));
+//            }
 //        }
 //
-//        Field field = fieldRepository.getReferenceById(data.id());
+//        // Add or keep new field values
+//        for (var key : newFieldValuesMap.keySet()) {
+//            if (!existingFieldValuesMap.containsKey(key)) {
+//                modelFieldValueRepository.save(newFieldValuesMap.get(key));
+//            }
+//        }
 //
-//        var fieldGroup = fieldGroupRepository.getReferenceById(data.fieldGroupId());
+//        // Handle sections and areas
+//        Map<Long, Section> existingSectionsMap = model.getSections().stream()
+//                .collect(Collectors.toMap(Section::getId, section -> section));
 //
-//        field.setName(data.name());
-//        field.setFieldGroup(fieldGroup);
-////        field.setFieldType(data.fieldType());
-////        field.setDataType(data.dataType());
-////        field.setUpdatedAt(LocalDateTime.now());
-////        field.setIsMultiple(data.isMultiple() != null ? data.isMultiple() : false);
+//        var newSectionsMap = data.sections().stream()
+//                .collect(Collectors.toMap(
+//                        SectionDTO::id,
+//                        s -> new Section(new SectionRegisterDTO(s.name(), s.sectionOrder(), model))
+//                ));
 //
-//        return new FieldInfoDTO(field);
-//    }
+//        // Update or delete existing sections
+//        for (var id : existingSectionsMap.keySet()) {
+//            if (!newSectionsMap.containsKey(id)) {
+//                sectionRepository.delete(existingSectionsMap.get(id));
+//            } else {
+//                Section section = existingSectionsMap.get(id);
+//                SectionDTO newSection = data.sections().stream().filter(s -> s.id() == id).findFirst().orElseThrow();
+//                section.setName(newSection.name());
+//                section.setSectionOrder(newSection.sectionOrder());
 //
+//                Map<Long, SectionArea> existingAreasMap = section.getAreas().stream()
+//                        .collect(Collectors.toMap(SectionArea::getId, area -> area));
+//
+//                var newAreasMap = newSection.areas().stream()
+//                        .collect(Collectors.toMap(
+//                                SectionAreaDTO::id,
+//                                sa -> new SectionArea(new SectionAreaRegisterDTO(
+//                                        sa.name(), section, sa.areaOrder(), sa.printOnLabel(),
+//                                        sa.printAreaNameOnLabel(), sa.orderOnLabel(), sa.isCritical()
+//                                ))
+//                        ));
+//
+//                // Update or delete existing areas
+//                for (var areaId : existingAreasMap.keySet()) {
+//                    if (!newAreasMap.containsKey(areaId)) {
+//                        sectionAreaRepository.delete(existingAreasMap.get(areaId));
+//                    } else {
+//                        SectionArea area = existingAreasMap.get(areaId);
+//                        SectionAreaDTO newArea = newSection.areas().stream().filter(a -> a.id() == areaId).findFirst().orElseThrow();
+//                        area.setName(newArea.name());
+//                        area.setAreaOrder(newArea.areaOrder());
+//                        area.setPrintOnLabel(newArea.printOnLabel());
+//                        area.setPrintAreaNameOnLabel(newArea.printAreaNameOnLabel());
+//                        area.setOrderOnLabel(newArea.orderOnLabel());
+//                        area.setCritical(newArea.isCritical());
+//                    }
+//                }
+//
+//                // Add new areas
+//                for (var areaId : newAreasMap.keySet()) {
+//                    if (!existingAreasMap.containsKey(areaId)) {
+//                        sectionAreaRepository.save(newAreasMap.get(areaId));
+//                    }
+//                }
+//            }
+//        }
+//
+//        // Add new sections
+//        for (var id : newSectionsMap.keySet()) {
+//            if (!existingSectionsMap.containsKey(id)) {
+//                sectionRepository.save(newSectionsMap.get(id));
+//                newSectionsMap.get(id).getAreas().forEach(sectionAreaRepository::save);
+//            }
+//        }
+
+        modelRepository.save(model);
+        return new ModelInfoDTO(model);
+    }
+//}
+
 ////    public Page<Field> getAllEnabledFieldsByFieldGroupId(Long fieldGroupId, Pageable pageable) {
 ////        return fieldRepository.findByEnabledTrueAndFieldGroup_Id(fieldGroupId, pageable);
 ////    }

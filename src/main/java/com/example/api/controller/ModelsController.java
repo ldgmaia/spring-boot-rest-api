@@ -1,16 +1,20 @@
 package com.example.api.controller;
 
+import com.example.api.domain.models.ModelInfoDTO;
 import com.example.api.domain.models.ModelRequestDTO;
 import com.example.api.domain.models.ModelService;
+import com.example.api.repositories.ModelRepository;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
@@ -21,9 +25,9 @@ public class ModelsController {
     @Autowired
     private ModelService modelService;
 
-//    @Autowired
-//    private FieldRepository fieldRepository;
-//
+    @Autowired
+    private ModelRepository modelRepository;
+
 //    @Autowired
 //    private FieldGroupRepository fieldGroupRepository;
 
@@ -50,21 +54,19 @@ public class ModelsController {
         return ResponseEntity.created(uri).body("ok");
     }
 
-//    @GetMapping
-//    public ResponseEntity<Page<FieldListDTO>> list(HttpServletRequest request, @PageableDefault(size = 100, page = 0, sort = {"name"}) Pageable pagination, @RequestHeader HttpHeaders headers) {
-//        var page = fieldRepository.findAllByEnabledTrue(pagination).map(FieldListDTO::new);
-//        return ResponseEntity.ok(page);
-//    }
-//
-//    @PutMapping
-//    @Transactional
-//    public ResponseEntity update(@RequestBody @Valid FieldUpdateDTO data) {
-////        var field = fieldRepository.getReferenceById(data.id());
-//        var field = fieldService.updateInfo(data);
-//
-//        return ResponseEntity.ok(field);
-//    }
-//
+    @GetMapping
+    public ResponseEntity<Page<ModelInfoDTO>> list(HttpServletRequest request, @PageableDefault(size = 100, page = 0, sort = {"name"}) Pageable pagination, @RequestHeader HttpHeaders headers) {
+        var page = modelRepository.findAll(pagination).map(ModelInfoDTO::new);
+        return ResponseEntity.ok(page);
+    }
+
+    @PutMapping("/{id}")
+    @Transactional
+    public ResponseEntity update(@RequestBody @Valid ModelRequestDTO data, @PathVariable Long id) {
+        var field = modelService.update(data, id);
+        return ResponseEntity.ok(field);
+    }
+
 //    @DeleteMapping("/{id}")
 //    @Transactional
 //    public ResponseEntity delete(@PathVariable Long id) { // route is /doctors/1, for example
@@ -79,18 +81,24 @@ public class ModelsController {
 //
 //        return ResponseEntity.noContent().build();
 //    }
-//
-//    @GetMapping("/{id}")
-//    public ResponseEntity detail(@PathVariable Long id) {
+
+    @GetMapping("/{id}")
+    public ResponseEntity detail(@PathVariable Long id) {
+
+//        modelRepository.findById(id)
+//                .orElseThrow(() -> new ValidationException("Model not found"));
+
+        var modelDetails = modelService.getModelDetails(id);
+        return ResponseEntity.ok(modelDetails);
 //        try {
-//            var field = fieldRepository.getReferenceById(id);
-//            return ResponseEntity.ok(new FieldInfoDTO(field));
+//            var model = modelRepository.getReferenceById(id);
+//            return ResponseEntity.ok(new ModelInfoDTO(model));
 //        } catch (EntityNotFoundException ex) {
-//            Map<String, String> jsonResponse = Map.of("message", "Field not found");
+//            Map<String, String> jsonResponse = Map.of("message", "Model not found");
 //            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(jsonResponse);
 //        }
-//    }
-//
+    }
+
 //    @GetMapping("/field-group/{fieldGroupId}")
 //    public ResponseEntity<FieldsByGroupDTO> getEnabledFieldsByFieldGroupId(
 //            @PathVariable Long fieldGroupId
