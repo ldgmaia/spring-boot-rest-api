@@ -14,7 +14,7 @@ public interface SectionAreaRepository extends JpaRepository<SectionArea, Long> 
                 FROM SectionArea sa
                 WHERE sa.section.id = :sectionId
             """)
-    List<SectionAreaInfoDTO> findAllBySectionId(Long sectionId);
+    List<SectionAreaInfoDTO> findSectionAreasBySectionId(Long sectionId);
 
 //    @Query(value = """
 //                SELECT NEW com.example.api.domain.values.ValueInfoDTO(vd.id, vd.valueData, vd.enabled, fv.score)
@@ -24,5 +24,7 @@ public interface SectionAreaRepository extends JpaRepository<SectionArea, Long> 
 //                AND fv.enabled = true
 //            """)
 //    List<ValueInfoDTO> findAllEnabledValuesByFieldId(Long fieldId);
+
+    List<SectionArea> findAllBySectionId(Long sectionId);
 
 }

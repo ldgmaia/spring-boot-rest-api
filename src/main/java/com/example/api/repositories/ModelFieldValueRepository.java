@@ -19,4 +19,6 @@ public interface ModelFieldValueRepository extends JpaRepository<ModelFieldsValu
             WHERE mfv.model.id = :modelId
             """)
     List<ModelFieldValueInfoDTO> findFieldsValuesByModelId(Long modelId);
+
+    List<ModelFieldsValues> findAllByModelId(Long modelId);
 }

@@ -36,8 +36,11 @@ public class ErrorHandler {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity handleDataIntegrityViolationException(DataIntegrityViolationException exception) {
-        Map<String, String> jsonResponse = Map.of("message", exception.getMessage());
+        String friendlyMessage = getFriendlyMessage(exception);
+        Map<String, String> jsonResponse = Map.of("message", friendlyMessage);
         return ResponseEntity.status(HttpStatus.CONFLICT).body(jsonResponse);
+//        Map<String, String> jsonResponse = Map.of("message", exception.getMessage());
+//        return ResponseEntity.status(HttpStatus.CONFLICT).body(jsonResponse);
     }
 
     @ExceptionHandler(UniqueConstraintViolationException.class)
@@ -47,12 +50,19 @@ public class ErrorHandler {
     }
 
     private record ErrorDataValidation(String field, String message) {
-
         public ErrorDataValidation(FieldError error) {
             this(error.getField(), error.getDefaultMessage());
         }
-
     }
 
+    private String getFriendlyMessage(DataIntegrityViolationException exception) {
+        String message = exception.getMessage();
+
+        if (message.contains("Duplicate entry")) {
+            return "A record with the same unique identifier already exists. Please use a different value.";
+        }
+        // Add more checks for other common data integrity violations if needed
+        return "A data integrity violation occurred. Please check your input and try again.";
+    }
 
 }

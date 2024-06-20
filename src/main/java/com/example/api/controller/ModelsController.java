@@ -3,6 +3,7 @@ package com.example.api.controller;
 import com.example.api.domain.models.ModelInfoDTO;
 import com.example.api.domain.models.ModelRequestDTO;
 import com.example.api.domain.models.ModelService;
+import com.example.api.domain.models.ModelUpdateDTO;
 import com.example.api.repositories.ModelRepository;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
@@ -62,7 +63,7 @@ public class ModelsController {
 
     @PutMapping("/{id}")
     @Transactional
-    public ResponseEntity update(@RequestBody @Valid ModelRequestDTO data, @PathVariable Long id) {
+    public ResponseEntity update(@RequestBody @Valid ModelUpdateDTO data, @PathVariable Long id) {
         var field = modelService.update(data, id);
         return ResponseEntity.ok(field);
     }
