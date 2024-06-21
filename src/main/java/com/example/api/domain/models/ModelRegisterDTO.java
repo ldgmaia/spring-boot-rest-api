@@ -10,6 +10,7 @@ public record ModelRegisterDTO(
 
         String description,
         String identifier,
+        String status,
         Boolean needsMpn,
 
         @NotBlank

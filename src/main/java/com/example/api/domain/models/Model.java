@@ -22,6 +22,7 @@ public class Model {
 
     private String description;
     private String identifier;
+    private String status;
     private Boolean enabled;
     private Boolean needsMpn;
 
@@ -34,6 +35,7 @@ public class Model {
         this.name = data.name();
         this.description = data.description();
         this.identifier = data.identifier();
+        this.status = data.status();
         this.needsMpn = data.needsMpn();
         this.category = data.category();
         this.enabled = true;

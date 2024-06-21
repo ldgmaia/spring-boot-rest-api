@@ -11,6 +11,7 @@ public record ModelInfoDetailsDTO(
         String name,
         String description,
         String identifier,
+        String status,
         Boolean enabled,
         Boolean needsMpn,
         CategoryInfoDTO category,

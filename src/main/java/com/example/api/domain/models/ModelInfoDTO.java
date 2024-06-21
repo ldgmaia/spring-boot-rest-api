@@ -7,6 +7,7 @@ public record ModelInfoDTO(
         String name,
         String description,
         String identifier,
+        String status,
         Boolean enabled,
         Boolean needsMpn,
         CategoryInfoDTO category
@@ -17,6 +18,7 @@ public record ModelInfoDTO(
                 model.getName(),
                 model.getDescription(),
                 model.getIdentifier(),
+                model.getStatus(),
                 model.getEnabled(),
                 model.getNeedsMpn(),
                 new CategoryInfoDTO(model.getCategory())

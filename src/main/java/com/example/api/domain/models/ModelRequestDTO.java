@@ -14,6 +14,7 @@ public record ModelRequestDTO(
 
         String description,
         String identifier,
+        String status,
 
         @NotNull
         Long categoryId,

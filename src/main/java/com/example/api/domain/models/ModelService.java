@@ -50,7 +50,7 @@ public class ModelService {
         try {
             var category = categoryRepository.getReferenceById(data.categoryId());
 
-            var model = new Model(new ModelRegisterDTO(data.name(), data.description(), data.identifier(), data.needsMpn(), category));
+            var model = new Model(new ModelRegisterDTO(data.name(), data.description(), data.identifier(), data.status(), data.needsMpn(), category));
             modelRepository.save(model);
 
             if (data.modelFieldsValues() != null) {
@@ -100,6 +100,7 @@ public class ModelService {
                 model.getName(),
                 model.getDescription(),
                 model.getIdentifier(),
+                model.getStatus(),
                 model.getEnabled(),
                 model.getNeedsMpn(),
                 new CategoryInfoDTO(model.getCategory()),
