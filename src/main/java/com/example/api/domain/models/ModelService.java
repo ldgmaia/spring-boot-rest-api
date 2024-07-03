@@ -120,6 +120,40 @@ public class ModelService {
         var category = categoryRepository.getReferenceById(data.categoryId());
         model.setCategory(category);
 
+//        var existingFieldValuesMap = modelFieldValueRepository.findFieldsValuesByModelId(modelId);
+//        System.out.println("existingFieldValuesMap " + existingFieldValuesMap);
+//        System.out.println("data.modelFieldsValues() " + data.modelFieldsValues());
+
+//        // Handle model fields values
+//        Map<ModelFieldId, ModelFieldsValues> existingFieldValuesMap = modelFieldValueRepository.findAllByModelId(modelId).stream()
+//                .collect(Collectors.toMap(
+//                        mfv -> new ModelFieldId(mfv.getField().getId(), mfv.getValueData().getId()),
+//                        mfv -> mfv
+//                ));
+//
+//        var newFieldValuesMap = data.modelFieldsValues().stream()
+//                .collect(Collectors.toMap(
+//                        mfv -> new ModelFieldId(mfv.fieldId(), mfv.valueDataId()),
+//                        mfv -> new ModelFieldsValues(new ModelFieldValueRegisterDTO(
+//                                fieldValueRepository.findByFieldIdAndValueDataId(mfv.fieldId(), mfv.valueDataId()),
+//                                model
+//                        ))
+//                ));
+//
+//        // Remove old field values not present in the new data
+//        for (var key : existingFieldValuesMap.keySet()) {
+//            if (!newFieldValuesMap.containsKey(key)) {
+//                modelFieldValueRepository.delete(existingFieldValuesMap.get(key));
+//            }
+//        }
+//
+//        // Add or keep new field values
+//        for (var key : newFieldValuesMap.keySet()) {
+//            if (!existingFieldValuesMap.containsKey(key)) {
+//                modelFieldValueRepository.save(newFieldValuesMap.get(key));
+//            }
+//        }
+
         // Handle model fields values
         Map<ModelFieldId, ModelFieldsValues> existingFieldValuesMap = modelFieldValueRepository.findAllByModelId(modelId).stream()
                 .collect(Collectors.toMap(
@@ -136,36 +170,38 @@ public class ModelService {
                         ))
                 ));
 
-        if (data.sections() != null) {
-            data.sections().forEach(s -> {
-                var section = new Section(new SectionRegisterDTO(s.name(), s.sectionOrder(), model));
-                sectionRepository.save(section);
+//        if (data.sections() != null) {
+//            data.sections().forEach(s -> {
+//                var section = new Section(new SectionRegisterDTO(s.name(), s.sectionOrder(), model));
+//                sectionRepository.save(section);
+//
+//                if (s.areas() != null) {
+//                    s.areas().forEach(sa -> {
+//                        var sectionArea = new SectionArea(new SectionAreaRegisterDTO(sa.name(), section, sa.areaOrder(), sa.printOnLabel(), sa.printAreaNameOnLabel(), sa.orderOnLabel(), sa.isCritical()));
+//                        sectionAreaRepository.save(sectionArea);
+//                    });
+//                }
+//
+//            });
+//        }
 
-                if (s.areas() != null) {
-                    s.areas().forEach(sa -> {
-                        var sectionArea = new SectionArea(new SectionAreaRegisterDTO(sa.name(), section, sa.areaOrder(), sa.printOnLabel(), sa.printAreaNameOnLabel(), sa.orderOnLabel(), sa.isCritical()));
-                        sectionAreaRepository.save(sectionArea);
-                    });
-                }
 
-            });
+        // Remove old field values not present in the new data
+        for (var key : existingFieldValuesMap.keySet()) {
+            System.out.println("exist key " + existingFieldValuesMap.get(key));
+            if (!newFieldValuesMap.containsKey(key)) {
+                modelFieldValueRepository.delete(existingFieldValuesMap.get(key));
+            }
         }
 
+        // Add or keep new field values
+        for (var key : newFieldValuesMap.keySet()) {
+            System.out.println("new key " + key.toString());
+            if (!existingFieldValuesMap.containsKey(key)) {
+                modelFieldValueRepository.save(newFieldValuesMap.get(key));
+            }
+        }
 
-//        // Remove old field values not present in the new data
-//        for (var key : existingFieldValuesMap.keySet()) {
-//            if (!newFieldValuesMap.containsKey(key)) {
-//                modelFieldValueRepository.delete(existingFieldValuesMap.get(key));
-//            }
-//        }
-//
-//        // Add or keep new field values
-//        for (var key : newFieldValuesMap.keySet()) {
-//            if (!existingFieldValuesMap.containsKey(key)) {
-//                modelFieldValueRepository.save(newFieldValuesMap.get(key));
-//            }
-//        }
-//
 //        // Handle sections and areas
 //        Map<Long, Section> existingSectionsMap = sectionRepository.findAllByModelId(modelId).stream()
 //                .collect(Collectors.toMap(Section::getId, section -> section));
@@ -223,8 +259,8 @@ public class ModelService {
 //                }
 //            }
 //        }
-
-        // Add new sections
+//
+////         Add new sections
 //        for (var section : newSectionsMap.keySet()) {
 //            if (!existingSectionsMap.containsKey(section)) {
 //                sectionRepository.save(newSectionsMap.get(section));

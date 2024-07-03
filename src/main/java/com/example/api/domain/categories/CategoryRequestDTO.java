@@ -21,6 +21,6 @@ public record CategoryRequestDTO(
         Boolean needsPost,
 
         @NotNull
-        List<CategoryFieldUpdateDTO> fields
+        List<CategoryFieldUpdateDTO> categoryFieldsValues
 ) {
 }

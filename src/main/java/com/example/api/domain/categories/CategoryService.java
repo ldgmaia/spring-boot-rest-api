@@ -55,7 +55,7 @@ public class CategoryService {
         categoryRepository.save(category);
 
         // Handling fields
-        List<CategoryFieldUpdateDTO> fieldList = data.fields();
+        List<CategoryFieldUpdateDTO> fieldList = data.categoryFieldsValues();
         if (fieldList != null) {
             for (CategoryFieldUpdateDTO field : fieldList) {
 
@@ -138,7 +138,7 @@ public class CategoryService {
         }
 
         // handling category fields
-        List<CategoryFieldUpdateDTO> newFieldList = data.fields();
+        List<CategoryFieldUpdateDTO> newFieldList = data.categoryFieldsValues();
         List<CategoryField> currentFieldList = categoryFieldsRepository.findAllByEnabledTrueAndCategoryId(id);
 
         // Create a map of current fields by field ID for easy lookup

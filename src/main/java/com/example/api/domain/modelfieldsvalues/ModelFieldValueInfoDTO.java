@@ -4,7 +4,7 @@ public record ModelFieldValueInfoDTO(
         Long id,
         Long fieldId,
         String fieldName,
-        Long valueId,
+        Long valueDataId,
         String valueData
 ) {
 //    public ModelFieldValueInfoDTO(Model model) {

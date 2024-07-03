@@ -90,6 +90,7 @@ public class ModelsController {
 //                .orElseThrow(() -> new ValidationException("Model not found"));
 
         var modelDetails = modelService.getModelDetails(id);
+
         return ResponseEntity.ok(modelDetails);
 //        try {
 //            var model = modelRepository.getReferenceById(id);
