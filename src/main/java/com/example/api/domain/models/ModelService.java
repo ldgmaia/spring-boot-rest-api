@@ -16,8 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -188,7 +190,6 @@ public class ModelService {
 
         // Remove old field values not present in the new data
         for (var key : existingFieldValuesMap.keySet()) {
-            System.out.println("exist key " + existingFieldValuesMap.get(key));
             if (!newFieldValuesMap.containsKey(key)) {
                 modelFieldValueRepository.delete(existingFieldValuesMap.get(key));
             }
@@ -196,23 +197,107 @@ public class ModelService {
 
         // Add or keep new field values
         for (var key : newFieldValuesMap.keySet()) {
-            System.out.println("new key " + key.toString());
             if (!existingFieldValuesMap.containsKey(key)) {
                 modelFieldValueRepository.save(newFieldValuesMap.get(key));
             }
         }
 
-//        // Handle sections and areas
-//        Map<Long, Section> existingSectionsMap = sectionRepository.findAllByModelId(modelId).stream()
-//                .collect(Collectors.toMap(Section::getId, section -> section));
-//
+        // Handle sections and areas
+        Map<Long, Section> existingSectionsMap = sectionRepository.findAllByModelId(modelId).stream()
+                .collect(Collectors.toMap(Section::getId, section -> section));
+
+
 //        var newSectionsMap = data.sections().stream()
 //                .collect(Collectors.toMap(
-////                        SectionDTO::id,
 //                        s -> s,
 //                        s -> new Section(new SectionRegisterDTO(s.name(), s.sectionOrder(), model))
 //                ));
-//
+        // Create a map to hold new sections with their areas
+        Map<Long, Section> newSectionsMap = new HashMap<>();
+        data.sections().forEach(s -> {
+            Section section = new Section(new SectionRegisterDTO(s.name(), s.sectionOrder(), model));
+            if (s.id() != null) {
+                section.setId(s.id()); // Ensure the section ID is set for existing sections
+            }
+            newSectionsMap.put(section.getId(), section);
+
+            // Handle areas for the section
+            List<SectionArea> areas = s.areas().stream()
+                    .map(sa -> {
+                        SectionArea area = new SectionArea(new SectionAreaRegisterDTO(
+                                sa.name(), section, sa.areaOrder(), sa.printOnLabel(),
+                                sa.printAreaNameOnLabel(), sa.orderOnLabel(), sa.isCritical()
+                        ));
+                        if (sa.id() != null) {
+                            area.setId(sa.id()); // Ensure the area ID is set for existing areas
+                        }
+                        area.setSection(section); // Set the section for the area
+                        return area;
+                    }).collect(Collectors.toList());
+            section.setAreas(areas);
+        });
+
+        // Update or delete existing sections
+        for (var id : existingSectionsMap.keySet()) {
+            if (!newSectionsMap.containsKey(id)) {
+                sectionRepository.delete(existingSectionsMap.get(id));
+            } else {
+                Section section = existingSectionsMap.get(id);
+                var newSection = data.sections().stream().filter(s -> Objects.equals(s.id(), id)).findFirst().orElseThrow();
+                section.setName(newSection.name());
+                section.setSectionOrder(newSection.sectionOrder());
+
+                // Handle areas for the section
+                Map<Long, SectionArea> existingAreasMap = sectionAreaRepository.findAllBySectionId(section.getId()).stream()
+                        .collect(Collectors.toMap(SectionArea::getId, area -> area));
+
+                Map<Long, SectionArea> newAreasMap = new HashMap<>();
+                newSection.areas().forEach(sa -> {
+                    SectionArea area = new SectionArea(new SectionAreaRegisterDTO(
+                            sa.name(), section, sa.areaOrder(), sa.printOnLabel(),
+                            sa.printAreaNameOnLabel(), sa.orderOnLabel(), sa.isCritical()
+                    ));
+                    if (sa.id() != null) {
+                        area.setId(sa.id()); // Ensure the area ID is set for existing areas
+                    }
+                    area.setSection(section); // Set the section for the area
+                    newAreasMap.put(area.getId(), area);
+                });
+
+                // Update or delete existing areas
+                for (var areaId : existingAreasMap.keySet()) {
+                    if (!newAreasMap.containsKey(areaId)) {
+                        sectionAreaRepository.delete(existingAreasMap.get(areaId));
+                    } else {
+                        SectionArea area = existingAreasMap.get(areaId);
+                        var newArea = newSection.areas().stream().filter(a -> Objects.equals(a.id(), areaId)).findFirst().orElseThrow();
+                        area.setName(newArea.name());
+                        area.setAreaOrder(newArea.areaOrder());
+                        area.setPrintOnLabel(newArea.printOnLabel());
+                        area.setPrintAreaNameOnLabel(newArea.printAreaNameOnLabel());
+                        area.setOrderOnLabel(newArea.orderOnLabel());
+                        area.setIsCritical(newArea.isCritical());
+                    }
+                }
+
+                // Add new areas
+                for (var areaId : newAreasMap.keySet()) {
+                    if (!existingAreasMap.containsKey(areaId)) {
+                        sectionAreaRepository.save(newAreasMap.get(areaId));
+                    }
+                }
+            }
+        }
+
+        // Add new sections
+        for (var section : newSectionsMap.values()) {
+            if (!existingSectionsMap.containsKey(section.getId())) {
+                sectionRepository.save(section);
+                section.getAreas().forEach(sectionAreaRepository::save);
+            }
+        }
+
+
 //        // Update or delete existing sections
 //        for (var id : existingSectionsMap.keySet()) {
 //            if (!newSectionsMap.containsKey(id)) {
@@ -260,12 +345,11 @@ public class ModelService {
 //            }
 //        }
 //
-////         Add new sections
+//        // Add new sections
 //        for (var section : newSectionsMap.keySet()) {
 //            if (!existingSectionsMap.containsKey(section)) {
 //                sectionRepository.save(newSectionsMap.get(section));
 //                sectionAreaRepository.findAllBySectionId(section.id()).forEach(sectionAreaRepository::save);
-////                newSectionsMap.get(id).getAreas().forEach(sectionAreaRepository::save);
 //            }
 //        }
 

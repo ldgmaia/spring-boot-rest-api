@@ -59,6 +59,12 @@ public class ErrorHandler {
         String message = exception.getMessage();
 
         if (message.contains("Duplicate entry")) {
+            String[] parts = message.split("'");
+            String entry = parts[1];
+            String key = parts[3];
+            if (key.contains("sections.models_id")) {
+                return "A section with the name '" + entry.split("-")[1] + "' already exists.";
+            }
             return "A record with the same unique identifier already exists. Please use a different value.";
         }
         // Add more checks for other common data integrity violations if needed
