@@ -2,6 +2,8 @@ package com.example.api.domain.models;
 
 import com.example.api.domain.ValidationException;
 import com.example.api.domain.categories.CategoryInfoDTO;
+import com.example.api.domain.fieldsvalues.FieldValue;
+import com.example.api.domain.fieldsvalues.FieldValueRegisterDTO;
 import com.example.api.domain.modelfieldsvalues.ModelFieldValueInfoDTO;
 import com.example.api.domain.modelfieldsvalues.ModelFieldValueRegisterDTO;
 import com.example.api.domain.modelfieldsvalues.ModelFieldsValues;
@@ -11,15 +13,14 @@ import com.example.api.domain.sectionareas.SectionAreaRegisterDTO;
 import com.example.api.domain.sections.Section;
 import com.example.api.domain.sections.SectionRegisterDTO;
 import com.example.api.domain.sections.SectionWithAreasDTO;
+import com.example.api.domain.values.Value;
+import com.example.api.domain.values.ValueRegisterDTO;
 import com.example.api.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,6 +33,9 @@ public class ModelService {
     private ModelRepository modelRepository;
 
     @Autowired
+    private FieldRepository fieldRepository;
+
+    @Autowired
     private FieldValueRepository fieldValueRepository;
 
     @Autowired
@@ -42,6 +46,10 @@ public class ModelService {
 
     @Autowired
     private SectionAreaRepository sectionAreaRepository;
+
+    @Autowired
+    private ValueRepository valueRepository;
+
 
 //    @Autowired
 //    private List<FieldValidator> validators; // Spring boot will automatically detect that a List is being ejected and will get all classes that implements this interface and will inject the validators automatically
@@ -58,7 +66,20 @@ public class ModelService {
             if (data.modelFieldsValues() != null) {
                 data.modelFieldsValues()
                         .forEach(mfv -> {
-                            var modelFieldValue = new ModelFieldsValues(new ModelFieldValueRegisterDTO(fieldValueRepository.findByFieldIdAndValueDataId(mfv.fieldId(), mfv.valueDataId()), model));
+                            var valueData = valueRepository.findByValueData(mfv.valueData());
+                            if (valueData == null) {
+                                // Create and save new Value object if it doesn't exist
+                                var newValueData = new Value(new ValueRegisterDTO(mfv.valueData()));
+                                valueData = valueRepository.save(newValueData);
+                            }
+
+                            var mfvData = fieldValueRepository.findByFieldIdAndValueDataId(mfv.fieldId(), valueData.getId());
+                            if (mfvData == null) {
+                                // Create and save new FieldValue object if it doesn't exist
+                                var newFieldValue = new FieldValue(new FieldValueRegisterDTO(valueData, null, fieldRepository.getReferenceById(mfv.fieldId())));
+                                mfvData = fieldValueRepository.save(newFieldValue);
+                            }
+                            var modelFieldValue = new ModelFieldsValues(new ModelFieldValueRegisterDTO(mfvData, model));
                             modelFieldValueRepository.save(modelFieldValue);
                         });
             }
@@ -94,7 +115,11 @@ public class ModelService {
             return new SectionWithAreasDTO(s, areas);
         }).collect(Collectors.toList());
 
-        List<ModelFieldValueInfoDTO> fields = modelFieldValueRepository.findFieldsValuesByModelId(id);
+//        List<ModelFieldValueInfoDTO> fields = modelFieldValueRepository.findFieldsValuesByModelId(id);
+        // Fetch fields and sort by fieldId
+        List<ModelFieldValueInfoDTO> fields = modelFieldValueRepository.findFieldsValuesByModelId(id).stream()
+                .sorted(Comparator.comparingLong(ModelFieldValueInfoDTO::fieldId))  // Sort by fieldId
+                .collect(Collectors.toList());
 
         // Assemble the final DTO
         return new ModelInfoDetailsDTO(
@@ -163,14 +188,46 @@ public class ModelService {
                         mfv -> mfv
                 ));
 
+//        System.out.println("data.modelFieldsValues() " + data.modelFieldsValues());
         var newFieldValuesMap = data.modelFieldsValues().stream()
                 .collect(Collectors.toMap(
-                        mfv -> new ModelFieldId(mfv.fieldId(), mfv.valueDataId()),
-                        mfv -> new ModelFieldsValues(new ModelFieldValueRegisterDTO(
-                                fieldValueRepository.findByFieldIdAndValueDataId(mfv.fieldId(), mfv.valueDataId()),
-                                model
-                        ))
+                        mfv -> {
+
+                            var valueData = valueRepository.findByValueData(mfv.valueData());
+                            if (valueData == null) {
+                                // Create and save new Value object if it doesn't exist
+                                var newValueData = new Value(new ValueRegisterDTO(mfv.valueData()));
+                                valueData = valueRepository.save(newValueData);
+                            }
+
+                            var mfvData = fieldValueRepository.findByFieldIdAndValueDataId(mfv.fieldId(), valueData.getId());
+                            if (mfvData == null) {
+                                // Create and save new FieldValue object if it doesn't exist
+                                var newFieldValue = new FieldValue(new FieldValueRegisterDTO(valueData, null, fieldRepository.getReferenceById(mfv.fieldId())));
+                                mfvData = fieldValueRepository.save(newFieldValue);
+                            }
+
+                            return new ModelFieldId(mfvData.getField().getId(), mfvData.getValueData().getId());
+                        },
+                        mfv -> {
+                            var valueData = valueRepository.findByValueData(mfv.valueData());
+                            if (valueData == null) {
+                                // Create and save new Value object if it doesn't exist
+                                var newValueData = new Value(new ValueRegisterDTO(mfv.valueData()));
+                                valueData = valueRepository.save(newValueData);
+                            }
+
+                            var mfvData = fieldValueRepository.findByFieldIdAndValueDataId(mfv.fieldId(), valueData.getId());
+                            if (mfvData == null) {
+                                // Create and save new FieldValue object if it doesn't exist
+                                var newFieldValue = new FieldValue(new FieldValueRegisterDTO(valueData, null, fieldRepository.getReferenceById(mfv.fieldId())));
+                                mfvData = fieldValueRepository.save(newFieldValue);
+                            }
+
+                            return new ModelFieldsValues(new ModelFieldValueRegisterDTO(mfvData, model));
+                        }
                 ));
+
 
 //        if (data.sections() != null) {
 //            data.sections().forEach(s -> {

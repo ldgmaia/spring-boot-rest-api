@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 
 public record ModelFieldValueRequestDTO(
         @NotBlank
-        Long valueDataId,
+        String valueData,
 
         @NotNull
         Long fieldId

@@ -15,10 +15,7 @@ import com.example.api.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -212,6 +209,7 @@ public class CategoryService {
                     List<ValueInfoDTO> values = fieldValueRepository.findAllEnabledValuesByFieldId(categoryField.fieldId());
                     return new CategoryFieldsValuesInfoDTO(categoryFieldsRepository.getReferenceById(categoryField.id()), values);
                 })
+                .sorted(Comparator.comparingLong(CategoryFieldsValuesInfoDTO::fieldId))  // Sort by fieldId
                 .toList();
 
         // Assemble the final DTO
