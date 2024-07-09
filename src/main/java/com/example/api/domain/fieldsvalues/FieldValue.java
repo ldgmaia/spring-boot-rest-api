@@ -29,28 +29,14 @@ public class FieldValue {
     private Double score;
     private Boolean enabled;
 
-//    @CreatedDate
-//    private LocalDateTime createdAt;
-//
-//    @LastModifiedDate
-//    private LocalDateTime updatedAt;
-
     public FieldValue(FieldValueRegisterDTO data) {
         this.valueData = data.valueData();
         this.field = data.field();
         this.score = data.score();
 
         this.enabled = true;
-//        this.createdAt = LocalDateTime.now();
-//        this.updatedAt = LocalDateTime.now();
     }
 
-    //    public void updateInfo(FieldUpdateDTO data) {
-//
-//        this.name = (data.name() != null) ? data.name() : this.name;
-//        this.updatedAt = LocalDateTime.now();
-//    }
-//
     public void deactivate() {
         this.enabled = false;
     }

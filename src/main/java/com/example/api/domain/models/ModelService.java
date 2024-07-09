@@ -147,40 +147,6 @@ public class ModelService {
         var category = categoryRepository.getReferenceById(data.categoryId());
         model.setCategory(category);
 
-//        var existingFieldValuesMap = modelFieldValueRepository.findFieldsValuesByModelId(modelId);
-//        System.out.println("existingFieldValuesMap " + existingFieldValuesMap);
-//        System.out.println("data.modelFieldsValues() " + data.modelFieldsValues());
-
-//        // Handle model fields values
-//        Map<ModelFieldId, ModelFieldsValues> existingFieldValuesMap = modelFieldValueRepository.findAllByModelId(modelId).stream()
-//                .collect(Collectors.toMap(
-//                        mfv -> new ModelFieldId(mfv.getField().getId(), mfv.getValueData().getId()),
-//                        mfv -> mfv
-//                ));
-//
-//        var newFieldValuesMap = data.modelFieldsValues().stream()
-//                .collect(Collectors.toMap(
-//                        mfv -> new ModelFieldId(mfv.fieldId(), mfv.valueDataId()),
-//                        mfv -> new ModelFieldsValues(new ModelFieldValueRegisterDTO(
-//                                fieldValueRepository.findByFieldIdAndValueDataId(mfv.fieldId(), mfv.valueDataId()),
-//                                model
-//                        ))
-//                ));
-//
-//        // Remove old field values not present in the new data
-//        for (var key : existingFieldValuesMap.keySet()) {
-//            if (!newFieldValuesMap.containsKey(key)) {
-//                modelFieldValueRepository.delete(existingFieldValuesMap.get(key));
-//            }
-//        }
-//
-//        // Add or keep new field values
-//        for (var key : newFieldValuesMap.keySet()) {
-//            if (!existingFieldValuesMap.containsKey(key)) {
-//                modelFieldValueRepository.save(newFieldValuesMap.get(key));
-//            }
-//        }
-
         // Handle model fields values
         Map<ModelFieldId, ModelFieldsValues> existingFieldValuesMap = modelFieldValueRepository.findAllByModelId(modelId).stream()
                 .collect(Collectors.toMap(
@@ -228,23 +194,6 @@ public class ModelService {
                         }
                 ));
 
-
-//        if (data.sections() != null) {
-//            data.sections().forEach(s -> {
-//                var section = new Section(new SectionRegisterDTO(s.name(), s.sectionOrder(), model));
-//                sectionRepository.save(section);
-//
-//                if (s.areas() != null) {
-//                    s.areas().forEach(sa -> {
-//                        var sectionArea = new SectionArea(new SectionAreaRegisterDTO(sa.name(), section, sa.areaOrder(), sa.printOnLabel(), sa.printAreaNameOnLabel(), sa.orderOnLabel(), sa.isCritical()));
-//                        sectionAreaRepository.save(sectionArea);
-//                    });
-//                }
-//
-//            });
-//        }
-
-
         // Remove old field values not present in the new data
         for (var key : existingFieldValuesMap.keySet()) {
             if (!newFieldValuesMap.containsKey(key)) {
@@ -263,12 +212,6 @@ public class ModelService {
         Map<Long, Section> existingSectionsMap = sectionRepository.findAllByModelId(modelId).stream()
                 .collect(Collectors.toMap(Section::getId, section -> section));
 
-
-//        var newSectionsMap = data.sections().stream()
-//                .collect(Collectors.toMap(
-//                        s -> s,
-//                        s -> new Section(new SectionRegisterDTO(s.name(), s.sectionOrder(), model))
-//                ));
         // Create a map to hold new sections with their areas
         Map<Long, Section> newSectionsMap = new HashMap<>();
         data.sections().forEach(s -> {
@@ -354,80 +297,7 @@ public class ModelService {
             }
         }
 
-
-//        // Update or delete existing sections
-//        for (var id : existingSectionsMap.keySet()) {
-//            if (!newSectionsMap.containsKey(id)) {
-//                sectionRepository.delete(existingSectionsMap.get(id));
-//            } else {
-//                Section section = existingSectionsMap.get(id);
-//                var newSection = data.sections().stream().filter(s -> Objects.equals(s.id(), id)).findFirst().orElseThrow();
-//                section.setName(newSection.name());
-//                section.setSectionOrder(newSection.sectionOrder());
-//
-//                Map<Long, SectionArea> existingAreasMap = sectionAreaRepository.findAllBySectionId(section.getId()).stream()
-//                        .collect(Collectors.toMap(SectionArea::getId, area -> area));
-//
-//                var newAreasMap = newSection.areas().stream()
-//                        .collect(Collectors.toMap(
-//                                sa -> sa,
-//                                sa -> new SectionArea(new SectionAreaRegisterDTO(
-//                                        sa.name(), section, sa.areaOrder(), sa.printOnLabel(),
-//                                        sa.printAreaNameOnLabel(), sa.orderOnLabel(), sa.isCritical()
-//                                ))
-//                        ));
-//
-//                // Update or delete existing areas
-//                for (var areaId : existingAreasMap.keySet()) {
-//                    if (!newAreasMap.containsKey(areaId)) {
-//                        sectionAreaRepository.delete(existingAreasMap.get(areaId));
-//                    } else {
-//                        SectionArea area = existingAreasMap.get(areaId);
-//                        var newArea = newSection.areas().stream().filter(a -> Objects.equals(a.id(), areaId)).findFirst().orElseThrow();
-//                        area.setName(newArea.name());
-//                        area.setAreaOrder(newArea.areaOrder());
-//                        area.setPrintOnLabel(newArea.printOnLabel());
-//                        area.setPrintAreaNameOnLabel(newArea.printAreaNameOnLabel());
-//                        area.setOrderOnLabel(newArea.orderOnLabel());
-//                        area.setIsCritical(newArea.isCritical());
-//                    }
-//                }
-//
-//                // Add new areas
-//                for (var areaId : newAreasMap.keySet()) {
-//                    if (!existingAreasMap.containsKey(areaId)) {
-//                        sectionAreaRepository.save(newAreasMap.get(areaId));
-//                    }
-//                }
-//            }
-//        }
-//
-//        // Add new sections
-//        for (var section : newSectionsMap.keySet()) {
-//            if (!existingSectionsMap.containsKey(section)) {
-//                sectionRepository.save(newSectionsMap.get(section));
-//                sectionAreaRepository.findAllBySectionId(section.id()).forEach(sectionAreaRepository::save);
-//            }
-//        }
-
         modelRepository.save(model);
         return new ModelInfoDTO(model);
     }
-//}
-
-////    public Page<Field> getAllEnabledFieldsByFieldGroupId(Long fieldGroupId, Pageable pageable) {
-////        return fieldRepository.findByEnabledTrueAndFieldGroup_Id(fieldGroupId, pageable);
-////    }
-//
-//    public FieldsByGroupDTO getEnabledFieldsByFieldGroupId(Long fieldGroupId) {
-//        var fieldGroup = fieldGroupRepository.findById(fieldGroupId).orElse(null);
-//        if (fieldGroup == null) {
-//            throw new ValidationException("Field Group ID not found");
-//        }
-//
-//        List<Field> fields = fieldRepository.findByEnabledTrueAndFieldGroupId(fieldGroupId);
-//        List<FieldListDTO> fieldsListDTO = fields.stream().map(FieldListDTO::new).collect(Collectors.toList());
-//
-//        return new FieldsByGroupDTO(fieldGroup.getName(), fieldsListDTO);
-//    }
 }

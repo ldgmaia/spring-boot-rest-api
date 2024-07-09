@@ -21,23 +21,14 @@ public class Value {
     private String valueData;
     private Boolean enabled;
 
-//    @CreatedDate
-//    private LocalDateTime createdAt;
-//
-//    @LastModifiedDate
-//    private LocalDateTime updatedAt;
-
     public Value(ValueRegisterDTO data) {
         this.valueData = data.valueData();
         this.enabled = true;
-//        this.createdAt = LocalDateTime.now();
-//        this.updatedAt = LocalDateTime.now();
     }
 
     public void updateInfo(ValueUpdateDTO data) {
 
         this.valueData = (data.valueData() != null) ? data.valueData() : this.valueData;
-//        this.updatedAt = LocalDateTime.now();
     }
 
     public void deactivate() {
