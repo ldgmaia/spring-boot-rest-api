@@ -41,11 +41,16 @@ public class MPNController {
 //        }
 //
 
-//        var model = modelService.register(data);
-//        var uri = uriBuilder.path("/models/{id}").buildAndExpand(model.id()).toUri();
+        var mpn = mpnService.register(data);
+        var uri = uriBuilder.path("/mpns/{id}").buildAndExpand(mpn.id()).toUri();
 
         return ResponseEntity.ok(data);
-//        return ResponseEntity.created(uri).body("ok");
+    }
+
+    @GetMapping("/list/mpn-fields/{modelId}")
+    public ResponseEntity detail(@PathVariable Long modelId) {
+        var mpnFields = mpnService.listMpnFields(modelId);
+        return ResponseEntity.ok(mpnFields);
     }
 
 //    @GetMapping
@@ -76,12 +81,6 @@ public class MPNController {
 //        return ResponseEntity.noContent().build();
 //    }
 
-
-    @GetMapping("/list/mpn-fields/{modelId}")
-    public ResponseEntity detail(@PathVariable Long modelId) {
-        var mpnFields = mpnService.listMpnFields(modelId);
-        return ResponseEntity.ok(mpnFields);
-    }
 
 //    @GetMapping("/list/mpn-fields/{modelId}")
 //    public ResponseEntity<List<MPNFieldsDTO>> listMpnFields(@PathVariable Long modelId) {

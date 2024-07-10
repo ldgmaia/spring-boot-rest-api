@@ -6,6 +6,14 @@ public record MPNInfoDTO(
         String description,
         String status,
         Boolean enabled
-
 ) {
+    public MPNInfoDTO(MPN mpn) {
+        this(
+                mpn.getId(),
+                mpn.getName(),
+                mpn.getDescription(),
+                mpn.getStatus(),
+                mpn.getEnabled()
+        );
+    }
 }

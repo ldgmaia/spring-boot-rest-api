@@ -43,7 +43,6 @@ public class MPN {
         this.description = data.description();
         this.enabled = true;
         this.status = data.status();
-
         this.model = data.model();
 
     }

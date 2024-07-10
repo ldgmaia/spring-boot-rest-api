@@ -7,6 +7,6 @@ public record MPNFieldValueRequestDTO(
         Long fieldId,
 
         @NotNull
-        String valueDataId
+        Long valueDataId
 ) {
 }
