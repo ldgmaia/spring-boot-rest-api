@@ -1,11 +1,18 @@
 package com.example.api.controller;
 
+import com.example.api.domain.mpns.MPNInfoListDTO;
 import com.example.api.domain.mpns.MPNRequestDTO;
 import com.example.api.domain.mpns.MPNService;
+import com.example.api.repositories.MPNRepository;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -18,8 +25,8 @@ public class MPNController {
 //    @Autowired
 //    private ModelService modelService;
 
-//    @Autowired
-//    private ModelRepository modelRepository;
+    @Autowired
+    private MPNRepository mpnRepository;
 
     @Autowired
     private MPNService mpnService;
@@ -53,12 +60,12 @@ public class MPNController {
         return ResponseEntity.ok(mpnFields);
     }
 
-//    @GetMapping
-//    public ResponseEntity<Page<ModelInfoDTO>> list(HttpServletRequest request, @PageableDefault(size = 100, page = 0, sort = {"name"}) Pageable pagination, @RequestHeader HttpHeaders headers) {
-//        var page = modelRepository.findAll(pagination).map(ModelInfoDTO::new);
-//        return ResponseEntity.ok(page);
-//    }
-//
+    @GetMapping
+    public ResponseEntity<Page<MPNInfoListDTO>> list(HttpServletRequest request, @PageableDefault(size = 100, page = 0, sort = {"name"}) Pageable pagination, @RequestHeader HttpHeaders headers) {
+        var page = mpnRepository.listAllMPN(pagination);
+        return ResponseEntity.ok(page);
+    }
+
 //    @PutMapping("/{id}")
 //    @Transactional
 //    public ResponseEntity update(@RequestBody @Valid ModelUpdateDTO data, @PathVariable Long id) {

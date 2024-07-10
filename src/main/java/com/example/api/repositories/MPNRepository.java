@@ -2,6 +2,9 @@ package com.example.api.repositories;
 
 import com.example.api.domain.mpns.MPN;
 import com.example.api.domain.mpns.MPNFieldsDTO;
+import com.example.api.domain.mpns.MPNInfoListDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -19,4 +22,14 @@ public interface MPNRepository extends JpaRepository<MPN, Long> {
             and cf.dataLevel = 'MPN'
             """)
     List<MPNFieldsDTO> findMPNFieldsByModelId(Long modelId);
+
+    @Query("""
+            SELECT NEW com.example.api.domain.mpns.MPNInfoListDTO(
+                m.id, m.name, mod.name, m.status, m.enabled, createdBy.firstName, approvedBy.firstName)
+            FROM MPN m
+            JOIN m.model mod
+            LEFT JOIN m.createdBy createdBy
+            LEFT JOIN m.approvedBy approvedBy
+            """)
+    Page<MPNInfoListDTO> listAllMPN(Pageable pageable);
 }
