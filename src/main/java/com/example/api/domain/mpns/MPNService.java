@@ -40,8 +40,9 @@ public class MPNService {
         var mpn = new MPN(new MPNRegisterDTO(data.name(), data.description(), data.status(), modelRepository.getReferenceById(data.modelId())));
         mpnRepository.save(mpn);
 
+        List<MPNFieldValueInfoDTO> mpnFieldsValues = null;
         if (data.mpnFieldsValues() != null) {
-            List<MPNFieldValueInfoDTO> mpnFieldsValues = data.mpnFieldsValues().stream().map(mfv -> {
+            mpnFieldsValues = data.mpnFieldsValues().stream().map(mfv -> {
                 var fieldValue = fieldValueRepository.findByFieldIdAndValueDataId(mfv.fieldId(), mfv.valueDataId());
 
                 var mpnFieldValue = new MPNFieldsValues(new MPNFieldValueRegisterDTO(fieldValue, mpn));
@@ -49,7 +50,7 @@ public class MPNService {
                 return new MPNFieldValueInfoDTO(mpnFieldValue);
             }).toList();
         }
-        return new MPNInfoDTO(mpn);
+        return new MPNInfoDTO(mpn, mpnFieldsValues != null ? mpnFieldsValues : List.of());
     }
 
     public List<MPNFieldsValuesDTO> listMpnFields(Long modelId) {
@@ -63,6 +64,18 @@ public class MPNService {
 
         return mpnFieldsValues;
     }
+
+    public MPNInfoDTO get(Long id) {
+        var mpn = mpnRepository.getReferenceById(id);
+
+        // Collect the updated MPN field values for the response
+        List<MPNFieldValueInfoDTO> mpnFieldsValues = mpnFieldValueRepository.findAllByMpnId(id).stream()
+                .map(MPNFieldValueInfoDTO::new)
+                .toList();
+
+        return new MPNInfoDTO(mpn, mpnFieldsValues);
+    }
+
 
     public MPNInfoDTO update(MPNRequestDTO data, Long id) {
         var mpn = mpnRepository.findById(id).orElseThrow(() -> new RuntimeException("MPN not found"));
@@ -108,8 +121,13 @@ public class MPNService {
             }
         }
 
+        // Collect the updated MPN field values for the response
+        List<MPNFieldValueInfoDTO> mpnFieldsValues = mpnFieldValueRepository.findAllByMpnId(id).stream()
+                .map(MPNFieldValueInfoDTO::new)
+                .toList();
+
         mpnRepository.save(mpn);
 
-        return new MPNInfoDTO(mpn);
+        return new MPNInfoDTO(mpn, mpnFieldsValues);
     }
 }

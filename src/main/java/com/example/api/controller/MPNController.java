@@ -53,7 +53,7 @@ public class MPNController {
 
         var mpn = mpnService.register(data);
         var uri = uriBuilder.path("/mpns/{id}").buildAndExpand(mpn.id()).toUri();
-        return ResponseEntity.created(uri).body(data);
+        return ResponseEntity.created(uri).body(mpn);
 //        return ResponseEntity.ok(data);
     }
 
@@ -71,13 +71,14 @@ public class MPNController {
 
     @GetMapping("/{id}")
     public ResponseEntity detail(@PathVariable Long id) {
-        var mpnfieldGroupExists = mpnRepository.existsById(id);
+        var mpnExists = mpnRepository.existsById(id);
 
-        if (!mpnfieldGroupExists) {
+        if (!mpnExists) {
             Map<String, String> jsonResponse = Map.of("message", "MPN not found");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(jsonResponse);
         }
-        var mpn = mpnRepository.getMpnDetails(id);
+
+        var mpn = mpnService.get(id);
         return ResponseEntity.ok(mpn);
     }
 
