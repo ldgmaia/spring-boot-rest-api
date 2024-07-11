@@ -1,8 +1,10 @@
 package com.example.api.controller;
 
+import com.example.api.domain.mpnfieldsvalues.MPNFieldValueInfoDTO;
 import com.example.api.domain.mpns.MPNInfoListDTO;
 import com.example.api.domain.mpns.MPNRequestDTO;
 import com.example.api.domain.mpns.MPNService;
+import com.example.api.repositories.MPNFieldValueRepository;
 import com.example.api.repositories.MPNRepository;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,18 +20,20 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("mpns")
 @SecurityRequirement(name = "bearer-key")
 public class MPNController {
 
-//    @Autowired
-//    private ModelService modelService;
-
     @Autowired
     private MPNRepository mpnRepository;
+
+    @Autowired
+    private MPNFieldValueRepository mpnFieldValueRepository;
 
     @Autowired
     private MPNService mpnService;
@@ -65,8 +69,25 @@ public class MPNController {
 
     @GetMapping
     public ResponseEntity<Page<MPNInfoListDTO>> list(HttpServletRequest request, @PageableDefault(size = 100, page = 0, sort = {"name"}) Pageable pagination, @RequestHeader HttpHeaders headers) {
-        var page = mpnRepository.listAllMPN(pagination);
-        return ResponseEntity.ok(page);
+        var page = mpnRepository.findAll(pagination);
+        Page<MPNInfoListDTO> dtoPage = page.map(mpn -> {
+            List<MPNFieldValueInfoDTO> mpnFieldsValues = mpnFieldValueRepository.findAllByMpnId(mpn.getId()).stream()
+                    .map(MPNFieldValueInfoDTO::new)
+                    .collect(Collectors.toList());
+            return new MPNInfoListDTO(
+                    mpn.getId(),
+                    mpn.getName(),
+                    mpn.getModel().getName(),
+                    mpn.getStatus(),
+                    mpn.getEnabled(),
+                    mpn.getCreatedBy() != null ? mpn.getCreatedBy().getFirstName() : null,
+                    mpn.getApprovedBy() != null ? mpn.getApprovedBy().getFirstName() : null,
+                    mpnFieldsValues
+            );
+        });
+        return ResponseEntity.ok(dtoPage);
+//        var page = mpnRepository.listAllMPN(pagination);
+//        return ResponseEntity.ok(page);
     }
 
     @GetMapping("/{id}")
