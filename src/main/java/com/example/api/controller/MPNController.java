@@ -13,9 +13,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("mpns")
@@ -50,12 +53,12 @@ public class MPNController {
 
         var mpn = mpnService.register(data);
         var uri = uriBuilder.path("/mpns/{id}").buildAndExpand(mpn.id()).toUri();
-
-        return ResponseEntity.ok(data);
+        return ResponseEntity.created(uri).body(data);
+//        return ResponseEntity.ok(data);
     }
 
     @GetMapping("/list/mpn-fields/{modelId}")
-    public ResponseEntity detail(@PathVariable Long modelId) {
+    public ResponseEntity listMpnFieldsByModel(@PathVariable Long modelId) {
         var mpnFields = mpnService.listMpnFields(modelId);
         return ResponseEntity.ok(mpnFields);
     }
@@ -64,6 +67,18 @@ public class MPNController {
     public ResponseEntity<Page<MPNInfoListDTO>> list(HttpServletRequest request, @PageableDefault(size = 100, page = 0, sort = {"name"}) Pageable pagination, @RequestHeader HttpHeaders headers) {
         var page = mpnRepository.listAllMPN(pagination);
         return ResponseEntity.ok(page);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity detail(@PathVariable Long id) {
+        var mpnfieldGroupExists = mpnRepository.existsById(id);
+
+        if (!mpnfieldGroupExists) {
+            Map<String, String> jsonResponse = Map.of("message", "MPN not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(jsonResponse);
+        }
+        var mpn = mpnRepository.getMpnDetails(id);
+        return ResponseEntity.ok(mpn);
     }
 
 //    @PutMapping("/{id}")
@@ -86,50 +101,5 @@ public class MPNController {
 //        field.deactivate();
 //
 //        return ResponseEntity.noContent().build();
-//    }
-
-
-//    @GetMapping("/list/mpn-fields/{modelId}")
-//    public ResponseEntity<List<MPNFieldsDTO>> listMpnFields(@PathVariable Long modelId) {
-//
-////        modelRepository.findById(id)
-////                .orElseThrow(() -> new ValidationException("Model not found"));
-//        var mpnFields = mpnService.listMpnFields(modelId);
-//        return ResponseEntity.ok(mpnFields);
-//    }
-
-//    @GetMapping("/{id}")
-//    public ResponseEntity detail(@PathVariable Long id) {
-//
-////        modelRepository.findById(id)
-////                .orElseThrow(() -> new ValidationException("Model not found"));
-//
-//        var modelDetails = modelService.getModelDetails(id);
-//
-//        return ResponseEntity.ok(modelDetails);
-////        try {
-////            var model = modelRepository.getReferenceById(id);
-////            return ResponseEntity.ok(new ModelInfoDTO(model));
-////        } catch (EntityNotFoundException ex) {
-////            Map<String, String> jsonResponse = Map.of("message", "Model not found");
-////            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(jsonResponse);
-////        }
-//    }
-
-//    @GetMapping("/field-group/{fieldGroupId}")
-//    public ResponseEntity<FieldsByGroupDTO> getEnabledFieldsByFieldGroupId(
-//            @PathVariable Long fieldGroupId
-//    ) {
-//        FieldsByGroupDTO response = fieldService.getEnabledFieldsByFieldGroupId(fieldGroupId);
-//        return ResponseEntity.ok(response);
-//    }
-
-//    public ResponseEntity<Page<FieldListDTO>> getFieldsByGroup(
-//            @PathVariable Long fieldGroupId,
-//            Pageable pageable
-//    ) {
-//        Page<Field> fieldsPage = fieldService.getEnabledFieldsByFieldGroupId(fieldGroupId, pageable);
-//        Page<FieldListDTO> fieldsListDTOPage = fieldsPage.map(FieldListDTO::new);
-//        return ResponseEntity.ok(fieldsListDTOPage);
 //    }
 }

@@ -32,4 +32,15 @@ public interface MPNRepository extends JpaRepository<MPN, Long> {
             LEFT JOIN m.approvedBy approvedBy
             """)
     Page<MPNInfoListDTO> listAllMPN(Pageable pageable);
+
+    @Query("""
+            SELECT NEW com.example.api.domain.mpns.MPNInfoListDTO(
+                m.id, m.name, mod.name, m.status, m.enabled, createdBy.firstName, approvedBy.firstName)
+            FROM MPN m
+            JOIN m.model mod
+            LEFT JOIN m.createdBy createdBy
+            LEFT JOIN m.approvedBy approvedBy
+            WHERE m.id = :id
+            """)
+    MPNInfoListDTO getMpnDetails(Long id);
 }
