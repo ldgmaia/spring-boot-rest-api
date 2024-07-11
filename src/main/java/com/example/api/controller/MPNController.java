@@ -81,12 +81,12 @@ public class MPNController {
         return ResponseEntity.ok(mpn);
     }
 
-//    @PutMapping("/{id}")
-//    @Transactional
-//    public ResponseEntity update(@RequestBody @Valid ModelUpdateDTO data, @PathVariable Long id) {
-//        var field = modelService.update(data, id);
-//        return ResponseEntity.ok(field);
-//    }
+    @PutMapping("/{id}")
+    @Transactional
+    public ResponseEntity update(@RequestBody @Valid MPNRequestDTO data, @PathVariable Long id) {
+        var mpn = mpnService.update(data, id);
+        return ResponseEntity.ok(mpn);
+    }
 
 //    @DeleteMapping("/{id}")
 //    @Transactional

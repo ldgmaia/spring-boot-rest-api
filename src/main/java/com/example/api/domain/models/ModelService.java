@@ -154,7 +154,6 @@ public class ModelService {
                         mfv -> mfv
                 ));
 
-//        System.out.println("data.modelFieldsValues() " + data.modelFieldsValues());
         var newFieldValuesMap = data.modelFieldsValues().stream()
                 .collect(Collectors.toMap(
                         mfv -> {
