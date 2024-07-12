@@ -47,16 +47,19 @@ public class FieldService {
 
         // check if name is available
         var fieldNewInfo = fieldRepository.findByName(data.name());
-        if (!fieldNewInfo.getId().equals(data.id())) {
+        if (fieldNewInfo != null && !fieldNewInfo.getId().equals(data.id())) {
             throw new ValidationException("Field name already being used");
         }
 
         Field field = fieldRepository.getReferenceById(data.id());
 
-        var fieldGroup = fieldGroupRepository.getReferenceById(data.fieldGroupId());
+        if (data.fieldGroupId() != null) {
+            var fieldGroup = fieldGroupRepository.getReferenceById(data.fieldGroupId());
+            field.setFieldGroup(fieldGroup);
+        }
 
         field.setName(data.name());
-        field.setFieldGroup(fieldGroup);
+
 //        field.setFieldType(data.fieldType());
 //        field.setDataType(data.dataType());
 //        field.setUpdatedAt(LocalDateTime.now());
