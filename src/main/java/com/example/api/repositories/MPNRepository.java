@@ -20,6 +20,7 @@ public interface MPNRepository extends JpaRepository<MPN, Long> {
             join Model m on m.category.id = c.id
             where m.id = :modelId
             and cf.dataLevel = 'MPN'
+            and cf.enabled = true
             """)
     List<MPNFieldsDTO> findMPNFieldsByModelId(Long modelId);
 

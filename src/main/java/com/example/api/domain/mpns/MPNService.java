@@ -1,5 +1,6 @@
 package com.example.api.domain.mpns;
 
+import com.example.api.domain.ValidationException;
 import com.example.api.domain.mpnfieldsvalues.MPNFieldValueInfoDTO;
 import com.example.api.domain.mpnfieldsvalues.MPNFieldValueRegisterDTO;
 import com.example.api.domain.mpnfieldsvalues.MPNFieldValueRequestDTO;
@@ -12,6 +13,7 @@ import com.example.api.repositories.ModelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -40,17 +42,17 @@ public class MPNService {
         var mpn = new MPN(new MPNRegisterDTO(data.name(), data.description(), data.status(), modelRepository.getReferenceById(data.modelId())));
         mpnRepository.save(mpn);
 
-        List<MPNFieldValueInfoDTO> mpnFieldsValues = null;
+
         if (data.mpnFieldsValues() != null) {
-            mpnFieldsValues = data.mpnFieldsValues().stream().map(mfv -> {
+            data.mpnFieldsValues().forEach(mfv -> {
                 var fieldValue = fieldValueRepository.findByFieldIdAndValueDataId(mfv.fieldId(), mfv.valueDataId());
 
                 var mpnFieldValue = new MPNFieldsValues(new MPNFieldValueRegisterDTO(fieldValue, mpn));
                 mpnFieldValueRepository.save(mpnFieldValue);
-                return new MPNFieldValueInfoDTO(mpnFieldValue);
-            }).toList();
+            });
         }
-        return new MPNInfoDTO(mpn, mpnFieldsValues != null ? mpnFieldsValues : List.of());
+//        return new MPNInfoDTO(mpn, mpnFieldsValues != null ? mpnFieldsValues : List.of());
+        return new MPNInfoDTO(mpn);
     }
 
     public List<MPNFieldsValuesDTO> listMpnFields(Long modelId) {
@@ -65,16 +67,16 @@ public class MPNService {
         return mpnFieldsValues;
     }
 
-    public MPNInfoDTO get(Long id) {
-        var mpn = mpnRepository.getReferenceById(id);
-
-        // Collect the updated MPN field values for the response
-        List<MPNFieldValueInfoDTO> mpnFieldsValues = mpnFieldValueRepository.findAllByMpnId(id).stream()
-                .map(MPNFieldValueInfoDTO::new)
-                .toList();
-
-        return new MPNInfoDTO(mpn, mpnFieldsValues);
-    }
+//    public MPNInfoDTO get(Long id) {
+//        var mpn = mpnRepository.getReferenceById(id);
+//
+//        // Collect the updated MPN field values for the response
+//        List<MPNFieldValueInfoDTO> mpnFieldsValues = mpnFieldValueRepository.findAllByMpnId(id).stream()
+//                .map(MPNFieldValueInfoDTO::new)
+//                .toList();
+//
+//        return new MPNInfoDTO(mpn, mpnFieldsValues);
+//    }
 
 
     public MPNInfoDTO update(MPNRequestDTO data, Long id) {
@@ -121,13 +123,34 @@ public class MPNService {
             }
         }
 
-        // Collect the updated MPN field values for the response
-        List<MPNFieldValueInfoDTO> mpnFieldsValues = mpnFieldValueRepository.findAllByMpnId(id).stream()
-                .map(MPNFieldValueInfoDTO::new)
-                .toList();
+//        // Collect the updated MPN field values for the response
+//        List<MPNFieldValueInfoDTO> mpnFieldsValues = mpnFieldValueRepository.findAllByMpnId(id).stream()
+//                .map(MPNFieldValueInfoDTO::new)
+//                .toList();
 
         mpnRepository.save(mpn);
 
-        return new MPNInfoDTO(mpn, mpnFieldsValues);
+        return new MPNInfoDTO(mpn);
+    }
+
+    public MPNInfoDetailsDTO getMpnDetails(Long id) {
+        // Fetch category details
+        var model = mpnRepository.findById(id)
+                .orElseThrow(() -> new ValidationException("MPN not found"));
+
+        // Fetch fields and sort by fieldId
+        List<MPNFieldValueInfoDTO> fields = mpnFieldValueRepository.findFieldsValuesByMpnId(id).stream()
+                .sorted(Comparator.comparingLong(MPNFieldValueInfoDTO::fieldId))  // Sort by fieldId
+                .collect(Collectors.toList());
+
+        // Assemble the final DTO
+        return new MPNInfoDetailsDTO(
+                model.getId(),
+                model.getName(),
+                model.getDescription(),
+                model.getStatus(),
+                model.getEnabled(),
+                fields
+        );
     }
 }

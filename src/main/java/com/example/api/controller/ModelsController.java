@@ -101,6 +101,12 @@ public class ModelsController {
 //        }
     }
 
+    @GetMapping("/list/needs-mpn")
+    public ResponseEntity listModelsNeedsMpn() {
+        var models = modelRepository.findAllByNeedsMpnTrue();
+        return ResponseEntity.ok(models);
+    }
+
 
 //    @GetMapping("/field-group/{fieldGroupId}")
 //    public ResponseEntity<FieldsByGroupDTO> getEnabledFieldsByFieldGroupId(
