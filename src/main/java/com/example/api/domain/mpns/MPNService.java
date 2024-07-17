@@ -150,6 +150,7 @@ public class MPNService {
                 model.getDescription(),
                 model.getStatus(),
                 model.getEnabled(),
+                model.getModel().getId(),
                 fields
         );
     }

@@ -10,6 +10,7 @@ public record MPNInfoDetailsDTO(
         String description,
         String status,
         Boolean enabled,
+        Long modelId,
         List<MPNFieldValueInfoDTO> mpnFieldsValues
 ) {
 }
