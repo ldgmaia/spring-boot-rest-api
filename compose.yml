@@ -2,8 +2,6 @@ version: '3.8'
 
 services:
   mysql:
-#    volumes:
-#      - C:\\Users\\Diego\\Documents\\projects\\volumes\\mysqlnewrbms:/var/lib/mysql
     volumes:
       - ~/Documents/projects/volumes/mysqlnewrbms:/var/lib/mysql
     image: mysql:8.0
@@ -17,3 +15,30 @@ services:
       MYSQL_PASSWORD: admin
     ports:
       - '33060:3306'
+    networks:
+      - newrbms-network
+
+  newrbms-backend:
+    build:
+      context: .
+    container_name: newrbms-backend
+    ports:
+      - 8091:8091
+    volumes:
+      - .:/usr/src/app
+      - ~/.m2:/root/.m2
+    environment:
+      DATABASE_URL: jdbc:mysql://mysql:3306/newrbms
+      DATABASE_USER: admin
+      DATABASE_PASSWORD: admin
+      JWT_SECRET: basefilejwtsecret
+    depends_on:
+      - mysql
+    networks:
+      - newrbms-network
+
+networks:
+  newrbms-network:
+    name: newrbms-network
+    external: true
+    driver: bridge
