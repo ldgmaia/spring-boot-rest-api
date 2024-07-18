@@ -58,11 +58,12 @@ public class MPNService {
     public List<MPNFieldsValuesDTO> listMpnFields(Long modelId) {
         var fieldList = mpnRepository.findMPNFieldsByModelId(modelId);
 
-        List<MPNFieldsValuesDTO> mpnFieldsValues = fieldList.stream().map(f -> {
-            List<ValueInfoDTO> values = fieldValueRepository.findAllEnabledValuesByFieldId(f.id());
-            MPNFieldsDTO fieldWithValues = new MPNFieldsDTO(f.id(), f.name(), values);
-            return new MPNFieldsValuesDTO(fieldWithValues);
-        }).toList();
+        List<MPNFieldsValuesDTO> mpnFieldsValues = fieldList.stream()
+                .map(f -> {
+                    List<ValueInfoDTO> values = fieldValueRepository.findAllEnabledValuesByFieldId(f.id());
+                    MPNFieldsDTO fieldWithValues = new MPNFieldsDTO(f.id(), f.name(), values);
+                    return new MPNFieldsValuesDTO(fieldWithValues);
+                }).toList();
 
         return mpnFieldsValues;
     }

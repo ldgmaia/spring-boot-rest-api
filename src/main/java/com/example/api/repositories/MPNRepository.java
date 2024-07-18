@@ -21,6 +21,7 @@ public interface MPNRepository extends JpaRepository<MPN, Long> {
             where m.id = :modelId
             and cf.dataLevel = 'MPN'
             and cf.enabled = true
+            order by f.id
             """)
     List<MPNFieldsDTO> findMPNFieldsByModelId(Long modelId);
 

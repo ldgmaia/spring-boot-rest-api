@@ -3,7 +3,7 @@ version: '3.8'
 services:
   mysql:
     volumes:
-      - ~/Documents/projects/volumes/mysqlnewrbms:/var/lib/mysql
+      - ~/Documents/projects/volumes/mysqlspringboot:/var/lib/mysql
     image: mysql:8.0
     container_name: mysql-springboot
     command: --default-authentication-plugin=mysql_native_password

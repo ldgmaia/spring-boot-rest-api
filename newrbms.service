@@ -1,0 +1,14 @@
+# copy this file to /etc/systemd/system/newrbms.service
+[Unit]
+Description=RBMS
+
+[Service]
+WorkingDirectory=/home/deploy/rbms-backend/target
+ExecStart=java -Xms128m -Xmx256m -jar api-0.0.1-SNAPSHOT.jar
+User=deploy
+Type=simple
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
