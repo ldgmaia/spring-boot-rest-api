@@ -6,7 +6,7 @@ services:
       - ~/Documents/projects/volumes/mysqlspringboot:/var/lib/mysql
     image: mysql:8.0
     container_name: mysql-springboot
-    command: --default-authentication-plugin=mysql_native_password
+    command: --default-authentication-plugin=caching_sha2_password
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: root
