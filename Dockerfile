@@ -1,4 +1,5 @@
 FROM eclipse-temurin:17-jdk-jammy
+ENV TZ="America/Toronto"
 
 WORKDIR /usr/src/app
 
