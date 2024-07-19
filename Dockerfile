@@ -28,6 +28,7 @@ COPY ./src ./src
 RUN ./mvnw clean install -Dmaven.test.skip
 
 FROM eclipse-temurin:17-jre-jammy
+ENV TZ="America/Toronto"
 WORKDIR /usr/app
 # EXPOSE 8080
 COPY --from=builder /usr/app/target/*.jar /usr/app/*.jar
