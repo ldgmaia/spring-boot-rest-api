@@ -5,7 +5,10 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.example.api.domain.permission.Role;
 import com.example.api.domain.users.User;
+import com.example.api.repositories.UserPermissionRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +16,8 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class TokenService {
@@ -20,13 +25,18 @@ public class TokenService {
     @Value("${api.security.token.secret}")
     private String secret;
 
+    @Autowired
+    private UserPermissionRepository userPermissionRepository;
+
     public String generateToken(User user) {
         try {
+            List<Role> roles = userPermissionRepository.findRolesByUserId(user.getId());
+            List<String> roleNames = roles.stream().map(Role::getName).collect(Collectors.toList());
             var algorithm = Algorithm.HMAC256(secret);
             return JWT.create()
                     .withIssuer("API RBMS")
                     .withSubject(user.getUsername())
-//                    .withClaim("id", user.getId())
+                    .withClaim("roles", roleNames)
                     .withExpiresAt(expirationDate())
                     .sign(algorithm);
         } catch (JWTCreationException exception) {
@@ -45,6 +55,23 @@ public class TokenService {
                     .build()
                     .verify(tokenJWT)
                     .getSubject();
+
+        } catch (JWTVerificationException exception) {
+            throw new RuntimeException("Token JWT invalid or expired");
+        }
+    }
+
+    public List<String> getRoles(String tokenJWT) {
+        try {
+            var algorithm = Algorithm.HMAC256(secret);
+            return JWT.require(algorithm)
+                    // specify any specific claim validations
+                    .withIssuer("API RBMS")
+                    // reusable verifier instance
+                    .build()
+                    .verify(tokenJWT)
+                    .getClaim("roles")
+                    .asList(String.class);
 
         } catch (JWTVerificationException exception) {
             throw new RuntimeException("Token JWT invalid or expired");

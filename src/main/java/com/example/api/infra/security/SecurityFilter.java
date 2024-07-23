@@ -33,7 +33,7 @@ public class SecurityFilter extends OncePerRequestFilter {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }
-            
+
             var subject = tokenService.getSubject(tokenJWT);
             var user = userRepository.findByUsername(subject);
 
