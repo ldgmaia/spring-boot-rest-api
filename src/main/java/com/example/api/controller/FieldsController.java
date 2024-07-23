@@ -59,11 +59,11 @@ public class FieldsController {
         return ResponseEntity.ok(page);
     }
 
-    @PutMapping
+    @PutMapping("/{id}")
     @Transactional
-    public ResponseEntity update(@RequestBody @Valid FieldUpdateDTO data) {
+    public ResponseEntity update(@RequestBody @Valid FieldUpdateDTO data, @PathVariable Long id) {
 //        var field = fieldRepository.getReferenceById(data.id());
-        var field = fieldService.updateInfo(data);
+        var field = fieldService.updateInfo(data, id);
 
         return ResponseEntity.ok(field);
     }

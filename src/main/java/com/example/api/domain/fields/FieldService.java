@@ -43,15 +43,15 @@ public class FieldService {
         return new FieldInfoDTO(field);
     }
 
-    public FieldInfoDTO updateInfo(FieldUpdateDTO data) {
+    public FieldInfoDTO updateInfo(FieldUpdateDTO data, Long id) {
 
         // check if name is available
         var fieldNewInfo = fieldRepository.findByName(data.name());
-        if (fieldNewInfo != null && !fieldNewInfo.getId().equals(data.id())) {
+        if (fieldNewInfo != null && !fieldNewInfo.getId().equals(id)) {
             throw new ValidationException("Field name already being used");
         }
 
-        Field field = fieldRepository.getReferenceById(data.id());
+        Field field = fieldRepository.getReferenceById(id);
 
         if (data.fieldGroupId() != null) {
             var fieldGroup = fieldGroupRepository.getReferenceById(data.fieldGroupId());

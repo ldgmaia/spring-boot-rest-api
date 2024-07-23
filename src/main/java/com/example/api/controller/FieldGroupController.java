@@ -65,18 +65,18 @@ public class FieldGroupController {
         return ResponseEntity.ok(page);
     }
 
-    @PutMapping
+    @PutMapping("/{id}")
     @Transactional
-    public ResponseEntity update(@RequestBody @Valid FieldGroupUpdateDTO data) {
+    public ResponseEntity update(@RequestBody @Valid FieldGroupUpdateDTO data, @PathVariable Long id) {
 
-        var fieldGroupExists = fieldGroupRepository.existsById(data.id());
+        var fieldGroupExists = fieldGroupRepository.existsById(id);
 
         if (!fieldGroupExists) {
             Map<String, String> jsonResponse = Map.of("message", "Field group " + data.name() + " not found");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(jsonResponse);
         }
 
-        var fieldGroup = fieldGroupRepository.getReferenceById(data.id());
+        var fieldGroup = fieldGroupRepository.getReferenceById(id);
         fieldGroup.updateInfo(data);
 
         return ResponseEntity.ok(new FieldGroupInfoDTO(fieldGroup));
