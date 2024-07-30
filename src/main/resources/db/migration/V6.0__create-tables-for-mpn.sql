@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS mpns (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    name VARCHAR(255) NOT NULL UNIQUE,
+    name VARCHAR(255) NOT NULL,
     description VARCHAR(255),
     models_id BIGINT UNSIGNED,
     enabled BIT DEFAULT 1 NOT NULL,
@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS mpns (
     deleted_at TIMESTAMP,
 
     PRIMARY KEY (id),
+    UNIQUE (name),
     INDEX (approved_by),
     INDEX (created_by),
     INDEX (models_id),

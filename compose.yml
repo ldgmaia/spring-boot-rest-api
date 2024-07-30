@@ -11,6 +11,7 @@ services:
       MYSQL_DATABASE: newrbms
       MYSQL_USER: admin
       MYSQL_PASSWORD: admin
+      TZ: America/Toronto
     ports:
       - 3308:3306
     networks:

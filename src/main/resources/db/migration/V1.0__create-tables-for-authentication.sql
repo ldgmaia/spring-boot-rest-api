@@ -3,22 +3,24 @@ CREATE TABLE IF NOT EXISTS users (
     first_name VARCHAR(255) NOT NULL,
     last_name VARCHAR(255) NOT NULL,
     enabled BIT DEFAULT 1 NOT NULL,
-    username VARCHAR(255) NOT NULL UNIQUE,
+    username VARCHAR(255) NOT NULL,
     password VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     PRIMARY KEY (id),
+    UNIQUE (username),
     INDEX idx_username (username)
 );
 
 CREATE TABLE IF NOT EXISTS roles (
 	id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-	name VARCHAR(100) NOT NULL UNIQUE,
+	name VARCHAR(100) NOT NULL,
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     PRIMARY KEY (id),
+    UNIQUE (name),
     INDEX idx_name (name)
 );
 
@@ -32,18 +34,19 @@ CREATE TABLE IF NOT EXISTS users_roles (
     PRIMARY KEY (id),
 	FOREIGN KEY (role_id) REFERENCES roles (id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE ON UPDATE CASCADE,
-	UNIQUE uc_role_id_user_id (role_id, user_id),
-	INDEX idx_role_id_user_id (role_id, user_id)
+	UNIQUE (role_id, user_id),
+	INDEX (role_id, user_id)
 );
 
 CREATE TABLE IF NOT EXISTS permissions (
 	id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-	route VARCHAR(100) NOT NULL UNIQUE,
+	route VARCHAR(100) NOT NULL,
 	description VARCHAR(100) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     PRIMARY KEY (id),
+    UNIQUE (route),
     INDEX idx_route (route)
 );
 
