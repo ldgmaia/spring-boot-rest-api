@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS purchase_orders (
     qbo_created_at TIMESTAMP,
     qbo_updated_at TIMESTAMP,
     suppliers_id BIGINT UNSIGNED NOT NULL,
-    received VARCHAR(255) NOT NULL,
+    receiving_status VARCHAR(255) NOT NULL,
     watching_po VARCHAR(255) NOT NULL,
     last_received_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

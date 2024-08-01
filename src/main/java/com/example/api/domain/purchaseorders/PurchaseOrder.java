@@ -1,8 +1,10 @@
 package com.example.api.domain.purchaseorders;
 
-import com.example.api.domain.categories.Category;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Table(name = "purchase_orders")
 @Entity(name = "PurchaseOrder")
@@ -17,31 +19,43 @@ public class PurchaseOrder {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
-    private String name;
-
-    private String description;
-    private String identifier;
     private String status;
-    private Boolean enabled;
-    private Boolean needsMpn;
+    private String poNumber;
+    private String currency;
+    private BigDecimal total;
+    private Long qboId;
+    private LocalDateTime qboCreatedAt;
+    private LocalDateTime qboUpdatedAt;
+    private Long suppliersId;
+    private String receivingStatus;
+    private String watchingPo;
+    private LocalDateTime lastReceivedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "categories_id")
-    private Category category;
+//    @Column(unique = true, nullable = false)
+//    private String name;
+//
+//    private String description;
+//    private String identifier;
+//    private String status;
+//    private Boolean enabled;
+//    private Boolean needsMpn;
+//
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "categories_id")
+//    private Category category;
 
 
     public PurchaseOrder(PurchaseOrderRegisterDTO data) {
-        this.name = data.name();
-        this.description = data.description();
-        this.identifier = data.identifier();
         this.status = data.status();
-        this.needsMpn = data.needsMpn();
-        this.category = data.category();
-        this.enabled = true;
-    }
-
-    public void deactivate() {
-        this.enabled = false;
+        this.poNumber = data.poNumber();
+        this.currency = data.currency();
+        this.total = data.total();
+        this.qboId = data.qboId();
+        this.qboCreatedAt = data.qboCreatedAt();
+        this.qboUpdatedAt = data.qboUpdatedAt();
+        this.suppliersId = data.suppliersId();
+        this.receivingStatus = data.receivingStatus();
+        this.watchingPo = data.watchingPo();
+//        this.lastReceivedAt = data.lastReceivedAt();
     }
 }
