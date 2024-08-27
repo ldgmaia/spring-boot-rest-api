@@ -6,12 +6,14 @@ services:
     container_name: mysql-springboot
     command: --default-authentication-plugin=caching_sha2_password
     restart: unless-stopped
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: newrbms
-      MYSQL_USER: admin
-      MYSQL_PASSWORD: admin
-      TZ: America/Toronto
+    env_file:
+      - ./mysql.env
+    #    environment:
+    #      MYSQL_ROOT_PASSWORD: root
+    #      MYSQL_DATABASE: newrbms
+    #      MYSQL_USER: admin
+    #      MYSQL_PASSWORD: admin
+    #      TZ: America/Toronto
     ports:
       - 3308:3306
     networks:
