@@ -1,112 +1,36 @@
-package com.example.api.domain.purchaseorders;
+package com.example.api.domain.purchaseorderitems;
 
-import com.example.api.domain.purchaseorderitems.PurchaseOrderItem;
-import com.example.api.domain.purchaseorderitems.PurchaseOrderItemRegisterDTO;
-import com.example.api.domain.suppliers.Supplier;
-import com.example.api.domain.suppliers.SupplierRegisterDTO;
 import com.example.api.repositories.PurchaseOrderItemRepository;
 import com.example.api.repositories.PurchaseOrderRepository;
 import com.example.api.repositories.SupplierRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-
 @Service
-public class PurchaseOrderService {
+public class PurchaseOrderItemService {
 
 //    @Autowired
 //    private CategoryRepository categoryRepository;
-//
-//    @Autowired
-//    private ModelRepository modelRepository;
-//
-//    @Autowired
-//    private FieldRepository fieldRepository;
-//
-//    @Autowired
-//    private FieldValueRepository fieldValueRepository;
-//
-//    @Autowired
-//    private ModelFieldValueRepository modelFieldValueRepository;
-
-    @Autowired
-    private PurchaseOrderItemRepository purchaseOrderItemRepository;
 
     @Autowired
     private PurchaseOrderRepository purchaseOrderRepository;
 
     @Autowired
     private SupplierRepository supplierRepository;
+    @Autowired
+    private PurchaseOrderItemRepository purchaseOrderItemRepository;
 
 //    @Autowired
 //    private List<FieldValidator> validators; // Spring boot will automatically detect that a List is being ejected and will get all classes that implements this interface and will inject the validators automatically
 
-    public PurchaseOrderInfoDTO register(PurchaseOrderRequestDTO data) {
+    public PurchaseOrderItemInfoDTO register(PurchaseOrderItemRegisterDTO data) {
 //        validators.forEach(v -> v.validate(data));
 
-        // Create Supplier
-        var supplier = new Supplier(new SupplierRegisterDTO(
-                "Vendor?.DisplayName",
-                "Vendor.PrimaryPhone?.FreeFormNumber",
-                "Vendor.PrimaryEmailAddr?.Address",
-                "Vendor?.CompanyName",
-                "Vendor.BillAddr?.Line1",
-                "Vendor.BillAddr?.Line2",
-                "Vendor.BillAddr?.Line3",
-                "Vendor.BillAddr?.City",
-                "Vendor.BillAddr?.CountrySubDivisionCode",
-                "Vendor.BillAddr?.PostalCode",
-                "Vendor.BillAddr?.Country"
-        ));
-        supplierRepository.save(supplier);
+        var purchaseOrderItem = new PurchaseOrderItem(data);
 
-        System.out.println("supplier ID " + supplier.getId());
+        purchaseOrderItemRepository.save(purchaseOrderItem);
 
-        // Create Purachse Order
-
-        OffsetDateTime offsetDateTime = OffsetDateTime.parse(data.qbo_created_at());
-        // Convert to ZonedDateTime in the "America/Toronto" time zone
-        ZonedDateTime torontoZonedDateTime = offsetDateTime.atZoneSameInstant(ZoneId.of("America/Toronto")).toOffsetDateTime().toZonedDateTime();
-        // Extract the LocalDateTime in the Toronto time zone
-        LocalDateTime torontoLocalDateTime = torontoZonedDateTime.toLocalDateTime();
-
-        var purchaseOrder = new PurchaseOrder(new PurchaseOrderRegisterDTO(
-                "status",
-                "poNumber",
-                "currency",
-                BigDecimal.valueOf(10),
-                1L,
-                LocalDateTime.now(),
-                LocalDateTime.now(),
-                supplier.getId(),
-                "receivingStatus",
-                "watchingPo"
-        ));
-        purchaseOrderRepository.save(purchaseOrder);
-
-        // Create PO Items
-
-        var poi = new PurchaseOrderItem(new PurchaseOrderItemRegisterDTO(
-                "name",
-                "description",
-                1L,
-                new BigDecimal(10),
-                new BigDecimal(10),
-                1L,
-                1L,
-                purchaseOrder
-        ));
-
-        purchaseOrderItemRepository.save(poi);
-
-        return new PurchaseOrderInfoDTO(purchaseOrder.getId(), purchaseOrder.getPoNumber(), purchaseOrder.getStatus(), purchaseOrder.getLastReceivedAt(), supplier.getName());
-//        return new PurchaseOrderInfoDTO(1L, "123", "a", torontoLocalDateTime, "asdasd");
-
+        return new PurchaseOrderItemInfoDTO(purchaseOrderItem);
     }
 
 //    public PurchaseOrderInfoDetailsDTO getModelDetails(Long id) {
