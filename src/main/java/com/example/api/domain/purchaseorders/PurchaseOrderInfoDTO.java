@@ -1,5 +1,7 @@
 package com.example.api.domain.purchaseorders;
 
+import com.example.api.domain.suppliers.Supplier;
+
 import java.time.LocalDateTime;
 
 public record PurchaseOrderInfoDTO(
@@ -9,26 +11,38 @@ public record PurchaseOrderInfoDTO(
         LocalDateTime lastReceivedAt,
         String supplier
 
-//        LocalDateTime qboCreatedAt,
-//        String currency,
-//        BigDecimal total,
-//
-//
-//
-//        Long qbo_id,
-//        LocalDateTime qboUpdatedAt,
-//        Long suppliers_id,
-//        String received,
-//        String watching_po,
-//        LocalDateTime createdAt,
-//        LocalDateTime updatedAt
 ) {
-//    public PurchaseOrderInfoDTO(PurchaseOrder po) {
-//        this(
-//                po.getId(),
-//                po.getStatus()
-//        );
-//    }
+
+    public PurchaseOrderInfoDTO(PurchaseOrder purchaseOrder, Supplier supplier, Boolean enabled) {
+        this(purchaseOrder.getId(),
+                purchaseOrder.getPoNumber(),
+                purchaseOrder.getStatus(),
+                purchaseOrder.getLastReceivedAt(),
+                supplier.getName()
+
+        );
+    }
+
+    public PurchaseOrderInfoDTO(PurchaseOrder purchaseOrder) {
+        this(purchaseOrder.getId(),
+                purchaseOrder.getPoNumber(),
+                purchaseOrder.getStatus(),
+                purchaseOrder.getLastReceivedAt(),
+                null
+        );
+    }
+
+    public PurchaseOrderInfoDTO(PurchaseOrder purchaseOrder, Supplier supplier) {
+        this(
+                purchaseOrder.getId(),
+                purchaseOrder.getPoNumber(),
+                purchaseOrder.getStatus(),
+                purchaseOrder.getLastReceivedAt(),
+                supplier.getName()
+        );
+    }
+
+
 }
 
 

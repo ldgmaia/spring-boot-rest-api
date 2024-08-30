@@ -1,23 +1,20 @@
-//package com.example.api.domain.purchaseorders;
-//
-//import com.example.api.domain.categories.CategoryInfoDTO;
-//import com.example.api.domain.modelfieldsvalues.ModelFieldValueInfoDTO;
-//import com.example.api.domain.sections.SectionWithAreasDTO;
-//
-//import java.util.List;
-//
-//public record PurchaseOrderInfoDetailsDTO(
-//        Long id,
-//        String name,
-//        String description,
-//        String identifier,
-//        String status,
-//        Boolean enabled,
-//        Boolean needsMpn,
-//        CategoryInfoDTO category,
-//        List<ModelFieldValueInfoDTO> modelFieldsValues,
-//        List<SectionWithAreasDTO> sections
-//) {
-//}
-//
-//
+package com.example.api.domain.purchaseorders;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+public record PurchaseOrderInfoDetailsDTO(
+        Long id,
+        String status,
+        String poNumber,
+        String currency,
+        BigDecimal total,
+        String receivingStatus,
+        LocalDateTime lastReceivedAt
+
+//        SupplierInfoDTO supplier,
+//        List<PurchaseOrderItemInfoDTO> purchaseOrderItems
+) {
+}
+
+
