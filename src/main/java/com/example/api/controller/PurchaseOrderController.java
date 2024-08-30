@@ -1,20 +1,16 @@
 package com.example.api.controller;
 
-import com.example.api.domain.purchaseorders.PurchaseOrderListDTO;
 import com.example.api.domain.purchaseorders.PurchaseOrderRequestDTO;
 import com.example.api.domain.purchaseorders.PurchaseOrderService;
-import com.example.api.repositories.PurchaseOrderRepository;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
@@ -24,9 +20,6 @@ public class PurchaseOrderController {
 
     @Autowired
     private PurchaseOrderService purchaseOrderService;
-
-    @Autowired
-    private PurchaseOrderRepository purchaseOrderRepository;
 
 //    @Autowired
 //    private FieldRepository fieldRepository;
@@ -45,29 +38,11 @@ public class PurchaseOrderController {
     }
 
 //    @GetMapping
-//    public ResponseEntity List<PurchaseOrderListDTO> list(HttpServletRequest request, @PageableDefault(size = 5, page = 0, sort = {"name"}) Pageable pagination, @RequestHeader HttpHeaders headers){
-//        var list = purchaseOrderRepository.findAll(pagination);
-//        //return purchaseOrderRepository.findAll().stream().map(purchaseOrderRepository::new).toList();
-//        return ResponseEntity.ok(list);
-//
+//    public ResponseEntity<Page<FieldListDTO>> list(HttpServletRequest request, @PageableDefault(size = 100, page = 0, sort = {"name"}) Pageable pagination, @RequestHeader HttpHeaders headers) {
+//        var page = fieldRepository.findAllByEnabledTrue(pagination).map(FieldListDTO::new);
+//        return ResponseEntity.ok(page);
 //    }
-
-    @GetMapping
-    public ResponseEntity<Page<PurchaseOrderListDTO>> list(HttpServletRequest request, @PageableDefault(size = 100, page = 0, sort = {"poNumber"}) Pageable pagination, @RequestHeader HttpHeaders headers) {
-        var page = purchaseOrderRepository.findAll(pagination).map(PurchaseOrderListDTO::new);
-        return ResponseEntity.ok(page);
-    }
-
-
 //
-//    @GetMapping
-//    public ResponseEntity list(@PathVariable Long fieldId) {
-//
-//        var list = fieldValueService.findAllValuesByFieldId(fieldId);
-//
-//        return ResponseEntity.ok(list);
-//    }
-
 //    @PutMapping("/{id}")
 //    @Transactional
 //    public ResponseEntity update(@RequestBody @Valid FieldUpdateDTO data, @PathVariable Long id) {

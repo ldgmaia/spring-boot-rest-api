@@ -1,10 +1,7 @@
 package com.example.api.domain.purchaseorders;
 
-import com.example.api.domain.purchaseorderitems.PurchaseOrderItem;
-import com.example.api.domain.purchaseorderitems.PurchaseOrderItemRegisterDTO;
 import com.example.api.domain.suppliers.Supplier;
 import com.example.api.domain.suppliers.SupplierRegisterDTO;
-import com.example.api.repositories.PurchaseOrderItemRepository;
 import com.example.api.repositories.PurchaseOrderRepository;
 import com.example.api.repositories.SupplierRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,9 +30,9 @@ public class PurchaseOrderService {
 //
 //    @Autowired
 //    private ModelFieldValueRepository modelFieldValueRepository;
-
-    @Autowired
-    private PurchaseOrderItemRepository purchaseOrderItemRepository;
+//
+//    @Autowired
+//    private SectionRepository sectionRepository;
 
     @Autowired
     private PurchaseOrderRepository purchaseOrderRepository;
@@ -49,7 +46,6 @@ public class PurchaseOrderService {
     public PurchaseOrderInfoDTO register(PurchaseOrderRequestDTO data) {
 //        validators.forEach(v -> v.validate(data));
 
-        // Create Supplier
         var supplier = new Supplier(new SupplierRegisterDTO(
                 "Vendor?.DisplayName",
                 "Vendor.PrimaryPhone?.FreeFormNumber",
@@ -67,7 +63,6 @@ public class PurchaseOrderService {
 
         System.out.println("supplier ID " + supplier.getId());
 
-        // Create Purachse Order
 
         OffsetDateTime offsetDateTime = OffsetDateTime.parse(data.qbo_created_at());
         // Convert to ZonedDateTime in the "America/Toronto" time zone
@@ -88,21 +83,6 @@ public class PurchaseOrderService {
                 "watchingPo"
         ));
         purchaseOrderRepository.save(purchaseOrder);
-
-        // Create PO Items
-
-        var poi = new PurchaseOrderItem(new PurchaseOrderItemRegisterDTO(
-                "name",
-                "description",
-                1L,
-                new BigDecimal(10),
-                new BigDecimal(10),
-                1L,
-                1L,
-                purchaseOrder
-        ));
-
-        purchaseOrderItemRepository.save(poi);
 
         return new PurchaseOrderInfoDTO(purchaseOrder.getId(), purchaseOrder.getPoNumber(), purchaseOrder.getStatus(), purchaseOrder.getLastReceivedAt(), supplier.getName());
 //        return new PurchaseOrderInfoDTO(1L, "123", "a", torontoLocalDateTime, "asdasd");
