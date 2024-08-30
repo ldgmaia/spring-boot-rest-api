@@ -31,20 +31,6 @@ public class PurchaseOrder {
     private String watchingPo;
     private LocalDateTime lastReceivedAt;
 
-//    @Column(unique = true, nullable = false)
-//    private String name;
-//
-//    private String description;
-//    private String identifier;
-//    private String status;
-//    private Boolean enabled;
-//    private Boolean needsMpn;
-//
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "categories_id")
-//    private Category category;
-
-
     public PurchaseOrder(PurchaseOrderRegisterDTO data) {
         this.status = data.status();
         this.poNumber = data.poNumber();
@@ -56,6 +42,5 @@ public class PurchaseOrder {
         this.suppliersId = data.suppliersId();
         this.receivingStatus = data.receivingStatus();
         this.watchingPo = data.watchingPo();
-//        this.lastReceivedAt = data.lastReceivedAt();
     }
 }

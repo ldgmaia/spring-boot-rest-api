@@ -1,5 +1,6 @@
 package com.example.api.domain.purchaseorders;
 
+import com.example.api.domain.ValidationException;
 import com.example.api.domain.purchaseorderitems.PurchaseOrderItem;
 import com.example.api.domain.purchaseorderitems.PurchaseOrderItemRegisterDTO;
 import com.example.api.domain.suppliers.Supplier;
@@ -89,6 +90,15 @@ public class PurchaseOrderService {
         return new PurchaseOrderInfoDTO(purchaseOrder, supplier);
 //        return new PurchaseOrderInfoDTO(1L, "123", "a", torontoLocalDateTime, "asdasd");
 
+    }
+
+    public PurchaseOrderInfoDTO show(Long id) {
+
+        var purchaseOrder = purchaseOrderRepository.findById(id).orElseThrow(() -> new ValidationException("Purchase order not found"));
+
+        var supplier = supplierRepository.getReferenceById(purchaseOrder.getSuppliersId());
+
+        return new PurchaseOrderInfoDTO(purchaseOrder, supplier);
     }
 
 }

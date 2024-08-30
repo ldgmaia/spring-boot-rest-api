@@ -6,7 +6,6 @@ import com.example.api.domain.purchaseorders.PurchaseOrderRequestDTO;
 import com.example.api.domain.purchaseorders.PurchaseOrderService;
 import com.example.api.repositories.PurchaseOrderRepository;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -15,12 +14,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("purchase-orders")
@@ -56,12 +52,9 @@ public class PurchaseOrderController {
 
     @GetMapping("/{id}")
     public ResponseEntity detail(@PathVariable Long id) {
-        try {
-            var purchaseOrder = purchaseOrderRepository.getReferenceById(id);
-            return ResponseEntity.ok(new PurchaseOrderInfoDTO(purchaseOrder));
-        } catch (EntityNotFoundException ex) {
-            Map<String, String> jsonResponse = Map.of("message", "Purchase Order not found");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(jsonResponse);
-        }
+
+        var purchaseOrder = purchaseOrderService.show(id);
+        return ResponseEntity.ok(purchaseOrder);
+
     }
 }
