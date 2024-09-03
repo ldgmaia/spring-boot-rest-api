@@ -1,45 +1,30 @@
 package com.example.api.domain.purchaseorders;
 
+import com.example.api.domain.purchaseorderitems.PurchaseOrderItemInfoDTO;
 import com.example.api.domain.suppliers.Supplier;
 import com.example.api.domain.suppliers.SupplierInfoDTO;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public record PurchaseOrderInfoDTO(
         Long id,
         String poNumber,
         String status,
         LocalDateTime lastReceivedAt,
-        SupplierInfoDTO supplier
+        SupplierInfoDTO supplier,
+        List<PurchaseOrderItemInfoDTO> items
 
 ) {
 
-//    public PurchaseOrderInfoDTO(PurchaseOrder purchaseOrder, Supplier supplier, Boolean enabled) {
-//        this(purchaseOrder.getId(),
-//                purchaseOrder.getPoNumber(),
-//                purchaseOrder.getStatus(),
-//                purchaseOrder.getLastReceivedAt(),
-//                supplier.getName()
-//
-//        );
-//    }
-
-//    public PurchaseOrderInfoDTO(PurchaseOrder purchaseOrder) {
-//        this(purchaseOrder.getId(),
-//                purchaseOrder.getPoNumber(),
-//                purchaseOrder.getStatus(),
-//                purchaseOrder.getLastReceivedAt(),
-//                null
-//        );
-//    }
-
-    public PurchaseOrderInfoDTO(PurchaseOrder purchaseOrder, Supplier supplier) {
+    public PurchaseOrderInfoDTO(PurchaseOrder purchaseOrder, Supplier supplier, List<PurchaseOrderItemInfoDTO> items) {
         this(
                 purchaseOrder.getId(),
                 purchaseOrder.getPoNumber(),
                 purchaseOrder.getStatus(),
                 purchaseOrder.getLastReceivedAt(),
-                new SupplierInfoDTO(supplier)
+                new SupplierInfoDTO(supplier),
+                items
         );
     }
 

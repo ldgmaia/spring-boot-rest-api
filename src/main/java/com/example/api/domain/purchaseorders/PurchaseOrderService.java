@@ -87,7 +87,9 @@ public class PurchaseOrderService {
 
         purchaseOrderItemRepository.save(poi);
 
-        return new PurchaseOrderInfoDTO(purchaseOrder, supplier);
+        var items = purchaseOrderItemRepository.findAllByPurchaseOrderId(purchaseOrder.getId());
+
+        return new PurchaseOrderInfoDTO(purchaseOrder, supplier, items);
 //        return new PurchaseOrderInfoDTO(1L, "123", "a", torontoLocalDateTime, "asdasd");
 
     }
@@ -98,7 +100,9 @@ public class PurchaseOrderService {
 
         var supplier = supplierRepository.getReferenceById(purchaseOrder.getSuppliersId());
 
-        return new PurchaseOrderInfoDTO(purchaseOrder, supplier);
+        var items = purchaseOrderItemRepository.findAllByPurchaseOrderId(purchaseOrder.getId());
+
+        return new PurchaseOrderInfoDTO(purchaseOrder, supplier, items);
     }
 
 }
