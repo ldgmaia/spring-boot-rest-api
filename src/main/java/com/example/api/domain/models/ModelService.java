@@ -18,6 +18,7 @@ import com.example.api.domain.values.ValueRegisterDTO;
 import com.example.api.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -50,6 +51,8 @@ public class ModelService {
     @Autowired
     private ValueRepository valueRepository;
 
+    @Autowired
+    private UserRepository userRepository;
 
 //    @Autowired
 //    private List<FieldValidator> validators; // Spring boot will automatically detect that a List is being ejected and will get all classes that implements this interface and will inject the validators automatically
@@ -60,7 +63,11 @@ public class ModelService {
         try {
             var category = categoryRepository.getReferenceById(data.categoryId());
 
-            var model = new Model(new ModelRegisterDTO(data.name(), data.description(), data.identifier(), data.status(), data.needsMpn(), category));
+            // Fetch the currently logged-in user
+            String username = SecurityContextHolder.getContext().getAuthentication().getName();
+            var currentUser = userRepository.findByUsername(username);
+
+            var model = new Model(new ModelRegisterDTO(data.name(), data.description(), data.identifier(), data.status(), data.needsMpn(), category), currentUser);
             modelRepository.save(model);
 
             if (data.modelFieldsValues() != null) {

@@ -6,11 +6,9 @@ import com.example.api.domain.mpnfieldsvalues.MPNFieldValueRegisterDTO;
 import com.example.api.domain.mpnfieldsvalues.MPNFieldValueRequestDTO;
 import com.example.api.domain.mpnfieldsvalues.MPNFieldsValues;
 import com.example.api.domain.values.ValueInfoDTO;
-import com.example.api.repositories.FieldValueRepository;
-import com.example.api.repositories.MPNFieldValueRepository;
-import com.example.api.repositories.MPNRepository;
-import com.example.api.repositories.ModelRepository;
+import com.example.api.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -33,13 +31,19 @@ public class MPNService {
     @Autowired
     private MPNRepository mpnRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
 //    @Autowired
 //    private List<FieldValidator> validators; // Spring boot will automatically detect that a List is being ejected and will get all classes that implements this interface and will inject the validators automatically
 
-
     public MPNInfoDTO register(MPNRequestDTO data) {
 
-        var mpn = new MPN(new MPNRegisterDTO(data.name(), data.description(), data.status(), modelRepository.getReferenceById(data.modelId())));
+        // Fetch the currently logged-in user
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        var currentUser = userRepository.findByUsername(username);
+
+        var mpn = new MPN(new MPNRegisterDTO(data.name(), data.description(), data.status(), modelRepository.getReferenceById(data.modelId())), currentUser);
         mpnRepository.save(mpn);
 
 

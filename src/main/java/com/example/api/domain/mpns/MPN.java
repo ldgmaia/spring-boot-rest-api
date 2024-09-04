@@ -38,13 +38,13 @@ public class MPN {
     private User createdBy;
 
 
-    public MPN(MPNRegisterDTO data) {
+    public MPN(MPNRegisterDTO data, User currentUser) {
         this.name = data.name();
         this.description = data.description();
         this.enabled = true;
         this.status = data.status();
         this.model = data.model();
-
+        this.createdBy = currentUser;
     }
 
 //    public void deactivate() {
