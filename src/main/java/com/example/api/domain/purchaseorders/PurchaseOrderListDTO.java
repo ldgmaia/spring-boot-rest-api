@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public record PurchaseOrderListDTO(
+        Long id,
         String status,
         String poNumber,
         String currency,
@@ -13,6 +14,7 @@ public record PurchaseOrderListDTO(
 ) {
     public PurchaseOrderListDTO(PurchaseOrder purchaseOrder) {
         this(
+                purchaseOrder.getId(),
                 purchaseOrder.getPoNumber(),
                 purchaseOrder.getStatus(),
                 purchaseOrder.getCurrency(),
