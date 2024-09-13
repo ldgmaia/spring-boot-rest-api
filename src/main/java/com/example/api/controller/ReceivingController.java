@@ -48,6 +48,7 @@ public class ReceivingController {
     @GetMapping("/{id}")
     public ResponseEntity detail(@PathVariable Long id) {
         var receivingById = receivingService.show(id);
+
         return ResponseEntity.ok(receivingById);
     }
 

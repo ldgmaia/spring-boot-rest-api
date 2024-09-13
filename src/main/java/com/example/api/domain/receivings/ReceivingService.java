@@ -103,10 +103,19 @@ public class ReceivingService {
     }
 
 
-    public ReceivingListDTO show(Long id) {
-        //var supplierName = supplierRepository.getReferenceById(id).getName();
+    public ReceivingInfoDTO show(Long id) {
+//        var supplierName = supplierRepository.getReferenceById(id).getName();
+//        System.out.println("supplierName: " + supplierName + "\n");
         var receivingById = receivingRepository.findById(id).orElseThrow(() -> new ValidationException("Receiving not found"));
-        return new ReceivingListDTO(receivingById);
+        return new ReceivingInfoDTO(receivingById);
     }
+
+//    public ReceivingListDTO show(Long id) {
+//        //var supplierName = supplierRepository.getReferenceById(id).getName();
+//        var supplierName = supplierRepository.getReferenceById(id).getName();
+//        System.out.println("supplierName: " + supplierName);
+//        var receivingById = receivingRepository.findById(id).orElseThrow(() -> new ValidationException("Receiving not found"));
+//        return new ReceivingListDTO(receivingById);
+//    }
 
 }
