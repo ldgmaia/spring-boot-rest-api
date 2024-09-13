@@ -1,6 +1,5 @@
 package com.example.api.domain.receivings;
 
-import com.example.api.domain.purchaseorders.PurchaseOrder;
 import com.example.api.domain.suppliers.Supplier;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -19,8 +18,8 @@ public record ReceivingRegisterDTO(
         @NotNull
         Supplier supplierId,
 
-        @NotNull
-        PurchaseOrder purchaseOrderId,
+//        @NotNull
+//        PurchaseOrder purchaseOrderId,
 
         @NotNull
         Carriers carrier,

@@ -25,8 +25,6 @@ public class ReceivingController {
     @Transactional
     public ResponseEntity register(@RequestBody @Valid ReceivingRequestDTO data, UriComponentsBuilder uriBuilder) {
 
-        System.out.println("purchase order id =" + data.purchaseOrderId());
-
         var receiving = receivingService.register(data);
         var uri = uriBuilder.path("/receiving/{id}").buildAndExpand(receiving.identifier()).toUri();
         return ResponseEntity.created(uri).body(receiving);

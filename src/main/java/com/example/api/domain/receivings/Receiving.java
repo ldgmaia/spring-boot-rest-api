@@ -1,12 +1,9 @@
 package com.example.api.domain.receivings;
 
-import com.example.api.domain.purchaseorders.PurchaseOrder;
 import com.example.api.domain.suppliers.Supplier;
 import com.example.api.domain.users.User;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalDateTime;
 
 @Table(name = "receivings")
 @Entity(name = "Receiving")
@@ -29,9 +26,9 @@ public class Receiving {
     @JoinColumn(name = "suppliers_id")
     private Supplier supplierId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "purchase_order_id")
-    private PurchaseOrder purchaseOrder;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "purchase_order_id")
+//    private Long purchaseOrder;
 
     private String identifier;
     private String parcels;
@@ -41,19 +38,14 @@ public class Receiving {
     @JoinColumn(name = "created_by")
     private User createdBy;
 
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-
     public Receiving(ReceivingRegisterDTO data, User currentUser) {
         this.trackingLading = data.trackingLading();
         this.carrier = data.carrier();
         this.type = data.type();
         this.supplierId = data.supplierId();
-        this.purchaseOrder = data.purchaseOrderId();
         this.identifier = data.identifier();
         this.notes = data.notes();
         this.createdBy = currentUser;
 
     }
-
 }
