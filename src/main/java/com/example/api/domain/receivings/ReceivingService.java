@@ -37,9 +37,6 @@ public class ReceivingService {
     private UserRepository userRepository;
 
     public ReceivingInfoDTO register(ReceivingRequestDTO data) {
-
-        System.out.println("data " + data);
-
         // Fetch the currently logged-in user
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         var currentUser = userRepository.findByUsername(username);
@@ -54,8 +51,6 @@ public class ReceivingService {
         receivingRepository.save(receiving);
 
         // create the receiving record to get its ID
-        System.out.println("receiving ID " + receiving.getId());
-
         //add items
         if (data.receivingItems() != null) {
             data.receivingItems()
@@ -84,7 +79,6 @@ public class ReceivingService {
         }
 
         // Additional items record
-
         if (data.additionalItems() != null) {
             data.additionalItems()
                     .forEach(
@@ -103,10 +97,7 @@ public class ReceivingService {
                             });
         }
 
-
         //Additional Items
-
         return new ReceivingInfoDTO(receiving);
     }
-
 }

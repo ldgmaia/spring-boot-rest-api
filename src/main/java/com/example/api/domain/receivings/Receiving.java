@@ -18,17 +18,18 @@ public class Receiving {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "tracking_lading")
     private String trackingLading;
+
+    @Enumerated(EnumType.STRING)
     private Carriers carrier;
+
+    @Enumerated(EnumType.STRING)
     private ReceivingType type;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "suppliers_id")
     private Supplier supplierId;
-
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "purchase_order_id")
-//    private Long purchaseOrder;
 
     private String identifier;
     private String parcels;
@@ -46,6 +47,5 @@ public class Receiving {
         this.identifier = data.identifier();
         this.notes = data.notes();
         this.createdBy = currentUser;
-
     }
 }

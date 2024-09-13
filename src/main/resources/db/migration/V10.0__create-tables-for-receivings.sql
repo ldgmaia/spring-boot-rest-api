@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS receivings
     carrier           VARCHAR(255),
     type              VARCHAR(255),
     suppliers_id      BIGINT UNSIGNED NOT NULL,
-    identifier        BIGINT,
+    identifier        VARCHAR(255),
     parcels           VARCHAR(255),
     notes             VARCHAR(255),
     created_by        BIGINT UNSIGNED NOT NULL,

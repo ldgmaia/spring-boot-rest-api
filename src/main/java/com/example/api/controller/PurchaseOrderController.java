@@ -6,7 +6,6 @@ import com.example.api.domain.purchaseorders.PurchaseOrderRequestDTO;
 import com.example.api.domain.purchaseorders.PurchaseOrderService;
 import com.example.api.repositories.PurchaseOrderRepository;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +43,7 @@ public class PurchaseOrderController {
 
 
     @GetMapping
-    public ResponseEntity<Page<PurchaseOrderListDTO>> list(HttpServletRequest request, @PageableDefault(size = 100, page = 0, sort = {"poNumber"}) Pageable pagination, @RequestHeader HttpHeaders headers) {
+    public ResponseEntity<Page<PurchaseOrderListDTO>> list(@PageableDefault(size = 100, page = 0, sort = {"poNumber"}) Pageable pagination, @RequestHeader HttpHeaders headers) {
         var page = purchaseOrderRepository.findAll(pagination).map(PurchaseOrderListDTO::new);
         return ResponseEntity.ok(page);
     }
