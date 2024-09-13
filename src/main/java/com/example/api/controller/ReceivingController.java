@@ -44,4 +44,12 @@ public class ReceivingController {
         page.getContent().forEach(System.out::println); // Inspect the data here
         return ResponseEntity.ok(page);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity detail(@PathVariable Long id) {
+        var receivingById = receivingService.show(id);
+        return ResponseEntity.ok(receivingById);
+    }
+
+
 }

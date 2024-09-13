@@ -1,5 +1,6 @@
 package com.example.api.domain.receivings;
 
+import com.example.api.domain.ValidationException;
 import com.example.api.domain.receivingadditionalitems.ReceivingAdditionalItem;
 import com.example.api.domain.receivingadditionalitems.ReceivingAdditionalItemRegisterDTO;
 import com.example.api.domain.receivingadditionalitems.ReceivingAdditionalItemRequestDTO;
@@ -100,4 +101,12 @@ public class ReceivingService {
         //Additional Items
         return new ReceivingInfoDTO(receiving);
     }
+
+
+    public ReceivingListDTO show(Long id) {
+        //var supplierName = supplierRepository.getReferenceById(id).getName();
+        var receivingById = receivingRepository.findById(id).orElseThrow(() -> new ValidationException("Receiving not found"));
+        return new ReceivingListDTO(receivingById);
+    }
+
 }
