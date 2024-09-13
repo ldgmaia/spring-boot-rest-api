@@ -5,25 +5,20 @@ import jakarta.validation.constraints.NotNull;
 
 public record ReceivingItemRequestDTO(
 
-        @NotNull
         Long purchaseOrderItemId,
 
         @NotBlank
         String description,
 
-        @NotBlank
         Long quantityToReceive,
 
         @NotBlank
         Long quantityReceived,
 
         @NotBlank
-        Boolean receivableItem
+        Boolean receivableItem,
 
-//        @NotBlank
-//        Long createdBy
-
-
+        @NotNull
+        Boolean additionalItem
 ) {
-
 }

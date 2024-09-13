@@ -41,7 +41,7 @@ public class ReceivingController {
     public ResponseEntity<Page<ReceivingListDTO>> list(@PageableDefault(size = 100, page = 0, sort = {"id"}) Pageable pagination, @RequestHeader HttpHeaders headers) {
         var page = receivingRepository.findAll(pagination).map(ReceivingListDTO::new);
 
-        page.getContent().forEach(System.out::println); // Inspect the data here
+//        page.getContent().forEach(System.out::println); // Inspect the data here
         return ResponseEntity.ok(page);
     }
 

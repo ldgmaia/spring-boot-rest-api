@@ -24,7 +24,7 @@ public class ReceivingItem {
     private Receiving receiving;
 
     @ManyToOne
-    @JoinColumn(name = "purchase_order_item_id")
+    @JoinColumn(name = "purchase_order_item_id", nullable = true)
     private PurchaseOrderItem purchaseOrderItem;
 
     private String description;
@@ -39,7 +39,11 @@ public class ReceivingItem {
     @JoinColumn(name = "created_by")
     private User createdBy;
 
+    @Column(name = "receivable_item")
     private Boolean receivableItem;
+
+    @Column(name = "additional_item")
+    private Boolean additionalItem;
 
     public ReceivingItem(ReceivingItemRegisterDTO receivingItemRegister) {
         this.receiving = receivingItemRegister.receiving();
@@ -49,6 +53,6 @@ public class ReceivingItem {
         this.quantityReceived = receivingItemRegister.quantityReceived();
         this.createdBy = receivingItemRegister.createdBy();
         this.receivableItem = receivingItemRegister.receivableItem();
+        this.additionalItem = receivingItemRegister.additionalItem();
     }
-
 }

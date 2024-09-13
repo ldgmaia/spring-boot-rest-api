@@ -31,7 +31,7 @@ public class Receiving {
     @JoinColumn(name = "suppliers_id")
     private Supplier supplierId;
 
-    private String identifier;
+    private String identifier; // change this field to identifier_id and use the ID instead
     private String parcels;
     private String notes;
 

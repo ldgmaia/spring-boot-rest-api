@@ -1,9 +1,6 @@
 package com.example.api.domain.receivings;
 
 import com.example.api.domain.ValidationException;
-import com.example.api.domain.receivingadditionalitems.ReceivingAdditionalItem;
-import com.example.api.domain.receivingadditionalitems.ReceivingAdditionalItemRegisterDTO;
-import com.example.api.domain.receivingadditionalitems.ReceivingAdditionalItemRequestDTO;
 import com.example.api.domain.receivingitems.ReceivingItem;
 import com.example.api.domain.receivingitems.ReceivingItemRegisterDTO;
 import com.example.api.domain.receivingitems.ReceivingItemRequestDTO;
@@ -22,9 +19,6 @@ public class ReceivingService {
     private ReceivingItemRepository receivingItemRepository;
 
     @Autowired
-    private ReceivingAdditionalItemRepository receivingAdditionalItemRepository;
-
-    @Autowired
     private SupplierRepository supplierRepository;
 
     @Autowired
@@ -33,11 +27,11 @@ public class ReceivingService {
     @Autowired
     private PurchaseOrderItemRepository purchaseOrderItemRepository;
 
-
     @Autowired
     private UserRepository userRepository;
 
     public ReceivingInfoDTO register(ReceivingRequestDTO data) {
+
         // Fetch the currently logged-in user
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         var currentUser = userRepository.findByUsername(username);
@@ -49,73 +43,50 @@ public class ReceivingService {
                 data.carrier(),
                 data.notes()
         ), currentUser);
+
         receivingRepository.save(receiving);
+
 
         // create the receiving record to get its ID
         //add items
         if (data.receivingItems() != null) {
             data.receivingItems()
                     .forEach(
-                            (ReceivingItemRequestDTO receivingItemRequestDTO) -> {
-                                //System.out.println("**purchaseOrderItemId: " + mfv.purchaseOrderItemId() + "\n");
-                                var purchaseOrderItemId = receivingItemRequestDTO.purchaseOrderItemId();
-                                var description = receivingItemRequestDTO.description();
-                                var quantityToReceive = receivingItemRequestDTO.quantityToReceive();
-                                var quantityReceived = receivingItemRequestDTO.quantityReceived();
-                                var receivingId = receiving.getId();
-                                var receivableItem = receivingItemRequestDTO.receivableItem();
+                            (ReceivingItemRequestDTO receivingItem) -> {
+
+                                if (!receivingItem.additionalItem()) {
+                                    if (receivingItem.purchaseOrderItemId() == null) {
+                                        throw new ValidationException("Missing purchase order item");
+                                    }
+                                    if (receivingItem.quantityToReceive() == null) {
+                                        throw new ValidationException("Quantity to receive cannot be empty");
+                                    }
+                                }
 
                                 var receivingItems = new ReceivingItem(new ReceivingItemRegisterDTO(
                                         receiving,
-                                        purchaseOrderItemRepository.getReferenceById(purchaseOrderItemId),
-                                        description,
-                                        quantityToReceive,
-                                        quantityReceived,
+//                                        Optional.ofNullable(receivingItem.purchaseOrderItemId())
+//                                                .map(purchaseOrderItemRepository::getReferenceById)
+//                                                .orElse(null),
+                                        receivingItem.purchaseOrderItemId() == null ? null : purchaseOrderItemRepository.getReferenceById(receivingItem.purchaseOrderItemId()),
+                                        receivingItem.description(),
+                                        receivingItem.quantityToReceive() == null ? null : receivingItem.quantityToReceive(),
+                                        receivingItem.quantityReceived(),
                                         currentUser,
-                                        receivableItem
+                                        receivingItem.receivableItem(),
+                                        receivingItem.additionalItem()
                                 ));
-                                System.out.println("receivingItems " + receivingItems.toString());
+                                System.out.println("receivingItems - before save" + receivingItems);
                                 receivingItemRepository.save(receivingItems);
                             });
         }
 
-        // Additional items record
-        if (data.additionalItems() != null) {
-            data.additionalItems()
-                    .forEach(
-                            (ReceivingAdditionalItemRequestDTO receivingAdditionalItemRequestDTO) -> {
-                                var description = receivingAdditionalItemRequestDTO.description();
-                                var quantityReceived = receivingAdditionalItemRequestDTO.quantityReceived();
-                                var receivingAdditionalItems = new ReceivingAdditionalItem(new ReceivingAdditionalItemRegisterDTO(
-                                        receiving,
-                                        description,
-                                        quantityReceived,
-                                        currentUser
-                                ));
-
-                                receivingAdditionalItemRepository.save(receivingAdditionalItems);
-
-                            });
-        }
-
-        //Additional Items
         return new ReceivingInfoDTO(receiving);
     }
 
-
     public ReceivingInfoDTO show(Long id) {
-//        var supplierName = supplierRepository.getReferenceById(id).getName();
-//        System.out.println("supplierName: " + supplierName + "\n");
         var receivingById = receivingRepository.findById(id).orElseThrow(() -> new ValidationException("Receiving not found"));
         return new ReceivingInfoDTO(receivingById);
     }
-
-//    public ReceivingListDTO show(Long id) {
-//        //var supplierName = supplierRepository.getReferenceById(id).getName();
-//        var supplierName = supplierRepository.getReferenceById(id).getName();
-//        System.out.println("supplierName: " + supplierName);
-//        var receivingById = receivingRepository.findById(id).orElseThrow(() -> new ValidationException("Receiving not found"));
-//        return new ReceivingListDTO(receivingById);
-//    }
 
 }

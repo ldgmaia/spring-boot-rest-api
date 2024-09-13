@@ -8,16 +8,12 @@ import jakarta.validation.constraints.NotNull;
 
 public record ReceivingItemRegisterDTO(
 
-        @NotNull
         Receiving receiving,
 
-        @NotNull
         PurchaseOrderItem purchaseOrderItem,
 
-        @NotBlank
         String description,
 
-        @NotBlank
         Long quantityToReceive,
 
         @NotBlank
@@ -27,8 +23,10 @@ public record ReceivingItemRegisterDTO(
         User createdBy,
 
         @NotNull
-        Boolean receivableItem
+        Boolean receivableItem,
+
+        @NotNull
+        Boolean additionalItem
 
 ) {
-
 }

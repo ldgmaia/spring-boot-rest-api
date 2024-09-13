@@ -1,6 +1,5 @@
 package com.example.api.domain.receivings;
 
-import com.example.api.domain.receivingadditionalitems.ReceivingAdditionalItemRequestDTO;
 import com.example.api.domain.receivingitems.ReceivingItemRequestDTO;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -29,9 +28,7 @@ public record ReceivingRequestDTO(
         List<Long> pictureIds,
 
         @NotNull
-        List<ReceivingItemRequestDTO> receivingItems,
-
-        List<ReceivingAdditionalItemRequestDTO> additionalItems
+        List<ReceivingItemRequestDTO> receivingItems
 
 ) {
 
