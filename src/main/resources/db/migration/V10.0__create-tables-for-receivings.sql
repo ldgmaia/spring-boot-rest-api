@@ -1,8 +1,19 @@
+CREATE TABLE IF NOT EXISTS carriers
+(
+    id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    name            VARCHAR(255) NOT NULL,
+    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (id)
+);
+
+
 CREATE TABLE IF NOT EXISTS receivings
 (
     id                BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     tracking_lading   VARCHAR(255),
-    carrier           VARCHAR(255),
+    carrier_id        BIGINT UNSIGNED NOT NULL,
     type              VARCHAR(255),
     suppliers_id      BIGINT UNSIGNED NOT NULL,
     identifier        VARCHAR(255),
@@ -16,7 +27,8 @@ CREATE TABLE IF NOT EXISTS receivings
     INDEX (suppliers_id),
     INDEX (created_by),
     FOREIGN KEY (suppliers_id) REFERENCES suppliers (id),
-    FOREIGN KEY (created_by) REFERENCES users (id)
+    FOREIGN KEY (created_by) REFERENCES users (id),
+    FOREIGN KEY (carrier_id) REFERENCES carrier (id)
 );
 
 CREATE TABLE IF NOT EXISTS receiving_items

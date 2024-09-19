@@ -15,8 +15,8 @@ public record PurchaseOrderListDTO(
     public PurchaseOrderListDTO(PurchaseOrder purchaseOrder) {
         this(
                 purchaseOrder.getId(),
-                purchaseOrder.getPoNumber(),
                 purchaseOrder.getStatus(),
+                purchaseOrder.getPoNumber(),
                 purchaseOrder.getCurrency(),
                 purchaseOrder.getTotal(),
                 purchaseOrder.getReceivingStatus(),
