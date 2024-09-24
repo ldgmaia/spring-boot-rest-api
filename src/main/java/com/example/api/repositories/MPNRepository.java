@@ -3,6 +3,7 @@ package com.example.api.repositories;
 import com.example.api.domain.mpns.MPN;
 import com.example.api.domain.mpns.MPNFieldsDTO;
 import com.example.api.domain.mpns.MPNInfoListDTO;
+import com.example.api.domain.mpns.MPNsByModelDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -45,4 +46,6 @@ public interface MPNRepository extends JpaRepository<MPN, Long> {
             WHERE m.id = :id
             """)
     MPNInfoListDTO getMpnDetails(Long id);
+
+    List<MPNsByModelDTO> findAllByModelId(Long modelId);
 }

@@ -14,7 +14,10 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("receivings")
@@ -29,11 +32,22 @@ public class ReceivingController {
 
     @PostMapping
     @Transactional
-    public ResponseEntity register(@RequestBody @Valid ReceivingRequestDTO data, UriComponentsBuilder uriBuilder) {
+//    public ResponseEntity register(@RequestBody @Valid ReceivingRequestDTO data, UriComponentsBuilder uriBuilder) {
 
-        var receiving = receivingService.register(data);
-        var uri = uriBuilder.path("/receiving/{id}").buildAndExpand(receiving.identifier()).toUri();
-        return ResponseEntity.created(uri).body(receiving);
+//    public ResponseEntity register(@ModelAttribute @Valid ReceivingRequestDTO data, UriComponentsBuilder uriBuilder) throws IOException {
+    public ResponseEntity register(
+            @RequestPart("data") @Valid ReceivingRequestDTO data,  // For complex form data
+            @RequestPart("pictures") MultipartFile[] pictures,
+            UriComponentsBuilder uriBuilder) throws IOException {
+
+        System.out.println("data " + data);
+//        System.out.println("pictures " + pictures);
+
+
+        var receiving = receivingService.register(data, pictures);
+//        var uri = uriBuilder.path("/receiving/{id}").buildAndExpand(receiving.identifier()).toUri();
+//        return ResponseEntity.created(uri).body(receiving);
+        return ResponseEntity.ok("ok");
 
     }
 

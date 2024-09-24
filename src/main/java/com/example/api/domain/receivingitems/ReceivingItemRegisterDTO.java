@@ -25,8 +25,6 @@ public record ReceivingItemRegisterDTO(
         @NotNull
         Boolean receivableItem,
 
-        @NotNull
         Boolean additionalItem
-
 ) {
 }

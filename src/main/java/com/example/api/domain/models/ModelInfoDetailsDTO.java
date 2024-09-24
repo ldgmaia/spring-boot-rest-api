@@ -19,5 +19,3 @@ public record ModelInfoDetailsDTO(
         List<SectionWithAreasDTO> sections
 ) {
 }
-
-

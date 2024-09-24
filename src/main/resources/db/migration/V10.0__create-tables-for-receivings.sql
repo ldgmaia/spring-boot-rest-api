@@ -2,6 +2,7 @@ CREATE TABLE IF NOT EXISTS carriers
 (
     id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     name            VARCHAR(255) NOT NULL,
+    enabled BIT DEFAULT 1 NOT NULL,
     created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
@@ -13,10 +14,10 @@ CREATE TABLE IF NOT EXISTS receivings
 (
     id                BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     tracking_lading   VARCHAR(255),
-    carrier_id        BIGINT UNSIGNED NOT NULL,
+    carriers_id       BIGINT UNSIGNED,
     type              VARCHAR(255),
     suppliers_id      BIGINT UNSIGNED NOT NULL,
-    identifier        VARCHAR(255),
+    identifier_id     BIGINT UNSIGNED,
     parcels           VARCHAR(255),
     notes             VARCHAR(255),
     created_by        BIGINT UNSIGNED NOT NULL,
@@ -24,11 +25,13 @@ CREATE TABLE IF NOT EXISTS receivings
     updated_at        TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     PRIMARY KEY (id),
+    INDEX (carriers_id),
     INDEX (suppliers_id),
     INDEX (created_by),
+    FOREIGN KEY (carriers_id) REFERENCES carriers (id),
     FOREIGN KEY (suppliers_id) REFERENCES suppliers (id),
-    FOREIGN KEY (created_by) REFERENCES users (id),
-    FOREIGN KEY (carrier_id) REFERENCES carrier (id)
+    FOREIGN KEY (created_by) REFERENCES users (id)
+
 );
 
 CREATE TABLE IF NOT EXISTS receiving_items

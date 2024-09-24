@@ -55,7 +55,7 @@ public class ModelService {
     private UserRepository userRepository;
 
 //    @Autowired
-//    private List<FieldValidator> validators; // Spring boot will automatically detect that a List is being ejected and will get all classes that implements this interface and will inject the validators automatically
+//    private List<ReceivingValidator> validators; // Spring boot will automatically detect that a List is being ejected and will get all classes that implements this interface and will inject the validators automatically
 
 
     public ModelInfoDTO register(ModelRequestDTO data) {
@@ -306,4 +306,9 @@ public class ModelService {
         modelRepository.save(model);
         return new ModelInfoDTO(model);
     }
+
+    public List<ModelsByCategoryDTO> getModelsByCategoryId(Long categoryId) {
+        return modelRepository.findAllByCategoryId(categoryId);
+    }
+
 }

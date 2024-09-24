@@ -1,28 +1,26 @@
 package com.example.api.domain.receivings;
 
+import com.example.api.domain.carriers.Carrier;
 import com.example.api.domain.suppliers.Supplier;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record ReceivingRegisterDTO(
 
-        @NotBlank
         String trackingLading,
 
         @NotNull
         ReceivingType type,
 
         @NotNull
-        String identifier,
+        Long identifierId,
 
         @NotNull
-        Supplier supplierId,
+        Supplier supplier,
 
 //        @NotNull
 //        PurchaseOrder purchaseOrderId,
 
-        @NotNull
-        Carriers carrier,
+        Carrier carrier,
 
         String notes
 

@@ -35,7 +35,7 @@ public class MPNService {
     private UserRepository userRepository;
 
 //    @Autowired
-//    private List<FieldValidator> validators; // Spring boot will automatically detect that a List is being ejected and will get all classes that implements this interface and will inject the validators automatically
+//    private List<ReceivingValidator> validators; // Spring boot will automatically detect that a List is being ejected and will get all classes that implements this interface and will inject the validators automatically
 
     public MPNInfoDTO register(MPNRequestDTO data) {
 
@@ -158,5 +158,9 @@ public class MPNService {
                 model.getModel().getId(),
                 fields
         );
+    }
+
+    public List<MPNsByModelDTO> getMpnByModelId(Long modelId) {
+        return mpnRepository.findAllByModelId(modelId);
     }
 }

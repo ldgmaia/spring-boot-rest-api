@@ -29,7 +29,7 @@ public class ReceivingItem {
 
     private String description;
 
-    @Column(name = "quantity_to_receive")
+    @Column(name = "quantity_to_receive", nullable = true)
     private Long quantityToReceive;
 
     @Column(name = "quantity_received")
@@ -42,7 +42,7 @@ public class ReceivingItem {
     @Column(name = "receivable_item")
     private Boolean receivableItem;
 
-    @Column(name = "additional_item")
+    @Column(name = "additional_item", nullable = true)
     private Boolean additionalItem;
 
     public ReceivingItem(ReceivingItemRegisterDTO receivingItemRegister) {

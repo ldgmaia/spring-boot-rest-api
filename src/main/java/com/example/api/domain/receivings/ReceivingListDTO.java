@@ -3,9 +3,10 @@ package com.example.api.domain.receivings;
 public record ReceivingListDTO(
         Long id,
         String trackingLading,
-        Carriers carrier,
+        String supplierName,
+        String carrier,
         ReceivingType type,
-        String identifier,
+        Long identifierId,
         String parcels,
         String notes
 ) {
@@ -13,9 +14,10 @@ public record ReceivingListDTO(
         this(
                 receiving.getId(),
                 receiving.getTrackingLading(),
-                receiving.getCarrier(),
+                receiving.getSupplier().getName(),
+                receiving.getCarrier() != null ? receiving.getCarrier().getName() : null,
                 receiving.getType(),
-                receiving.getIdentifier(),
+                receiving.getIdentifierId(),
                 receiving.getParcels(),
                 receiving.getNotes()
         );

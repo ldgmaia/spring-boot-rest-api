@@ -31,28 +31,15 @@ public class MPNController {
 
     @Autowired
     private MPNService mpnService;
+    private Long modelId;
 
     @PostMapping
     @Transactional
     public ResponseEntity register(@RequestBody @Valid MPNRequestDTO data, UriComponentsBuilder uriBuilder) {
-//        System.out.println(data.modelFieldsValues());
-
-//        return ResponseEntity.ok().body(data.modelFieldsValues());
-
-//        if (data.fieldGroupId() != null) {
-//            var fieldGroupExists = fieldGroupRepository.existsById(data.fieldGroupId());
-//
-//            if (!fieldGroupExists) {
-//                Map<String, String> jsonResponse = Map.of("message", "Field group not found");
-//                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(jsonResponse);
-//            }
-//        }
-//
 
         var mpn = mpnService.register(data);
         var uri = uriBuilder.path("/mpns/{id}").buildAndExpand(mpn.id()).toUri();
         return ResponseEntity.created(uri).body(mpn);
-//        return ResponseEntity.ok(data);
     }
 
     @GetMapping("/list/mpn-fields/{modelId}")
@@ -65,38 +52,10 @@ public class MPNController {
     public ResponseEntity<Page<MPNInfoDTO>> list(HttpServletRequest request, @PageableDefault(size = 100, page = 0, sort = {"name"}) Pageable pagination, @RequestHeader HttpHeaders headers) {
         var page = mpnRepository.findAll(pagination).map(MPNInfoDTO::new);
         return ResponseEntity.ok(page);
-//        var page = mpnRepository.findAll(pagination);
-//        Page<MPNInfoListDTO> dtoPage = page.map(mpn -> {
-//            List<MPNFieldValueInfoDTO> mpnFieldsValues = mpnFieldValueRepository.findAllByMpnId(mpn.getId()).stream()
-//                    .map(MPNFieldValueInfoDTO::new)
-//                    .collect(Collectors.toList());
-//            return new MPNInfoListDTO(
-//                    mpn.getId(),
-//                    mpn.getName(),
-//                    mpn.getModel().getName(),
-//                    mpn.getStatus(),
-//                    mpn.getEnabled(),
-//                    mpn.getCreatedBy() != null ? mpn.getCreatedBy().getFirstName() : null,
-//                    mpn.getApprovedBy() != null ? mpn.getApprovedBy().getFirstName() : null,
-//                    mpnFieldsValues
-//            );
-//        });
-//        return ResponseEntity.ok(dtoPage);
-////        var page = mpnRepository.listAllMPN(pagination);
-////        return ResponseEntity.ok(page);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity detail(@PathVariable Long id) {
-//        var mpnExists = mpnRepository.existsById(id);
-//
-//        if (!mpnExists) {
-//            Map<String, String> jsonResponse = Map.of("message", "MPN not found");
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(jsonResponse);
-//        }
-//
-//        var mpn = mpnService.get(id);
-//        return ResponseEntity.ok(mpn);
         var mpnDetails = mpnService.getMpnDetails(id);
 
         return ResponseEntity.ok(mpnDetails);
@@ -109,18 +68,9 @@ public class MPNController {
         return ResponseEntity.ok(mpn);
     }
 
-//    @DeleteMapping("/{id}")
-//    @Transactional
-//    public ResponseEntity delete(@PathVariable Long id) { // route is /doctors/1, for example
-////        repository.deleteById(id); // hard delete from database
-//        var field = fieldRepository.getReferenceById(id);
-//
-//        if (!field.getEnabled()) {
-//            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).header("X-Custom-Message", "Field is already disabled").build();
-//        }
-//
-//        field.deactivate();
-//
-//        return ResponseEntity.noContent().build();
-//    }
+    @GetMapping("/get-by-modelid/{modelId}")
+    public ResponseEntity modelByCategoryId(@PathVariable Long modelId) {
+        var modelDetails = mpnService.getMpnByModelId(modelId);
+        return ResponseEntity.ok(modelDetails);
+    }
 }

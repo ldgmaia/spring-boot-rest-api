@@ -70,4 +70,11 @@ public class ModelsController {
         return ResponseEntity.ok(models);
     }
 
+    @GetMapping("/get-by-categoryid/{categoryId}")
+    public ResponseEntity modelByCategoryId(@PathVariable Long categoryId) {
+        var modelDetails = modelService.getModelsByCategoryId(categoryId);
+        return ResponseEntity.ok(modelDetails);
+    }
+
+
 }

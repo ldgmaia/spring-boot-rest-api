@@ -15,10 +15,20 @@ public record ReceivingItemRequestDTO(
         @NotBlank
         Long quantityReceived,
 
-        @NotBlank
+        @NotNull
         Boolean receivableItem,
 
-        @NotNull
         Boolean additionalItem
 ) {
+    // Custom constructor for setting default value for additionalItem
+    public ReceivingItemRequestDTO(ReceivingItem receivingItem) {
+        // Set default value for additionalItem if not provided (i.e., null)
+        this(
+                receivingItem.getPurchaseOrderItem().getQboPurchaseOrderItemId(),
+                receivingItem.getDescription(),
+                receivingItem.getQuantityToReceive(),
+                receivingItem.getQuantityReceived(),
+                receivingItem.getReceivableItem(),
+                receivingItem.getAdditionalItem() != null ? receivingItem.getAdditionalItem() : false);
+    }
 }
