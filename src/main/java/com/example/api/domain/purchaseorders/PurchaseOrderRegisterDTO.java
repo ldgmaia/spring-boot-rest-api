@@ -1,5 +1,6 @@
 package com.example.api.domain.purchaseorders;
 
+import com.example.api.domain.suppliers.Supplier;
 import jakarta.validation.constraints.NotBlank;
 
 import java.math.BigDecimal;
@@ -15,7 +16,7 @@ public record PurchaseOrderRegisterDTO(
         Long qboId,
         LocalDateTime qboCreatedAt,
         LocalDateTime qboUpdatedAt,
-        Long suppliersId,
+        Supplier supplier,
         String receivingStatus,
         String watchingPo
 ) {

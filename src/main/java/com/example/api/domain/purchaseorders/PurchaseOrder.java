@@ -1,5 +1,6 @@
 package com.example.api.domain.purchaseorders;
 
+import com.example.api.domain.suppliers.Supplier;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,7 +27,11 @@ public class PurchaseOrder {
     private Long qboId;
     private LocalDateTime qboCreatedAt;
     private LocalDateTime qboUpdatedAt;
-    private Long suppliersId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "suppliers_id")
+    private Supplier supplier;
+
     private String receivingStatus;
     private String watchingPo;
     private LocalDateTime lastReceivedAt;
@@ -39,7 +44,7 @@ public class PurchaseOrder {
         this.qboId = data.qboId();
         this.qboCreatedAt = data.qboCreatedAt();
         this.qboUpdatedAt = data.qboUpdatedAt();
-        this.suppliersId = data.suppliersId();
+        this.supplier = data.supplier();
         this.receivingStatus = data.receivingStatus();
         this.watchingPo = data.watchingPo();
     }

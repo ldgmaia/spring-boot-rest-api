@@ -66,7 +66,7 @@ public class PurchaseOrderService {
                 1L,
                 LocalDateTime.now(),
                 LocalDateTime.now(),
-                supplier.getId(),
+                supplier,
                 "receivingStatus",
                 "watchingPo"
         ));
@@ -98,7 +98,7 @@ public class PurchaseOrderService {
 
         var purchaseOrder = purchaseOrderRepository.findById(id).orElseThrow(() -> new ValidationException("Purchase order not found"));
 
-        var supplier = supplierRepository.getReferenceById(purchaseOrder.getSuppliersId());
+        var supplier = purchaseOrder.getSupplier();
 
         var items = purchaseOrderItemRepository.findAllByPurchaseOrderId(purchaseOrder.getId());
 

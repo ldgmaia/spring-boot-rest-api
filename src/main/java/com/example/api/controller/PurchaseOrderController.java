@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -48,12 +49,35 @@ public class PurchaseOrderController {
         return ResponseEntity.ok(page);
     }
 
-
     @GetMapping("/{id}")
     public ResponseEntity detail(@PathVariable Long id) {
-
         var purchaseOrder = purchaseOrderService.show(id);
         return ResponseEntity.ok(purchaseOrder);
-
     }
+
+    @GetMapping("/getSupplier/{id}")
+    public ResponseEntity<?> getSupplier(@PathVariable(required = false) String id) {
+        // Validate if the id is a valid Long
+        try {
+            Long parsedId = Long.valueOf(id); // Try converting id to Long
+
+            // Call the repository method with the parsed Long id
+            var supplier = purchaseOrderRepository.getSupplier(parsedId);
+
+            // If the supplier list is empty, return a 404 response
+            if (supplier == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("No supplier found for Purchase Order ID: " + parsedId);
+            }
+
+            // If the supplier is found, return the response
+            return ResponseEntity.ok(supplier);
+
+        } catch (NumberFormatException e) {
+            // Handle the case where the id is not a valid Long
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Invalid Purchase Order ID. Please provide a valid number.");
+        }
+    }
+
 }
