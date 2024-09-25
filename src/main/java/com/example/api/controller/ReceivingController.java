@@ -1,5 +1,6 @@
 package com.example.api.controller;
 
+import com.example.api.domain.receivings.Receiving;
 import com.example.api.domain.receivings.ReceivingListDTO;
 import com.example.api.domain.receivings.ReceivingRequestDTO;
 import com.example.api.domain.receivings.ReceivingService;
@@ -53,10 +54,14 @@ public class ReceivingController {
 
     @GetMapping
     public ResponseEntity<Page<ReceivingListDTO>> list(@PageableDefault(size = 100, page = 0, sort = {"id"}) Pageable pagination, @RequestHeader HttpHeaders headers) {
-        var page = receivingRepository.findAll(pagination).map(ReceivingListDTO::new);
+        Page<Receiving> page = receivingRepository.findAll(pagination);
 
-//        page.getContent().forEach(System.out::println); // Inspect the data here
-        return ResponseEntity.ok(page);
+        Page<ReceivingListDTO> dtoPage = page.map(ReceivingListDTO::new);
+
+        return ResponseEntity.ok(dtoPage);
+//        var page = receivingRepository.findAll(pagination).map(ReceivingListDTO::new);
+////        page.getContent().forEach(System.out::println); // Inspect the data here
+//        return ResponseEntity.ok(page);
     }
 
     @GetMapping("/{id}")
@@ -65,6 +70,4 @@ public class ReceivingController {
 
         return ResponseEntity.ok(receivingById);
     }
-
-
 }

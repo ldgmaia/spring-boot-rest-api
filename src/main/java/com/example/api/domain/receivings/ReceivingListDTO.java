@@ -1,6 +1,10 @@
 package com.example.api.domain.receivings;
 
+import com.example.api.domain.receivingitems.ReceivingItemsInfoDTO;
+
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public record ReceivingListDTO(
         Long id,
@@ -13,7 +17,8 @@ public record ReceivingListDTO(
         String notes,
         LocalDateTime createdAt,
         LocalDateTime updatedAt,
-        String createdBy
+        String createdBy,
+        List<ReceivingItemsInfoDTO> receivingItems
 ) {
     public ReceivingListDTO(Receiving receiving) {
         this(
@@ -27,7 +32,10 @@ public record ReceivingListDTO(
                 receiving.getNotes(),
                 receiving.getCreatedAt(),
                 receiving.getUpdatedAt(),
-                receiving.getCreatedBy().getFullName()
+                receiving.getCreatedBy().getFullName(),
+                receiving.getReceivingItems().stream()
+                        .map(ReceivingItemsInfoDTO::new)
+                        .collect(Collectors.toList()) // Convert to DTO list
         );
     }
 }

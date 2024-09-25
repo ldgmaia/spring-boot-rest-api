@@ -43,6 +43,7 @@ CREATE TABLE IF NOT EXISTS receiving_items
     quantity_to_receive BIGINT,
     quantity_received   BIGINT NOT NULL,
     created_by          BIGINT UNSIGNED NOT NULL,
+    status              VARCHAR(255)    NOT NULL,
     receivable_item     BIT DEFAULT 1 NOT NULL,
     additional_item     BIT DEFAULT 0 NOT NULL,
     created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
