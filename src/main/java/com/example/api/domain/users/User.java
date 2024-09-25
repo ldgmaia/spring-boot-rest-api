@@ -49,6 +49,10 @@ public class User implements UserDetails {
 //        this.updatedAt = LocalDateTime.now();
     }
 
+    public String getFullName() {
+        return this.firstName + " " + this.lastName;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));

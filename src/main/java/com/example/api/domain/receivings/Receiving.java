@@ -5,6 +5,10 @@ import com.example.api.domain.suppliers.Supplier;
 import com.example.api.domain.users.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+
+import java.time.LocalDateTime;
 
 @Table(name = "receivings")
 @Entity(name = "Receiving")
@@ -41,6 +45,12 @@ public class Receiving {
     @JoinColumn(name = "created_by")
     private User createdBy;
 
+    @CreatedDate
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
+
     public Receiving(ReceivingRegisterDTO data, User currentUser) {
         this.trackingLading = data.trackingLading();
         this.carrier = data.carrier();
@@ -49,5 +59,7 @@ public class Receiving {
         this.identifierId = data.identifierId();
         this.notes = data.notes();
         this.createdBy = currentUser;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 }
