@@ -1,6 +1,7 @@
 package com.example.api.domain.receivings;
 
 import com.example.api.domain.receivingitems.ReceivingItemsInfoDTO;
+import com.example.api.domain.receivingpictures.ReceivingPicturesInfoDTO;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,7 +19,8 @@ public record ReceivingListDTO(
         LocalDateTime createdAt,
         LocalDateTime updatedAt,
         String createdBy,
-        List<ReceivingItemsInfoDTO> receivingItems
+        List<ReceivingItemsInfoDTO> receivingItems,
+        List<ReceivingPicturesInfoDTO> pictures
 ) {
     public ReceivingListDTO(Receiving receiving) {
         this(
@@ -35,9 +37,10 @@ public record ReceivingListDTO(
                 receiving.getCreatedBy().getFullName(),
                 receiving.getReceivingItems().stream()
                         .map(ReceivingItemsInfoDTO::new)
-                        .collect(Collectors.toList()) // Convert to DTO list
+                        .collect(Collectors.toList()),
+                receiving.getPictures().stream()
+                        .map(ReceivingPicturesInfoDTO::new)
+                        .collect(Collectors.toList())
         );
     }
 }
-
-

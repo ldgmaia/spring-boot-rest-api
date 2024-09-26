@@ -41,20 +41,17 @@ public class ReceivingController {
             @RequestPart("pictures") MultipartFile[] pictures,
             UriComponentsBuilder uriBuilder) throws IOException {
 
-        System.out.println("data " + data);
-//        System.out.println("pictures " + pictures);
-
-
         var receiving = receivingService.register(data, pictures);
 //        var uri = uriBuilder.path("/receiving/{id}").buildAndExpand(receiving.identifier()).toUri();
 //        return ResponseEntity.created(uri).body(receiving);
-        return ResponseEntity.ok("ok");
+        return ResponseEntity.ok(receiving);
 
     }
 
     @GetMapping
     public ResponseEntity<Page<ReceivingListDTO>> list(@PageableDefault(size = 100, page = 0, sort = {"id"}) Pageable pagination, @RequestHeader HttpHeaders headers) {
-        Page<Receiving> page = receivingRepository.findAll(pagination);
+//        Page<Receiving> page = receivingRepository.findAll(pagination);
+        Page<Receiving> page = receivingRepository.findAllWithPictures(pagination);
 
         Page<ReceivingListDTO> dtoPage = page.map(ReceivingListDTO::new);
 

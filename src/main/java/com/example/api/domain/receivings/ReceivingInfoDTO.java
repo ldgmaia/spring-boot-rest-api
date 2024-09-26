@@ -11,9 +11,7 @@ public record ReceivingInfoDTO(
         SupplierInfoDTO supplier,
         CarrierInfoDTO carrier,
         String notes
-
 ) {
-
     public ReceivingInfoDTO(Receiving receiving) {
         this(
                 receiving.getId(),

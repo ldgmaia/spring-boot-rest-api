@@ -2,6 +2,7 @@ package com.example.api.domain.receivings;
 
 import com.example.api.domain.carriers.Carrier;
 import com.example.api.domain.receivingitems.ReceivingItem;
+import com.example.api.domain.receivingpictures.ReceivingPicture;
 import com.example.api.domain.suppliers.Supplier;
 import com.example.api.domain.users.User;
 import jakarta.persistence.*;
@@ -56,6 +57,9 @@ public class Receiving {
 
     @OneToMany(mappedBy = "receiving", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<ReceivingItem> receivingItems = new ArrayList<>();
+
+    @OneToMany(mappedBy = "receiving", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<ReceivingPicture> pictures = new ArrayList<>();
 
     public Receiving(ReceivingRegisterDTO data, User currentUser) {
         this.trackingLading = data.trackingLading();
