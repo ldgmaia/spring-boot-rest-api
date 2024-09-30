@@ -1,19 +1,13 @@
 services:
   mysql:
     volumes:
-      - ~/Documents/projects/volumes/mysqlspringboot:/var/lib/mysql
+      - ~/documents/projects/volumes/mysqlspringboot:/var/lib/mysql
     image: mysql:8.0
     container_name: mysql-springboot
     command: --default-authentication-plugin=caching_sha2_password
     restart: unless-stopped
     env_file:
       - ./mysql.env
-    #    environment:
-    #      MYSQL_ROOT_PASSWORD: root
-    #      MYSQL_DATABASE: newrbms
-    #      MYSQL_USER: admin
-    #      MYSQL_PASSWORD: admin
-    #      TZ: America/Toronto
     ports:
       - 3308:3306
     networks:
@@ -28,11 +22,8 @@ services:
     volumes:
       - .:/usr/src/app
       - ~/.m2:/root/.m2
-    environment:
-      DATABASE_URL: jdbc:mysql://mysql:3306/newrbms
-      DATABASE_USER: admin
-      DATABASE_PASSWORD: admin
-      JWT_SECRET: basefilejwtsecret
+    env_file:
+      - ./.env
     depends_on:
       - mysql
     networks:
@@ -41,5 +32,5 @@ services:
 networks:
   newrbms-network:
     name: newrbms-network
-    external: true
+    #    external: true
     driver: bridge
