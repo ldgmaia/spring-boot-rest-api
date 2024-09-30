@@ -1,14 +1,14 @@
-name: CI
+name: CI-BETA
 on:
   push:
     branches: [ beta ]
   workflow_dispatch:
 jobs:
   build:
-    name: Build
     runs-on: ubuntu-latest
     steps:
-      - name: executing remote ssh commands using password
+      - uses: actions/checkout@v2
+      - name: Git pull, run Migrations and restart services
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.BETA_SSH_HOST }}
