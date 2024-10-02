@@ -19,7 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("files")
 @SecurityRequirement(name = "bearer-key")
-public class FilesController {
+public class FileController {
 
     @Autowired
     private FileService fileService;
