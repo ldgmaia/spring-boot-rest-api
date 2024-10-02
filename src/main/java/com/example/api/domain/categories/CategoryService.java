@@ -2,13 +2,13 @@ package com.example.api.domain.categories;
 
 import com.example.api.domain.ValidationException;
 import com.example.api.domain.categories.validations.CategoryValidator;
-import com.example.api.domain.categorycomponent.CategoryComponent;
-import com.example.api.domain.categorycomponent.CategoryComponentRegisterDTO;
-import com.example.api.domain.categoryfield.CategoryField;
-import com.example.api.domain.categoryfield.CategoryFieldRegisterDTO;
-import com.example.api.domain.categoryfield.CategoryFieldUpdateDTO;
-import com.example.api.domain.categoryfield.CategoryFieldsValuesInfoDTO;
-import com.example.api.domain.categorygroups.CategoryGroupInfoDTO;
+import com.example.api.domain.categorycomponents.CategoryComponents;
+import com.example.api.domain.categorycomponents.CategoryComponentsRegisterDTO;
+import com.example.api.domain.categoryfields.CategoryFields;
+import com.example.api.domain.categoryfields.CategoryFieldsRegisterDTO;
+import com.example.api.domain.categoryfields.CategoryFieldsUpdateDTO;
+import com.example.api.domain.categoryfields.CategoryFieldsValuesInfoDTO;
+import com.example.api.domain.categorygroups.CategoryGroupsInfoDTO;
 import com.example.api.domain.fields.Field;
 import com.example.api.domain.values.ValueInfoDTO;
 import com.example.api.repositories.*;
@@ -28,7 +28,7 @@ public class CategoryService {
     private CategoryGroupRepository categoryGroupRepository;
 
     @Autowired
-    private CategoryFieldsRepository categoryFieldsRepository;
+    private CategoryFieldRepository categoryFieldRepository;
 
     @Autowired
     private CategoryComponentRepository categoryComponentRepository;
@@ -52,15 +52,15 @@ public class CategoryService {
         categoryRepository.save(category);
 
         // Handling fields
-        List<CategoryFieldUpdateDTO> fieldList = data.categoryFieldsValues();
+        List<CategoryFieldsUpdateDTO> fieldList = data.categoryFieldsValues();
         if (fieldList != null) {
-            for (CategoryFieldUpdateDTO field : fieldList) {
+            for (CategoryFieldsUpdateDTO field : fieldList) {
 
                 var fieldExists = fieldRepository.findById(field.fieldId())
                         .orElseThrow(() -> new ValidationException("Field not found"));
 
-                var categoryField = new CategoryField(new CategoryFieldRegisterDTO(field.dataLevel(), category, fieldExists, field.printOnLabel(), field.isMandatory()));
-                categoryFieldsRepository.save(categoryField);
+                var categoryField = new CategoryFields(new CategoryFieldsRegisterDTO(field.dataLevel(), category, fieldExists, field.printOnLabel(), field.isMandatory()));
+                categoryFieldRepository.save(categoryField);
             }
         }
 
@@ -72,7 +72,7 @@ public class CategoryService {
                 var parentCategory = categoryRepository.findById(categoryId)
                         .orElseThrow(() -> new ValidationException("Parent Category not found"));
 
-                var categoryComponent = new CategoryComponent(new CategoryComponentRegisterDTO(category, parentCategory));
+                var categoryComponent = new CategoryComponents(new CategoryComponentsRegisterDTO(category, parentCategory));
                 categoryComponentRepository.save(categoryComponent);
             }
         }
@@ -106,7 +106,7 @@ public class CategoryService {
         // handling parent category
         // handling parent categories
         List<Long> newParentCategoryIds = data.parentCategory();
-        List<CategoryComponent> currentParentCategories = categoryComponentRepository.findByChildCategoryId(id);
+        List<CategoryComponents> currentParentCategories = categoryComponentRepository.findByChildCategoryId(id);
 
         if (newParentCategoryIds == null || newParentCategoryIds.isEmpty()) {
             // If no parent categories are provided, delete all current parent categories
@@ -116,7 +116,7 @@ public class CategoryService {
             Set<Long> newParentCategoryIdsSet = new HashSet<>(newParentCategoryIds);
 
             // Iterate through current parent categories and remove those not in the new list
-            for (CategoryComponent currentParentCategory : currentParentCategories) {
+            for (CategoryComponents currentParentCategory : currentParentCategories) {
                 if (!newParentCategoryIdsSet.contains(currentParentCategory.getParentCategory().getId())) {
                     categoryComponentRepository.delete(currentParentCategory);
                 } else {
@@ -129,50 +129,50 @@ public class CategoryService {
             for (Long newParentCategoryId : newParentCategoryIdsSet) {
                 var newParentCategory = categoryRepository.findById(newParentCategoryId)
                         .orElseThrow(() -> new ValidationException("Parent Category not found"));
-                var categoryComponent = new CategoryComponent(new CategoryComponentRegisterDTO(category, newParentCategory));
+                var categoryComponent = new CategoryComponents(new CategoryComponentsRegisterDTO(category, newParentCategory));
                 categoryComponentRepository.save(categoryComponent);
             }
         }
 
         // handling category fields
-        List<CategoryFieldUpdateDTO> newFieldList = data.categoryFieldsValues();
-        List<CategoryField> currentFieldList = categoryFieldsRepository.findAllByEnabledTrueAndCategoryId(id);
+        List<CategoryFieldsUpdateDTO> newFieldList = data.categoryFieldsValues();
+        List<CategoryFields> currentFieldList = categoryFieldRepository.findAllByEnabledTrueAndCategoryId(id);
 
         // Create a map of current fields by field ID for easy lookup
-        Map<Long, CategoryField> currentFieldMap = currentFieldList.stream()
+        Map<Long, CategoryFields> currentFieldMap = currentFieldList.stream()
                 .collect(Collectors.toMap(field -> field.getField().getId(), field -> field));
 
         // Process new field list
-        for (CategoryFieldUpdateDTO newFieldDTO : newFieldList) {
+        for (CategoryFieldsUpdateDTO newFieldDTO : newFieldList) {
             Field field = fieldRepository.findById(newFieldDTO.fieldId())
                     .orElseThrow(() -> new ValidationException("Field not found"));
 
-            CategoryField currentField = currentFieldMap.get(newFieldDTO.fieldId());
+            CategoryFields currentField = currentFieldMap.get(newFieldDTO.fieldId());
             if (currentField != null) {
                 // Update existing field if the fields_id matches
                 currentField.setDataLevel(newFieldDTO.dataLevel());
                 currentField.setPrintOnLabel(newFieldDTO.printOnLabel());
                 currentField.setIsMandatory(newFieldDTO.isMandatory());
                 currentField.setEnabled(true);
-                categoryFieldsRepository.save(currentField);
+                categoryFieldRepository.save(currentField);
                 currentFieldMap.remove(newFieldDTO.fieldId());
             } else {
                 // Add new field
-                CategoryField newCategoryField = new CategoryField();
+                CategoryFields newCategoryField = new CategoryFields();
                 newCategoryField.setDataLevel(newFieldDTO.dataLevel());
                 newCategoryField.setCategory(category);
                 newCategoryField.setField(field);
                 newCategoryField.setIsMandatory(newFieldDTO.isMandatory());
                 newCategoryField.setPrintOnLabel(newFieldDTO.printOnLabel());
                 newCategoryField.setEnabled(true);
-                categoryFieldsRepository.save(newCategoryField);
+                categoryFieldRepository.save(newCategoryField);
             }
         }
 
         // Disable remaining fields that were not updated or added
-        for (CategoryField remainingField : currentFieldMap.values()) {
+        for (CategoryFields remainingField : currentFieldMap.values()) {
             remainingField.setEnabled(false);
-            categoryFieldsRepository.save(remainingField);
+            categoryFieldRepository.save(remainingField);
         }
 
         return new CategoryInfoDTO(category);
@@ -204,10 +204,10 @@ public class CategoryService {
         //        I prefer the first approach compared to this one, since is clear to understand what is happening, but this second way is less verbose in the service class
         // Fetch category fields
 //        var categoryFields = categoryFieldsRepository.findAllEnabledByCategoryId(id);
-        var categoryFields = categoryFieldsRepository.findAllEnabledByCategoryId(id).stream()
+        var categoryFields = categoryFieldRepository.findAllEnabledByCategoryId(id).stream()
                 .map(categoryField -> {
                     List<ValueInfoDTO> values = fieldValueRepository.findAllEnabledValuesByFieldId(categoryField.fieldId());
-                    return new CategoryFieldsValuesInfoDTO(categoryFieldsRepository.getReferenceById(categoryField.id()), values);
+                    return new CategoryFieldsValuesInfoDTO(categoryFieldRepository.getReferenceById(categoryField.id()), values);
                 })
                 .sorted(Comparator.comparingLong(CategoryFieldsValuesInfoDTO::fieldId))  // Sort by fieldId
                 .toList();
@@ -218,7 +218,7 @@ public class CategoryService {
                 category.getName(),
                 category.getNeedsPost(),
                 category.getNeedsSerialNumber(),
-                new CategoryGroupInfoDTO(categoryGroup),
+                new CategoryGroupsInfoDTO(categoryGroup),
                 parentCategory,
                 components,
                 categoryFields

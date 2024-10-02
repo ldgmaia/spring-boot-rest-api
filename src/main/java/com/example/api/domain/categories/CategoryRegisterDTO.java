@@ -1,13 +1,13 @@
 package com.example.api.domain.categories;
 
-import com.example.api.domain.categorygroups.CategoryGroup;
+import com.example.api.domain.categorygroups.CategoryGroups;
 import jakarta.validation.constraints.NotBlank;
 
 public record CategoryRegisterDTO(
         @NotBlank
         String name,
-        
-        CategoryGroup categoryGroup,
+
+        CategoryGroups categoryGroup,
 
 //        Long categoryGroupId,
 //        Long parentCategoryId,

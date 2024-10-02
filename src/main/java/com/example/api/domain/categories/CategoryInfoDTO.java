@@ -1,11 +1,11 @@
 package com.example.api.domain.categories;
 
-import com.example.api.domain.categorygroups.CategoryGroupInfoDTO;
+import com.example.api.domain.categorygroups.CategoryGroupsInfoDTO;
 
 public record CategoryInfoDTO(
         Long id,
         String name,
-        CategoryGroupInfoDTO categoryGroup,
+        CategoryGroupsInfoDTO categoryGroup,
         Boolean enabled,
         Boolean needsSerialNumber,
         Boolean needsPost
@@ -14,7 +14,7 @@ public record CategoryInfoDTO(
         this(
                 category.getId(),
                 category.getName(),
-                new CategoryGroupInfoDTO(category.getCategoryGroup()),
+                new CategoryGroupsInfoDTO(category.getCategoryGroup()),
                 category.getEnabled(),
                 category.getNeedsSerialNumber(),
                 category.getNeedsPost()

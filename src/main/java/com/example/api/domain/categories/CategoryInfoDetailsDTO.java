@@ -1,7 +1,7 @@
 package com.example.api.domain.categories;
 
-import com.example.api.domain.categoryfield.CategoryFieldsValuesInfoDTO;
-import com.example.api.domain.categorygroups.CategoryGroupInfoDTO;
+import com.example.api.domain.categoryfields.CategoryFieldsValuesInfoDTO;
+import com.example.api.domain.categorygroups.CategoryGroupsInfoDTO;
 
 import java.util.List;
 
@@ -10,7 +10,7 @@ public record CategoryInfoDetailsDTO(
         String name,
         Boolean needsPost,
         Boolean needsSerialNumber,
-        CategoryGroupInfoDTO categoryGroup,
+        CategoryGroupsInfoDTO categoryGroup,
         List<CategoryInfoDTO> parentCategory,
         List<CategoryInfoDTO> components,
         List<CategoryFieldsValuesInfoDTO> categoryFieldsValues
