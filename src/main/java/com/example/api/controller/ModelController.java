@@ -21,7 +21,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @RestController
 @RequestMapping("models")
 @SecurityRequirement(name = "bearer-key")
-public class ModelsController {
+public class ModelController {
 
     @Autowired
     private ModelService modelService;

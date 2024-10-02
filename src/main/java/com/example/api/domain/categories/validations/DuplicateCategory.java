@@ -19,6 +19,5 @@ public class DuplicateCategory implements CategoryValidator {
         if (categoryNameFound) {
             throw new ValidationException("Category name already registered");
         }
-
     }
 }

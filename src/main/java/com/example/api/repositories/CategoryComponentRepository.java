@@ -1,12 +1,12 @@
 package com.example.api.repositories;
 
-import com.example.api.domain.categorycomponent.CategoryComponent;
+import com.example.api.domain.categorycomponents.CategoryComponents;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface CategoryComponentRepository extends JpaRepository<CategoryComponent, Long> {
+public interface CategoryComponentRepository extends JpaRepository<CategoryComponents, Long> {
 
     //    Page<CategoryGroup> findAllByEnabledTrue(Pageable pagination);
 //
@@ -26,7 +26,7 @@ public interface CategoryComponentRepository extends JpaRepository<CategoryCompo
             WHERE cc.enabled = true
             AND cc.childCategory.id = :childCategoryId
             """)
-    List<CategoryComponent> findCategoryComponentByChildCategoryId(Long childCategoryId);
+    List<CategoryComponents> findCategoryComponentByChildCategoryId(Long childCategoryId);
 
     @Query("""
             SELECT cc
@@ -34,7 +34,7 @@ public interface CategoryComponentRepository extends JpaRepository<CategoryCompo
             WHERE cc.enabled = true
             AND cc.parentCategory.id = :parentCategoryId
             """)
-    List<CategoryComponent> findComponentsByParentCategoryId(Long parentCategoryId);
+    List<CategoryComponents> findComponentsByParentCategoryId(Long parentCategoryId);
 
-    List<CategoryComponent> findByChildCategoryId(Long id);
+    List<CategoryComponents> findByChildCategoryId(Long id);
 }

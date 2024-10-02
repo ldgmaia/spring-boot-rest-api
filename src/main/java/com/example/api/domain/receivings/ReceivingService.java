@@ -99,6 +99,18 @@ public class ReceivingService {
                                     }
                                 }
 
+                                //var receivingId = receiving.getId();
+                                var quantityToReceive = receivingItem.quantityToReceive();
+                                var quantityReceived = receivingItem.quantityReceived();
+                                var totalQuantityReceived = receivingItemRepository.findQuantityReceivedByPurchaseOrderItemId(receivingItem.purchaseOrderItemId());// Get total quantity already received for this receiving_id
+
+                                // Check if adding the current item exceeds the allowed quantity
+                                if (totalQuantityReceived + quantityReceived > quantityToReceive) {
+//                                    System.err.println("Can not add " + quantityReceived + " item(s) into " + quantityToReceive + " because there is Already " + totalQuantityReceived + " added");
+                                    var poi = purchaseOrderItemRepository.getReferenceById(receivingItem.purchaseOrderItemId());
+                                    throw new ValidationException("Total received quantity exceeds the quantity ordered for the item: " + poi.getDescription());
+                                }
+
                                 var receivingItems = new ReceivingItem(new ReceivingItemRegisterDTO(
                                         receiving,
 //                                        Optional.ofNullable(receivingItem.purchaseOrderItemId())
@@ -106,15 +118,19 @@ public class ReceivingService {
 //                                                .orElse(null),
                                         receivingItem.purchaseOrderItemId() == null ? null : purchaseOrderItemRepository.getReferenceById(receivingItem.purchaseOrderItemId()),
                                         receivingItem.description(),
-                                        receivingItem.quantityToReceive() == null ? null : receivingItem.quantityToReceive(),
+                                        receivingItem.quantityToReceive(),
                                         receivingItem.quantityReceived(),
                                         currentUser,
                                         receivingItem.receivableItem(),
                                         receivingItem.additionalItem()
                                 ));
-                                System.out.println("receivingItems - before save" + receivingItems);
+//                                System.out.println("receivingItems - before save" + receivingItems);
+
+                                //before this step validate if there are enough spaces to add the items
                                 receivingItemRepository.save(receivingItems);
                             });
+        } else {
+            throw new ValidationException("Quantity received is invalid");
         }
         return new ReceivingInfoDTO(receiving);
     }
