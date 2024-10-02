@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS purchase_order_items
     id                         BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     name                       VARCHAR(255)    NOT NULL,
     description                VARCHAR(768),
-    quantity                   DECIMAL(10, 2)  NOT NULL,
+    quantity_ordered           DECIMAL(10, 2)  NOT NULL,
     unit_price                 DECIMAL(10, 2)  NOT NULL,
     total                      DECIMAL(10, 2)  NOT NULL,
     qbo_item_id                BIGINT UNSIGNED NOT NULL,
