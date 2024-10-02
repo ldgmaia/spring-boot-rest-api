@@ -1,4 +1,4 @@
-package com.example.api.domain.categorycomponent;
+package com.example.api.domain.categorycomponents;
 
 import com.example.api.domain.categories.Category;
 import jakarta.persistence.*;
@@ -11,7 +11,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
-public class CategoryComponent {
+public class CategoryComponents {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +27,7 @@ public class CategoryComponent {
 
     private Boolean enabled;
 
-    public CategoryComponent(CategoryComponentRegisterDTO data) {
+    public CategoryComponents(CategoryComponentsRegisterDTO data) {
         this.childCategory = data.childCategory();
         this.parentCategory = data.parentCategory();
         this.enabled = true;

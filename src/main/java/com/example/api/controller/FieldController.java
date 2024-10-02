@@ -23,7 +23,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("fields")
 @SecurityRequirement(name = "bearer-key")
-public class FieldsController {
+public class FieldController {
 
     @Autowired
     private FieldService fieldService;

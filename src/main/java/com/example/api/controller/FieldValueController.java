@@ -16,7 +16,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @RestController
 @RequestMapping("field-values")
 @SecurityRequirement(name = "bearer-key")
-public class FieldValuesController {
+public class FieldValueController {
 
     @Autowired
     private FieldValueService fieldValueService;

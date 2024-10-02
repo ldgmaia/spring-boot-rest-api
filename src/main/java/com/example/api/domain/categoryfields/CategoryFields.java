@@ -1,4 +1,4 @@
-package com.example.api.domain.categoryfield;
+package com.example.api.domain.categoryfields;
 
 import com.example.api.domain.categories.Category;
 import com.example.api.domain.fields.Field;
@@ -12,7 +12,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
-public class CategoryField {
+public class CategoryFields {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,7 +34,7 @@ public class CategoryField {
     private Boolean printOnLabel;
     private Boolean enabled;
 
-    public CategoryField(CategoryFieldRegisterDTO data) {
+    public CategoryFields(CategoryFieldsRegisterDTO data) {
         this.dataLevel = data.dataLevel();
         this.category = data.category();
         this.field = data.field();

@@ -4,7 +4,7 @@ import com.example.api.domain.ValidationException;
 import com.example.api.domain.categories.CategoryListDTO;
 import com.example.api.domain.categories.CategoryRequestDTO;
 import com.example.api.domain.categories.CategoryService;
-import com.example.api.repositories.CategoryFieldsRepository;
+import com.example.api.repositories.CategoryFieldRepository;
 import com.example.api.repositories.CategoryRepository;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,7 +34,7 @@ public class CategoryController {
     private CategoryRepository categoryRepository;
 
     @Autowired
-    private CategoryFieldsRepository categoryFieldsRepository;
+    private CategoryFieldRepository categoryFieldRepository;
 
     @PostMapping
     @Transactional
@@ -65,7 +65,7 @@ public class CategoryController {
     @Transactional
     public ResponseEntity delete(@PathVariable Long id) {
 
-        var categoryHasFields = categoryFieldsRepository.existsByCategoryId(id);
+        var categoryHasFields = categoryFieldRepository.existsByCategoryId(id);
         if (categoryHasFields) {
             Map<String, String> jsonResponse = Map.of("message", "Category has fields and cannot be deactivated");
             return ResponseEntity.status(HttpStatus.CONFLICT).body(jsonResponse);

@@ -1,6 +1,6 @@
 package com.example.api.domain.categories;
 
-import com.example.api.domain.categorygroups.CategoryGroup;
+import com.example.api.domain.categorygroups.CategoryGroups;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
@@ -28,7 +28,7 @@ public class Category {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_group_id")
-    private CategoryGroup categoryGroup;
+    private CategoryGroups categoryGroup;
 
     public Category(CategoryRegisterDTO data) {
         this.name = data.name();

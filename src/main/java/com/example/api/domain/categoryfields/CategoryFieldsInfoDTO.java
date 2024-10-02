@@ -1,4 +1,4 @@
-package com.example.api.domain.categoryfield;
+package com.example.api.domain.categoryfields;
 
 import com.example.api.domain.fields.DataType;
 import com.example.api.domain.fields.FieldType;
@@ -6,7 +6,7 @@ import com.example.api.domain.values.ValueInfoDTO;
 
 import java.util.List;
 
-public record CategoryFieldsValuesInfoDTO(
+public record CategoryFieldsInfoDTO(
         Long id,
         DataLevel dataLevel,
         Boolean isMandatory,
@@ -16,10 +16,9 @@ public record CategoryFieldsValuesInfoDTO(
         DataType dataType,
         FieldType fieldType,
         Boolean isMultiple,
-        Boolean enabled,
-        List<ValueInfoDTO> values
+        Boolean enabled
 ) {
-    public CategoryFieldsValuesInfoDTO(CategoryField categoryField, List<ValueInfoDTO> values) {
+    public CategoryFieldsInfoDTO(CategoryFields categoryField, List<ValueInfoDTO> values) {
         this(
                 categoryField.getId(),
                 categoryField.getDataLevel(),
@@ -30,8 +29,7 @@ public record CategoryFieldsValuesInfoDTO(
                 categoryField.getField().getDataType(),
                 categoryField.getField().getFieldType(),
                 categoryField.getField().getIsMultiple(),
-                categoryField.getField().getEnabled(),
-                values
+                categoryField.getField().getEnabled()
         );
     }
 }

@@ -1,8 +1,11 @@
-package com.example.api.domain.categoryfield;
+package com.example.api.domain.categoryfields;
 
 import jakarta.validation.constraints.NotNull;
 
-public record CategoryFieldRequestDTO(
+public record CategoryFieldsUpdateDTO(
+        @NotNull
+        Long id,
+
         @NotNull
         DataLevel dataLevel,
 
