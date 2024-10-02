@@ -21,7 +21,7 @@ public class PurchaseOrderItem {
 
     private String name;
     private String description;
-    private Long quantity;
+    private Long quantityOrdered;
     private BigDecimal unitPrice;
     private BigDecimal total;
     private Long qboItemId;
@@ -34,7 +34,7 @@ public class PurchaseOrderItem {
     public PurchaseOrderItem(PurchaseOrderItemRegisterDTO data) {
         this.name = data.name();
         this.description = data.description();
-        this.quantity = data.quantity();
+        this.quantityOrdered = data.quantity();
         this.unitPrice = data.unitPrice();
         this.total = data.total();
         this.qboItemId = data.qboItemId();
