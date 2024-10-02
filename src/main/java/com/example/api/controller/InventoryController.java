@@ -1,10 +1,9 @@
 package com.example.api.controller;
 
-import com.example.api.domain.categories.CategoryService;
-import com.example.api.domain.inventory.Inventory;
-import com.example.api.domain.inventory.InventoryListDTO;
-import com.example.api.domain.inventory.InventoryRequestDTO;
-import com.example.api.domain.inventory.InventoryService;
+import com.example.api.domain.inventoryitems.Inventory;
+import com.example.api.domain.inventoryitems.InventoryListDTO;
+import com.example.api.domain.inventoryitems.InventoryRequestDTO;
+import com.example.api.domain.inventoryitems.InventoryService;
 import com.example.api.repositories.InventoryRepository;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,10 +17,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.UriComponentsBuilder;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.Map;
 
 @RestController
-@RequestMapping("inventory")
+@RequestMapping("inventory-items")
 @SecurityRequirement(name = "bearer-key")
 public class InventoryController {
 
@@ -31,48 +33,58 @@ public class InventoryController {
     @Autowired
     private InventoryRepository inventoryRepository;
 
-    @Autowired
-    private CategoryService categoryService;
-
-
     @PostMapping
     @Transactional
-    public ResponseEntity register(@RequestBody @Valid InventoryRequestDTO data, UriComponentsBuilder uriBuilder) {
+    public ResponseEntity register(@RequestBody @Valid InventoryRequestDTO data) {
 
-        System.out.println("data on controller: " + data);
-        var inventory = inventoryService.register(data);
-        var uri = uriBuilder.path("/inventory/{id}")
-                .buildAndExpand(inventory.id())
-                .toUri();
-        return ResponseEntity.created(uri).body(inventory);
-
+//        var inventory = inventoryService.register(data);
+//        var uri = uriBuilder.path("/inventory/{id}")
+//                .buildAndExpand(inventory.id())
+//                .toUri();
+//        return ResponseEntity.created(uri).body(inventory);
+        try {
+            inventoryService.register(data);
+            return ResponseEntity.ok("OK");
+        } catch (Exception e) {
+            throw new RuntimeException(e); // change this to show a meaningful message
+        }
     }
-
 
     @GetMapping
-    public ResponseEntity<Page<InventoryListDTO>> list(HttpServletRequest request, @PageableDefault(size = 100, page = 0, sort = {"name"}) Pageable pagination, @RequestHeader HttpHeaders headers) {
+    public ResponseEntity<Page<InventoryListDTO>> list(HttpServletRequest request, @PageableDefault(size = 100, page = 0, sort = {"id"}) Pageable pagination, @RequestHeader HttpHeaders headers) {
         var page = inventoryRepository.findAll(pagination)
                 .map((Inventory id) -> new InventoryListDTO(id));
-        return ResponseEntity.ok((Page<InventoryListDTO>) (Page<InventoryListDTO>) page);
+        return ResponseEntity.ok(page);
     }
 
-
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("{id}")
     @Transactional
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        var itemToDelete = inventoryRepository.findById(id);
+    public ResponseEntity delete(@PathVariable Long id) {
 
-        // Check if the item is present
-        if (itemToDelete.isEmpty()) {
-            System.err.println("// If not found, return a 404 Not Found response");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        } else {
-            System.out.println("// If found, delete the item by ID");
-            // If found, delete the item by ID
-            inventoryRepository.deleteById(id);
-            System.out.println("Item " + itemToDelete.toString() + " was deleted from inventory");
+        var inventoryItemToDelete = inventoryRepository.findById(id).orElse(null);
+        if (inventoryItemToDelete == null) {
+            Map<String, String> jsonResponse = Map.of("message", "Cannot delete item: It was not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(jsonResponse);
         }
-        return ResponseEntity.noContent().build();
-    }
 
+        LocalDateTime itemCreationTime = inventoryItemToDelete.getCreatedAt();
+
+        if (itemCreationTime == null) {
+            Map<String, String> jsonResponse = Map.of("message", "Cannot delete item: Creation date is invalid");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(jsonResponse);
+        }
+
+        LocalDateTime currentTime = LocalDateTime.now();
+        Duration timeDifference = Duration.between(itemCreationTime, currentTime);
+
+        if (timeDifference.toMinutes() > 30) {
+            Map<String, String> jsonResponse = Map.of("message", "Cannot delete item: It was created more than 30 minutes ago");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(jsonResponse);
+        }
+
+        // This line deletes the item only if the time is under 30 min with the previous validation
+        inventoryRepository.deleteById(id);
+
+        return ResponseEntity.ok(id);
+    }
 }

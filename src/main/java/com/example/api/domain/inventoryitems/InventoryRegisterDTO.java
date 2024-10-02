@@ -1,4 +1,4 @@
-package com.example.api.domain.inventory;
+package com.example.api.domain.inventoryitems;
 
 import com.example.api.domain.users.User;
 import jakarta.validation.constraints.NotBlank;
@@ -9,14 +9,12 @@ public record InventoryRegisterDTO(
         @NotNull Long categoryId,
         @NotNull Long modelId,
         @NotNull Long mpnId,
-        @NotNull Long conditionId,
+        @NotNull Long itemConditionsId,
         @NotNull Long receivingItemId,
+        @NotNull Long locationId,
         @NotNull User createdBy,
         @NotBlank String post,
-        @NotNull Boolean byQuantity,  // Changed from @NotBlank to @NotNull
-        Long quantity,
-        String serialNumber
+        String serialNumber,
+        String rbid
 ) {
 }
-
-

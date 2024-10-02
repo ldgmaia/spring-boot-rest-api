@@ -1,32 +1,30 @@
-package com.example.api.domain.inventory;
+package com.example.api.domain.inventoryitems;
 
-public record InventoryInfoDTO(
-        Long id,
+public record InventoryListDTO(
+        Inventory id,
         Long categoryId,
         Long modelId,
         Long mpnId,
-        Long conditionId,
+        Long itemConditionsId,
         Long receivingItemsId,
         Long createdBy,
-        Boolean byQuantity,
-        Long quantity,
         String post,
         String serialNumber
-
 ) {
-    public InventoryInfoDTO(Inventory inventory) {
+
+    // Custom constructor must call the canonical constructor
+    public InventoryListDTO(Inventory inventory) {
         this(
-                inventory.getId(),
+                inventory,
                 inventory.getCategoryId(),
                 inventory.getModelId(),
                 inventory.getMpnId(),
-                inventory.getConditionId(),
+                inventory.getItemConditionsId(),
                 inventory.getReceivingItemId(),
                 inventory.getCreatedBy().getId(),
-                inventory.getByQuantity(),
-                inventory.getQuantity(),
                 inventory.getPost(),
                 inventory.getSerialNumber()
         );
     }
+
 }
