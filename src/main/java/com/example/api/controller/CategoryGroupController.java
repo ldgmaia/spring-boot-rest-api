@@ -41,7 +41,7 @@ public class CategoryGroupController {
 
     @PostMapping
     @Transactional
-    public ResponseEntity register(@RequestBody @Valid CategoryGroupRegisterDTO data, UriComponentsBuilder uriBuilder) {
+    public ResponseEntity register(@RequestBody @Valid CategoryGroupsRegisterDTO data, UriComponentsBuilder uriBuilder) {
 
         var categoryGroupExists = categoryGroupRepository.existsByName(data.name());
 
@@ -50,25 +50,25 @@ public class CategoryGroupController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(jsonResponse);
         }
 
-        var categoryGroup = new CategoryGroup(data);
+        var categoryGroup = new CategoryGroups(data);
 
         categoryGroupRepository.save(categoryGroup);
 
         var uri = uriBuilder.path("/category-groups/{id}").buildAndExpand(categoryGroup.getId()).toUri();
 
-        return ResponseEntity.created(uri).body(new CategoryGroupInfoDTO(categoryGroup));
+        return ResponseEntity.created(uri).body(new CategoryGroupsInfoDTO(categoryGroup));
     }
 
     @GetMapping
-    public ResponseEntity<Page<CategoryGroupInfoDTO>> list(HttpServletRequest request, @PageableDefault(size = 10, page = 0, sort = {"name"}) Pageable pagination, @RequestHeader HttpHeaders headers) {
+    public ResponseEntity<Page<CategoryGroupsInfoDTO>> list(HttpServletRequest request, @PageableDefault(size = 10, page = 0, sort = {"name"}) Pageable pagination, @RequestHeader HttpHeaders headers) {
 
-        var page = categoryGroupRepository.findAllByEnabledTrue(pagination).map(CategoryGroupInfoDTO::new);
+        var page = categoryGroupRepository.findAllByEnabledTrue(pagination).map(CategoryGroupsInfoDTO::new);
         return ResponseEntity.ok(page);
     }
 
     @PutMapping("/{id}")
     @Transactional
-    public ResponseEntity update(@RequestBody @Valid CategoryGroupUpdateDTO data, @PathVariable Long id) {
+    public ResponseEntity update(@RequestBody @Valid CategoryGroupsUpdateDTO data, @PathVariable Long id) {
 
         var categoryGroupExists = categoryGroupRepository.existsById(id);
 
@@ -80,7 +80,7 @@ public class CategoryGroupController {
         var categoryGroup = categoryGroupRepository.getReferenceById(id);
         categoryGroup.updateInfo(data);
 
-        return ResponseEntity.ok(new CategoryGroupInfoDTO(categoryGroup));
+        return ResponseEntity.ok(new CategoryGroupsInfoDTO(categoryGroup));
     }
 
     @DeleteMapping("/{id}")
@@ -111,7 +111,7 @@ public class CategoryGroupController {
 
             var categories = categoryRepository.findAllByCategoryGroupId(id);
 
-            return ResponseEntity.ok(new CategoryGroupInfoDetailsDTO(categoryGroup.getId(), categoryGroup.getName(), categoryGroup.getEnabled(), categories));
+            return ResponseEntity.ok(new CategoryGroupsInfoDetailsDTO(categoryGroup.getId(), categoryGroup.getName(), categoryGroup.getEnabled(), categories));
         } catch (EntityNotFoundException ex) {
             Map<String, String> jsonResponse = Map.of("message", "Category group not found");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(jsonResponse);

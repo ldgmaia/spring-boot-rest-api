@@ -1,6 +1,6 @@
 package com.example.api.domain.categorygroups;
 
-public record CategoryGroupUpdateDTO(
+public record CategoryGroupsUpdateDTO(
 //        @NotNull
 //        Long id,
         String name

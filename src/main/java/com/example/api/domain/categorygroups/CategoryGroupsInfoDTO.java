@@ -1,8 +1,8 @@
 package com.example.api.domain.categorygroups;
 
-public record CategoryGroupInfoDTO(Long id, String name, Boolean enabled) {
+public record CategoryGroupsInfoDTO(Long id, String name, Boolean enabled) {
 
-    public CategoryGroupInfoDTO(CategoryGroup categoryGroup) {
+    public CategoryGroupsInfoDTO(CategoryGroups categoryGroup) {
         this(categoryGroup.getId(), categoryGroup.getName(), categoryGroup.getEnabled());
     }
 }

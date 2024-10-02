@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
-public class CategoryGroup {
+public class CategoryGroups {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,16 +21,16 @@ public class CategoryGroup {
 
     @NotBlank
     private String name;
-    
+
     private Boolean enabled;
 
 
-    public CategoryGroup(CategoryGroupRegisterDTO data) {
+    public CategoryGroups(CategoryGroupsRegisterDTO data) {
         this.name = data.name();
         this.enabled = true;
     }
 
-    public void updateInfo(CategoryGroupUpdateDTO data) {
+    public void updateInfo(CategoryGroupsUpdateDTO data) {
 
         this.name = (data.name() != null) ? data.name() : this.name;
     }

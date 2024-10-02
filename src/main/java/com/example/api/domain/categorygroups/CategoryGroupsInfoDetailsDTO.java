@@ -4,7 +4,7 @@ import com.example.api.domain.categories.CategoryListDTO;
 
 import java.util.List;
 
-public record CategoryGroupInfoDetailsDTO(
+public record CategoryGroupsInfoDetailsDTO(
         Long id,
         String name,
         Boolean enabled,
