@@ -13,8 +13,8 @@ CREATE TABLE IF NOT EXISTS purchase_orders
     watching_po      VARCHAR(255)    NOT NULL,
     last_received_at TIMESTAMP,
     fully_received   BIT       DEFAULT NULL,
-    created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
 
     PRIMARY KEY (id),
     UNIQUE (po_number),
@@ -34,8 +34,8 @@ CREATE TABLE IF NOT EXISTS purchase_order_items
     qbo_item_id                BIGINT UNSIGNED NOT NULL,
     qbo_purchase_order_item_id BIGINT UNSIGNED NOT NULL,
     purchase_orders_id         BIGINT UNSIGNED NOT NULL,
-    created_at                 TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at                 TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_at                 TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at                 TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
 
     PRIMARY KEY (id),
 --    UNIQUE (purchase_orders_id, qbo_purchase_order_item_id, description), -- Issue with MySQL
