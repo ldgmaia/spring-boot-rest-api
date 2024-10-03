@@ -9,12 +9,10 @@ public record PurchaseOrderInfoDetailsDTO(
         String poNumber,
         String currency,
         BigDecimal total,
-        String receivingStatus,
+//        String receivingStatus,
         LocalDateTime lastReceivedAt
 
 //        SupplierInfoDTO supplier,
 //        List<PurchaseOrderItemInfoDTO> purchaseOrderItems
 ) {
 }
-
-

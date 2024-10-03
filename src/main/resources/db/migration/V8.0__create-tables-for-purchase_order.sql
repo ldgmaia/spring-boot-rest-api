@@ -9,10 +9,9 @@ CREATE TABLE IF NOT EXISTS purchase_orders
     qbo_created_at   TIMESTAMP,
     qbo_updated_at   TIMESTAMP,
     suppliers_id     BIGINT UNSIGNED NOT NULL,
-    receiving_status VARCHAR(255)    NOT NULL,
-    watching_po      VARCHAR(255)    NOT NULL,
+--    receiving_status VARCHAR(255)    NOT NULL,
+    watching_po      VARCHAR(255),
     last_received_at TIMESTAMP,
-    fully_received   BIT       DEFAULT NULL,
     created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
 

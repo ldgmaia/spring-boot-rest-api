@@ -74,7 +74,7 @@ public class PurchaseOrderService {
                 OffsetDateTime.parse(data.qbo_created_at()).toLocalDateTime(),
                 OffsetDateTime.parse(data.qbo_updated_at()).toLocalDateTime(),
                 supplier,
-                data.status(),
+//                data.status(),
                 "watchingPo"
         ));
         purchaseOrderRepository.save(purchaseOrder);

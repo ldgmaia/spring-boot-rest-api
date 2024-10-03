@@ -1,6 +1,5 @@
 package com.example.api.controller;
 
-import com.example.api.domain.mpns.MPNInfoDTO;
 import com.example.api.domain.mpns.MPNRequestDTO;
 import com.example.api.domain.mpns.MPNService;
 import com.example.api.repositories.MPNFieldValueRepository;
@@ -10,7 +9,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
@@ -49,9 +47,11 @@ public class MPNController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<MPNInfoDTO>> list(HttpServletRequest request, @PageableDefault(size = 100, page = 0, sort = {"name"}) Pageable pagination, @RequestHeader HttpHeaders headers) {
-        var page = mpnRepository.findAll(pagination).map(MPNInfoDTO::new);
+    public ResponseEntity list(HttpServletRequest request, @PageableDefault(size = 100, page = 0, sort = {"name"}) Pageable pagination, @RequestHeader HttpHeaders headers) {
+        var page = mpnRepository.listAllMPN(pagination);
         return ResponseEntity.ok(page);
+//        var page = mpnRepository.findAll(pagination).map(MPNInfoDTO::new);
+//        return ResponseEntity.ok(page);
     }
 
     @GetMapping("/{id}")

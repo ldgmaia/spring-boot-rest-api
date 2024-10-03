@@ -1,0 +1,12 @@
+INSERT INTO item_conditions
+    (name, created_by)
+VALUES
+    ('NEW', 1),
+    ('USED', 1),
+    ('REFURBISHED', 1),
+    ('DOA', 1);
+
+INSERT INTO locations
+    (name, created_by)
+VALUES
+    ('UserLocation', 1);

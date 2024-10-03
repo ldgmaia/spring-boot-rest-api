@@ -105,7 +105,7 @@ public class ReceivingService {
                                 var totalQuantityReceived = receivingItemRepository.findQuantityReceivedByPurchaseOrderItemId(receivingItem.purchaseOrderItemId());// Get total quantity already received for this receiving_id
 
                                 // Check if adding the current item exceeds the allowed quantity
-                                if (totalQuantityReceived + quantityReceived > quantityToReceive) {
+                                if (!receivingItem.additionalItem() && totalQuantityReceived + quantityReceived > quantityToReceive) {
 //                                    System.err.println("Can not add " + quantityReceived + " item(s) into " + quantityToReceive + " because there is Already " + totalQuantityReceived + " added");
                                     var poi = purchaseOrderItemRepository.getReferenceById(receivingItem.purchaseOrderItemId());
                                     throw new ValidationException("Total received quantity exceeds the quantity ordered for the item: " + poi.getDescription());

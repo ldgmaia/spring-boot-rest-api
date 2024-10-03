@@ -42,10 +42,10 @@ public class ReceivingController {
             UriComponentsBuilder uriBuilder) throws IOException {
 
         var receiving = receivingService.register(data, pictures);
-//        var uri = uriBuilder.path("/receiving/{id}").buildAndExpand(receiving.identifier()).toUri();
-//        return ResponseEntity.created(uri).body(receiving);
-        return ResponseEntity.ok(receiving);
-
+        var uri = uriBuilder.path("/receiving/{id}").buildAndExpand(receiving.id()).toUri();
+        return ResponseEntity.created(uri).body(receiving);
+//        return ResponseEntity.ok(receiving);
+//        return ResponseEntity.ok("ok");
     }
 
     @GetMapping

@@ -9,7 +9,7 @@ public record PurchaseOrderListDTO(
         String poNumber,
         String currency,
         BigDecimal total,
-        String receivingStatus,
+//        String receivingStatus,
         LocalDateTime lastReceivedAt
 ) {
     public PurchaseOrderListDTO(PurchaseOrder purchaseOrder) {
@@ -19,7 +19,7 @@ public record PurchaseOrderListDTO(
                 purchaseOrder.getPoNumber(),
                 purchaseOrder.getCurrency(),
                 purchaseOrder.getTotal(),
-                purchaseOrder.getReceivingStatus(),
+//                purchaseOrder.getReceivingStatus(),
                 purchaseOrder.getLastReceivedAt()
         );
     }

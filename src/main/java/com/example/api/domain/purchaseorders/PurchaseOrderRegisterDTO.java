@@ -17,7 +17,7 @@ public record PurchaseOrderRegisterDTO(
         LocalDateTime qboCreatedAt,
         LocalDateTime qboUpdatedAt,
         Supplier supplier,
-        String receivingStatus,
+//        String receivingStatus,
         String watchingPo
 ) {
 }

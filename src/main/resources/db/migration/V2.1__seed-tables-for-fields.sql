@@ -1,0 +1,70 @@
+INSERT INTO fields
+	(name,data_type,field_type,field_groups_id,is_multiple,enabled)
+VALUES
+	 ('function-boolean-field','BOOLEAN','FUNCTIONAL',NULL,0,1),
+	 ('functional-string-field','STRING','FUNCTIONAL',NULL,0,1),
+	 ('functional-open-field','OPENTEXT','FUNCTIONAL',NULL,0,1),
+	 ('functional-integer-field','INTEGER','FUNCTIONAL',NULL,0,1),
+	 ('functional-percentage-field','PERCENTAGE','FUNCTIONAL',NULL,0,1),
+	 ('functional-double-field','DOUBLE','FUNCTIONAL',NULL,0,1),
+	 ('cosmetic-boolean-field','BOOLEAN','COSMETIC',NULL,0,1),
+	 ('cosmetic-string-field','STRING','COSMETIC',NULL,0,1),
+	 ('cosmetic-open-field','OPENTEXT','COSMETIC',NULL,0,1),
+	 ('cosmetic-integer-field','INTEGER','COSMETIC',NULL,0,1),
+	 ('cosmetic-percentage-field','PERCENTAGE','COSMETIC',NULL,0,1),
+	 ('cosmetic-double-field','DOUBLE','COSMETIC',NULL,0,1),
+	 ('specs-boolean-field','BOOLEAN','SPECS',NULL,0,1),
+	 ('specs-string-field','STRING','SPECS',NULL,0,1),
+	 ('specs-open-field','OPENTEXT','SPECS',NULL,0,1),
+	 ('specs-integer-field','INTEGER','SPECS',NULL,0,1),
+	 ('specs-percentage-field','PERCENTAGE','SPECS',NULL,0,1),
+	 ('specs-double-field','DOUBLE','SPECS',NULL,0,1);
+
+INSERT INTO values_data
+	(value_data,enabled)
+VALUES
+	 ('10.5',1),
+	 ('11.5',1),
+	 ('1',1),
+	 ('2',1),
+	 ('3',1),
+	 ('cosmetic-string-field-value1',1),
+	 ('cosmetic-string-field-value2',1),
+	 ('1.2',1),
+	 ('3.5',1),
+	 ('100',1),
+	 ('15',1),
+	 ('functional-string-field-value1',1),
+	 ('functional-string-field-value2',1),
+	 ('5.8',1),
+	 ('9.4',1),
+	 ('25',1),
+	 ('54',1),
+	 ('specs-string-field-value1',1),
+	 ('specs-string-field-value2',1),
+	 ('false',1),
+	 ('true',1);
+
+INSERT INTO fields_values
+	(values_data_id,fields_id,score,enabled)
+VALUES
+	 (1,12,NULL,1),
+	 (2,12,NULL,1),
+	 (3,10,NULL,1),
+	 (4,10,NULL,1),
+	 (5,10,NULL,1),
+	 (6,8,NULL,1),
+	 (7,8,NULL,1),
+	 (8,6,NULL,1),
+	 (9,6,NULL,1),
+	 (10,4,NULL,1),
+	 (11,4,NULL,1),
+	 (12,2,NULL,1),
+	 (13,2,NULL,1),
+	 (14,18,NULL,1),
+	 (15,18,NULL,1),
+	 (16,16,NULL,1),
+	 (17,16,NULL,1),
+	 (18,14,NULL,1),
+	 (19,14,NULL,1),
+	 (21,13,NULL,1);
