@@ -25,6 +25,5 @@ public record ReceivingItemRegisterDTO(
         @NotNull
         Boolean receivableItem,
 
-        Boolean additionalItem
-) {
+        Boolean additionalItem) {
 }
