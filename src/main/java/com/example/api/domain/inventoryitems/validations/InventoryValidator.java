@@ -1,8 +1,8 @@
 package com.example.api.domain.inventoryitems.validations;
 
-import com.example.api.domain.inventoryitems.InventoryRequestDTO;
+import com.example.api.domain.inventoryitems.InventoryItemRequestDTO;
 
 public interface InventoryValidator {
 
-    void validate(InventoryRequestDTO data);
+    void validate(InventoryItemRequestDTO data);
 }

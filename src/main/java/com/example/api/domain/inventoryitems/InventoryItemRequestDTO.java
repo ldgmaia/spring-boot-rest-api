@@ -4,20 +4,19 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 //@ValidQuantityByQuantity
-public record InventoryRequestDTO(
-        @NotNull Long inventoryId,
+public record InventoryItemRequestDTO(
         @NotNull Long receivingItemId,
         @NotNull Long categoryId,
         @NotNull Long modelId,
-        @NotNull Long mpnId,
-        @NotNull Long itemConditionsId,
+        Long mpnId,
+        @NotNull Long itemConditionId,
         @NotBlank String post,
         @NotNull Boolean byQuantity,
-        @NotNull Long locationId,
         Long quantity,
-        String serialNumber
+        String serialNumber,
+        String type
 ) {
-    public InventoryRequestDTO {
+    public InventoryItemRequestDTO {
         post = post.toUpperCase();  // Ensure POST is uppercase during record creation
     }
 }

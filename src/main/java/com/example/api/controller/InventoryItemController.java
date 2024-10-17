@@ -1,10 +1,7 @@
 package com.example.api.controller;
 
-import com.example.api.domain.inventoryitems.Inventory;
-import com.example.api.domain.inventoryitems.InventoryListDTO;
-import com.example.api.domain.inventoryitems.InventoryRequestDTO;
-import com.example.api.domain.inventoryitems.InventoryService;
-import com.example.api.repositories.InventoryRepository;
+import com.example.api.domain.inventoryitems.*;
+import com.example.api.repositories.InventoryItemRepository;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
@@ -20,40 +17,45 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("inventory-items")
 @SecurityRequirement(name = "bearer-key")
-public class InventoryController {
+public class InventoryItemController {
 
     @Autowired
-    private InventoryService inventoryService;
+    private InventoryItemService inventoryItemService;
 
     @Autowired
-    private InventoryRepository inventoryRepository;
+    private InventoryItemRepository inventoryRepository;
+
 
     @PostMapping
     @Transactional
-    public ResponseEntity register(@RequestBody @Valid InventoryRequestDTO data) {
+    public ResponseEntity register(@RequestBody @Valid InventoryItemRequestDTO data) {
 
 //        var inventory = inventoryService.register(data);
 //        var uri = uriBuilder.path("/inventory/{id}")
 //                .buildAndExpand(inventory.id())
 //                .toUri();
 //        return ResponseEntity.created(uri).body(inventory);
+//        System.out.println("data " + data);
+//        return ResponseEntity.ok("OK");
+
         try {
-            inventoryService.register(data);
-            return ResponseEntity.ok("OK");
+            var newInventoryItems = inventoryItemService.register(data);
+            return ResponseEntity.ok(newInventoryItems);
         } catch (Exception e) {
             throw new RuntimeException(e); // change this to show a meaningful message
         }
     }
 
     @GetMapping
-    public ResponseEntity<Page<InventoryListDTO>> list(HttpServletRequest request, @PageableDefault(size = 100, page = 0, sort = {"id"}) Pageable pagination, @RequestHeader HttpHeaders headers) {
+    public ResponseEntity<Page<InventoryInfoDTO>> list(HttpServletRequest request, @PageableDefault(size = 100, page = 0, sort = {"id"}) Pageable pagination, @RequestHeader HttpHeaders headers) {
         var page = inventoryRepository.findAll(pagination)
-                .map((Inventory id) -> new InventoryListDTO(id));
+                .map((InventoryItem inventoryItem) -> new InventoryInfoDTO(inventoryItem));
         return ResponseEntity.ok(page);
     }
 
@@ -87,4 +89,12 @@ public class InventoryController {
 
         return ResponseEntity.ok(id);
     }
+
+    @GetMapping("/by-receiving-item/{receivingItemId}")
+    public ResponseEntity getInventoryItemsByReceivingItemId(@PathVariable Long receivingItemId) {
+        List<InventoryItemsByReceivingItemDTO> items = inventoryItemService.getInventoryItemsByReceivingItemId(receivingItemId);
+
+        return ResponseEntity.ok(items);
+    }
+
 }
