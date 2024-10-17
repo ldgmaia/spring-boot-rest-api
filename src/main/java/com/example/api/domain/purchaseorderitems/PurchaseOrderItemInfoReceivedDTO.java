@@ -1,5 +1,8 @@
 package com.example.api.domain.purchaseorderitems;
 
+import com.example.api.domain.receivingitems.ReceivingItem;
+import com.example.api.domain.receivingitems.ReceivingItemInfoDTO;
+
 import java.math.BigDecimal;
 
 public record PurchaseOrderItemInfoReceivedDTO(
@@ -9,9 +12,10 @@ public record PurchaseOrderItemInfoReceivedDTO(
         Long quantityOrdered,
         Long quantityReceived,
         BigDecimal unitPrice,
-        BigDecimal total
+        BigDecimal total,
+        ReceivingItemInfoDTO receivingItems
 ) {
-    public PurchaseOrderItemInfoReceivedDTO(PurchaseOrderItem poi, Long quantityReceived) {
+    public PurchaseOrderItemInfoReceivedDTO(PurchaseOrderItem poi, Long quantityReceived, ReceivingItem receivingItem) {
         this(
                 poi.getId(),
                 poi.getName(),
@@ -19,7 +23,8 @@ public record PurchaseOrderItemInfoReceivedDTO(
                 poi.getQuantityOrdered(),
                 quantityReceived,
                 poi.getUnitPrice(),
-                poi.getTotal()
+                poi.getTotal(),
+                receivingItem != null ? new ReceivingItemInfoDTO(receivingItem) : null
         );
     }
 }
