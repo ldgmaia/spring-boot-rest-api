@@ -1,11 +1,11 @@
 INSERT INTO purchase_orders
 	(status,po_number,currency,total,qbo_id,suppliers_id)
 VALUES
-	('Open','3047','USD',51142.97,71095,1),
-	('Open','3083','CAD',7730,72076,2),
-	('Open','3089','USD',101250,72258,3),
-	('Open','3103','USD',20500,72607,4),
-	('Open','3111','USD',62461.13,72697,5);
+	('Pending Receiving','3047','USD',51142.97,71095,1),
+	('Pending Receiving','3083','CAD',7730,72076,2),
+	('Pending Receiving','3089','USD',101250,72258,3),
+	('Pending Receiving','3103','USD',20500,72607,4),
+	('Pending Receiving','3111','USD',62461.13,72697,5);
 
 INSERT INTO purchase_order_items
 (name,description,quantity_ordered,unit_price,total,qbo_item_id,qbo_purchase_order_item_id,purchase_orders_id)
@@ -25,7 +25,7 @@ VALUES
 	('Purchases','Panaosnic CF-C2',32,115.16,3685.12,17,17,4),
 	('Purchases','Panasonic FZ-55',63,115.16,7255.08,17,17,4),
 	('Purchases','Panasonic FZ-G1',4,115.16,460.64,17,17,4),
-	('Purchases','Panasonic FZ-M1',6,115.4133333,692.48,17,17,4),
+	('Purchases','Panasonic FZ-M1',6,115.41,692.48,17,17,4),
 	('Purchases','Panasonic TOUGHBOOK CF-20',7,121.53,850.71,17,17,5),
 	('Purchases','Panasonic TOUGHBOOK CF-33/MK1',249,149.83,37307.67,17,17,5),
 	('Purchases','Panasonic TOUGHBOOK CF-54',37,116.42,4307.54,17,17,5),

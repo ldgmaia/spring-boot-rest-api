@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS receivings
     carriers_id       BIGINT UNSIGNED,
     type              VARCHAR(255),
     suppliers_id      BIGINT UNSIGNED NOT NULL,
-    identifier_id     BIGINT UNSIGNED,
+    purchase_order_id BIGINT UNSIGNED,
     parcels           VARCHAR(255),
     notes             VARCHAR(255),
     created_by        BIGINT UNSIGNED NOT NULL,
