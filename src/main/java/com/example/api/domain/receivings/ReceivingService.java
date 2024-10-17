@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class ReceivingService {
@@ -64,8 +65,8 @@ public class ReceivingService {
         var receiving = new Receiving(new ReceivingRegisterDTO(
                 data.trackingCode(),
                 data.type(),
-                data.identifierId(),
                 supplierRepository.getReferenceById(data.supplierId()),
+                purchaseOrderRepository.getReferenceById(data.purchaseOrderId()),
                 carrier,
                 data.notes()
         ), currentUser);
@@ -124,20 +125,52 @@ public class ReceivingService {
                                         receivingItem.receivableItem(),
                                         receivingItem.additionalItem()
                                 ));
+
 //                                System.out.println("receivingItems - before save" + receivingItems);
+
+                                if (!Objects.equals(quantityReceived, quantityToReceive)) {
+                                    receivingItems.setStatus("Partially Received");
+                                } else {
+                                    receivingItems.setStatus("Fully Received");
+                                    purchaseOrderRepository.getReferenceById(receivingItem.purchaseOrderItemId()).setStatus("Fully Received");
+                                }
 
                                 //before this step validate if there are enough spaces to add the items
                                 receivingItemRepository.save(receivingItems);
+                                // Update the overall receiving status based on all items received
+                                updateReceivingStatus(receiving.getId(), receivingItem.purchaseOrderItemId());
+
                             });
+
         } else {
             throw new ValidationException("Quantity received is invalid");
         }
+
         return new ReceivingInfoDTO(receiving);
     }
 
     public ReceivingInfoDTO show(Long id) {
-        var receivingById = receivingRepository.findById(id).orElseThrow(() -> new ValidationException("Receiving not found"));
-        return new ReceivingInfoDTO(receivingById);
+        var receiving = receivingRepository.findById(id).orElseThrow(() -> new ValidationException("Receiving not found"));
+        return new ReceivingInfoDTO(receiving);
+    }
+
+    /**
+     * This method checks the total quantity received for each purchase order item and updates the status accordingly.
+     */
+    private void updateReceivingStatus(Long receivingId, Long purchaseOrderItemId) {
+        // Fetch the total received quantity for the given purchase order item
+        var totalReceived = receivingItemRepository.findTotalReceivedQuantityByPurchaseOrderItemId(purchaseOrderItemId);
+
+        // Fetch the ordered quantity for the given purchase order item
+        var quantityOrdered = purchaseOrderItemRepository.findQuantityOrderedById(purchaseOrderItemId);
+
+        // Compare and update the status
+        if (Objects.equals(totalReceived, quantityOrdered)) {
+            receivingItemRepository.updateStatusByPurchaseOrderItemId(purchaseOrderItemId, "Fully Received");
+            purchaseOrderRepository.getReferenceById(purchaseOrderItemId).setStatus("Fully Received");
+        } else {
+            receivingItemRepository.updateStatusByPurchaseOrderItemId(purchaseOrderItemId, "Partially Received");
+        }
     }
 
 }

@@ -1,6 +1,7 @@
 package com.example.api.domain.receivings;
 
 import com.example.api.domain.carriers.Carrier;
+import com.example.api.domain.purchaseorders.PurchaseOrder;
 import com.example.api.domain.receivingitems.ReceivingItem;
 import com.example.api.domain.receivingpictures.ReceivingPicture;
 import com.example.api.domain.suppliers.Supplier;
@@ -41,7 +42,10 @@ public class Receiving {
     @JoinColumn(name = "suppliers_id")
     private Supplier supplier;
 
-    private Long identifierId; // change this field to identifier_id and use the ID instead
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "purchase_order_id", nullable = true)
+    private PurchaseOrder purchaseOrder;
+
     private String parcels;
     private String notes;
 
@@ -66,7 +70,7 @@ public class Receiving {
         this.carrier = data.carrier();
         this.type = data.type();
         this.supplier = data.supplier();
-        this.identifierId = data.identifierId();
+        this.purchaseOrder = data.purchaseOrder();
         this.notes = data.notes();
         this.createdBy = currentUser;
         this.createdAt = LocalDateTime.now();

@@ -12,12 +12,11 @@ public record ReceivingRequestDTO(
 
         @NotNull
         ReceivingType type,
-
-        @NotNull
-        Long identifierId,
-
+        
         @NotNull
         Long supplierId,
+
+        Long purchaseOrderId,
 
         Long carrierId,
 

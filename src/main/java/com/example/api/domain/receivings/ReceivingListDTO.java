@@ -1,6 +1,6 @@
 package com.example.api.domain.receivings;
 
-import com.example.api.domain.receivingitems.ReceivingItemsInfoDTO;
+import com.example.api.domain.receivingitems.ReceivingItemInfoDTO;
 import com.example.api.domain.receivingpictures.ReceivingPicturesInfoDTO;
 
 import java.time.LocalDateTime;
@@ -13,13 +13,13 @@ public record ReceivingListDTO(
         String supplierName,
         String carrier,
         ReceivingType type,
-        Long identifierId,
+        String poNumber,
         String parcels,
         String notes,
         LocalDateTime createdAt,
         LocalDateTime updatedAt,
         String createdBy,
-        List<ReceivingItemsInfoDTO> receivingItems,
+        List<ReceivingItemInfoDTO> receivingItems,
         List<ReceivingPicturesInfoDTO> pictures
 ) {
     public ReceivingListDTO(Receiving receiving) {
@@ -29,14 +29,14 @@ public record ReceivingListDTO(
                 receiving.getSupplier().getName(),
                 receiving.getCarrier() != null ? receiving.getCarrier().getName() : null,
                 receiving.getType(),
-                receiving.getIdentifierId(),
+                receiving.getPurchaseOrder().getPoNumber(),
                 receiving.getParcels(),
                 receiving.getNotes(),
                 receiving.getCreatedAt(),
                 receiving.getUpdatedAt(),
                 receiving.getCreatedBy().getFullName(),
                 receiving.getReceivingItems().stream()
-                        .map(ReceivingItemsInfoDTO::new)
+                        .map(ReceivingItemInfoDTO::new)
                         .collect(Collectors.toList()),
                 receiving.getPictures().stream()
                         .map(ReceivingPicturesInfoDTO::new)
