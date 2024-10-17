@@ -103,6 +103,7 @@ public class PurchaseOrderService {
     }
 
     public PurchaseOrderInfoReceivedDTO show(Long id) {
+        System.out.println("id " + id);
         var purchaseOrder = purchaseOrderRepository.findById(id).orElseThrow(() -> new ValidationException("Purchase order not found"));
         var supplier = purchaseOrder.getSupplier();
 
@@ -111,8 +112,13 @@ public class PurchaseOrderService {
         var items = purchaseOrderItemRepository.findAllByPurchaseOrderId(purchaseOrder.getId())
                 .stream()
                 .map(poi -> {
-                    Long quantityReceived = receivingItemRepository.findQuantityReceivedByPurchaseOrderItemId(poi.id());
-                    return new PurchaseOrderItemInfoReceivedDTO(purchaseOrderItemRepository.getReferenceById(poi.id()), quantityReceived != null ? quantityReceived : 0L);  // Include quantityReceived
+                    var receivingItem = receivingItemRepository.findByPurchaseOrderItemId(poi.id());
+                    if (receivingItem != null) {
+                        Long quantityReceived = receivingItemRepository.findQuantityReceivedByPurchaseOrderItemId(poi.id());
+                        return new PurchaseOrderItemInfoReceivedDTO(purchaseOrderItemRepository.getReferenceById(poi.id()), quantityReceived != null ? quantityReceived : 0L, receivingItem);  // Include quantityReceived
+                    } else {
+                        return new PurchaseOrderItemInfoReceivedDTO(purchaseOrderItemRepository.getReferenceById(poi.id()), 0L, receivingItem);  // Include quantityReceived
+                    }
                 })
                 .toList();
 

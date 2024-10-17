@@ -1,9 +1,12 @@
 package com.example.api.repositories;
 
 import com.example.api.domain.purchaseorders.PurchaseOrder;
+import com.example.api.domain.purchaseorders.PurchaseOrderListDTO;
 import com.example.api.domain.suppliers.SupplierInfoDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+
+import java.util.List;
 
 public interface PurchaseOrderRepository extends JpaRepository<PurchaseOrder, Long> {
 
@@ -14,4 +17,7 @@ public interface PurchaseOrderRepository extends JpaRepository<PurchaseOrder, Lo
             WHERE po.id = :id
             """)
     SupplierInfoDTO getSupplier(Long id);
+
+    List<PurchaseOrderListDTO> findAllByStatusNot(String status);
+
 }

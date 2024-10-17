@@ -15,4 +15,14 @@ public record PurchaseOrderInfoDetailsDTO(
 //        SupplierInfoDTO supplier,
 //        List<PurchaseOrderItemInfoDTO> purchaseOrderItems
 ) {
+    public PurchaseOrderInfoDetailsDTO(PurchaseOrder purchaseOrder) {
+        this(
+                purchaseOrder.getId(),
+                purchaseOrder.getStatus(),
+                purchaseOrder.getPoNumber(),
+                purchaseOrder.getCurrency(),
+                purchaseOrder.getTotal(),
+                purchaseOrder.getLastReceivedAt()
+        );
+    }
 }

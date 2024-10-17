@@ -80,4 +80,9 @@ public class PurchaseOrderController {
         }
     }
 
+    @GetMapping("/non-fully-received-po")
+    public ResponseEntity getNonFullyReceivedPurchaseOrders() {
+        var purchaseOrderInfoDTOs = purchaseOrderRepository.findAllByStatusNot("Fully Received");
+        return ResponseEntity.ok(purchaseOrderInfoDTOs);
+    }
 }

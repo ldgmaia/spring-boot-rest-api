@@ -25,4 +25,15 @@ public record PurchaseOrderInfoDTO(
                 items
         );
     }
+
+    public PurchaseOrderInfoDTO(PurchaseOrder purchaseOrder) {
+        this(
+                purchaseOrder.getId(),
+                purchaseOrder.getPoNumber(),
+                purchaseOrder.getStatus(),
+                purchaseOrder.getLastReceivedAt(),
+                null,
+                null
+        );
+    }
 }
