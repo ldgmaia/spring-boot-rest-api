@@ -15,7 +15,7 @@ public interface SectionRepository extends JpaRepository<Section, Long> {
 //            """)
 //    List<SectionInfoDTO> findAllByModelsId(Long modelId);
 
-    List<Section> findAllByModelId(Long modelId);
+    List<Section> findAllByModelIdOrderBySectionOrder(Long modelId);
 
 //    @Query(value = """
 //            SELECT new com.example.api.domain.sections.SectionWithAreasDTO(
