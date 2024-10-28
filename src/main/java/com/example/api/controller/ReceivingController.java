@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,9 +32,6 @@ public class ReceivingController {
 
     @PostMapping
     @Transactional
-//    public ResponseEntity register(@RequestBody @Valid ReceivingRequestDTO data, UriComponentsBuilder uriBuilder) {
-
-//    public ResponseEntity register(@ModelAttribute @Valid ReceivingRequestDTO data, UriComponentsBuilder uriBuilder) throws IOException {
     public ResponseEntity register(
             @RequestPart("data") @Valid ReceivingRequestDTO data,  // For complex form data
             @RequestPart("pictures") MultipartFile[] pictures,
@@ -44,12 +40,10 @@ public class ReceivingController {
         var receiving = receivingService.register(data, pictures);
         var uri = uriBuilder.path("/receiving/{id}").buildAndExpand(receiving.id()).toUri();
         return ResponseEntity.created(uri).body(receiving);
-//        return ResponseEntity.ok(receiving);
-//        return ResponseEntity.ok("ok");
     }
 
     @GetMapping
-    public ResponseEntity<Page<ReceivingListDTO>> list(@PageableDefault(size = 100, page = 0, sort = {"id"}) Pageable pagination, @RequestHeader HttpHeaders headers) {
+    public ResponseEntity<Page<ReceivingListDTO>> list(@PageableDefault(size = 100, page = 0, sort = {"id"}) Pageable pagination) {
 //        Page<Receiving> page = receivingRepository.findAll(pagination);
         Page<Receiving> page = receivingRepository.findAllWithPictures(pagination);
 

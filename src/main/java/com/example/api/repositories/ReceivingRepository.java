@@ -8,6 +8,10 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface ReceivingRepository extends JpaRepository<Receiving, Long> {
 
-    @Query("SELECT r FROM Receiving r LEFT JOIN FETCH r.pictures")
+    @Query("""
+            SELECT r
+            FROM Receiving r
+            LEFT JOIN FETCH r.pictures
+            """)
     Page<Receiving> findAllWithPictures(Pageable pageable);
 }
