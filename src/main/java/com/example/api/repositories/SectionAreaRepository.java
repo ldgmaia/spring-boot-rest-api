@@ -6,15 +6,17 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface SectionAreaRepository extends JpaRepository<SectionArea, Long> {
 
     @Query(value = """
-                SELECT NEW com.example.api.domain.sectionareas.SectionAreaInfoDTO(sa.id, sa.name, sa.areaOrder, sa.printOnLabel, sa.printAreaNameOnLabel, sa.orderOnLabel, sa.isCritical)
+                SELECT NEW com.example.api.domain.sectionareas.SectionAreaInfoDTO(sa)
                 FROM SectionArea sa
                 WHERE sa.section.id = :sectionId
+                ORDER BY areaOrder
             """)
-    List<SectionAreaInfoDTO> findSectionAreasBySectionId(Long sectionId);
+    List<SectionAreaInfoDTO> findSectionAreasBySectionIdOrderByAreaOrder(Long sectionId);
 
 //    @Query(value = """
 //                SELECT NEW com.example.api.domain.values.ValueInfoDTO(vd.id, vd.valueData, vd.enabled, fv.score)
@@ -27,4 +29,6 @@ public interface SectionAreaRepository extends JpaRepository<SectionArea, Long> 
 
     List<SectionArea> findAllBySectionId(Long sectionId);
 
+    // SectionAreaRepository
+    Optional<SectionArea> findBySectionIdAndName(Long sectionId, String name);
 }
