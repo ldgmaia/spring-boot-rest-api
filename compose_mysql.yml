@@ -1,0 +1,20 @@
+services:
+  mysql:
+    volumes:
+      - ~/documents/projects/volumes/mysqlspringboot:/var/lib/mysql
+    image: mysql:8.0
+    container_name: mysql-newrbms
+    command: --default-authentication-plugin=caching_sha2_password
+    restart: unless-stopped
+    env_file:
+      - ./mysql.env
+    ports:
+      - 3306:3306
+    networks:
+      - newrbms-network
+
+networks:
+  newrbms-network:
+    name: newrbms-network
+    external: true
+    driver: bridge

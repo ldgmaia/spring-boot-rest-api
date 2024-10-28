@@ -1,0 +1,20 @@
+services:
+  newrbms-backend-prod:
+    build:
+      context: .
+    container_name: newrbms-backend-prod
+    ports:
+      - 8091:8091
+    volumes:
+      - .:/usr/src/app
+      - ~/.m2:/root/.m2
+    env_file:
+      - ./.env
+    networks:
+      - newrbms-network
+
+networks:
+  newrbms-network:
+    name: newrbms-network
+    external: true
+    driver: bridge
