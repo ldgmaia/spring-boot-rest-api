@@ -29,3 +29,18 @@ CREATE TABLE IF NOT EXISTS section_areas (
     INDEX (sections_id),
     FOREIGN KEY (sections_id) REFERENCES sections (id)
 );
+
+CREATE TABLE IF NOT EXISTS section_areas_models (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    section_areas_id BIGINT UNSIGNED NOT NULL,
+    models_id BIGINT UNSIGNED NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
+
+    PRIMARY KEY (id),
+    UNIQUE (section_areas_id, models_id),
+    INDEX (section_areas_id),
+    INDEX (models_id),
+    FOREIGN KEY (section_areas_id)  REFERENCES section_areas (id),
+    FOREIGN KEY (models_id)         REFERENCES models (id)
+);
