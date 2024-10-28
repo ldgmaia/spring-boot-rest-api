@@ -1,6 +1,5 @@
 package com.example.api.controller;
 
-import com.example.api.domain.purchaseorders.PurchaseOrderInfoDTO;
 import com.example.api.domain.purchaseorders.PurchaseOrderListDTO;
 import com.example.api.domain.purchaseorders.PurchaseOrderRequestDTO;
 import com.example.api.domain.purchaseorders.PurchaseOrderService;
@@ -29,9 +28,6 @@ public class PurchaseOrderController {
     @Autowired
     private PurchaseOrderRepository purchaseOrderRepository;
 
-
-    private PurchaseOrderInfoDTO purchaseOrderInfoDTO;
-
     @PostMapping
     @Transactional
     public ResponseEntity register(@RequestBody @Valid PurchaseOrderRequestDTO data, UriComponentsBuilder uriBuilder) {
@@ -41,7 +37,6 @@ public class PurchaseOrderController {
 
         return ResponseEntity.created(uri).body(purchaseOrder);
     }
-
 
     @GetMapping
     public ResponseEntity<Page<PurchaseOrderListDTO>> list(@PageableDefault(size = 100, page = 0, sort = {"poNumber"}) Pageable pagination, @RequestHeader HttpHeaders headers) {
@@ -80,7 +75,7 @@ public class PurchaseOrderController {
         }
     }
 
-    @GetMapping("/non-fully-received-po")
+    @GetMapping("/list/open-purchase-orders")
     public ResponseEntity getNonFullyReceivedPurchaseOrders() {
         var purchaseOrderInfoDTOs = purchaseOrderRepository.findAllByStatusNot("Fully Received");
         return ResponseEntity.ok(purchaseOrderInfoDTOs);

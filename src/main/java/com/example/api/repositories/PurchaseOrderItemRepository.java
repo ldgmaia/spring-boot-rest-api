@@ -12,7 +12,10 @@ public interface PurchaseOrderItemRepository extends JpaRepository<PurchaseOrder
 
     List<PurchaseOrderItemInfoDTO> findAllByPurchaseOrderId(Long purchaseOrderId);
 
-    @Query("SELECT poi.quantityOrdered FROM PurchaseOrderItem poi WHERE poi.id = :purchaseOrderItemId")
+    @Query("""
+                SELECT poi.quantityOrdered
+                FROM PurchaseOrderItem poi
+                WHERE poi.id = :purchaseOrderItemId
+            """)
     Long findQuantityOrderedById(@Param("purchaseOrderItemId") Long purchaseOrderItemId);
-    
 }

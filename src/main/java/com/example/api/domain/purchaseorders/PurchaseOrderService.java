@@ -35,7 +35,6 @@ public class PurchaseOrderService {
     private ReceivingItemRepository receivingItemRepository;
 
     public PurchaseOrderInfoDTO register(PurchaseOrderRequestDTO data) {
-//        validators.forEach(v -> v.validate(data));
 
         var supplier = supplierRepository.findById(1L).orElse(null);
         if (supplier == null) {// Create Supplier
@@ -55,10 +54,6 @@ public class PurchaseOrderService {
             supplierRepository.save(supplier);
         }
 
-        System.out.println("supplier ID " + supplier.getId());
-
-        // Create Purachse Order
-
         OffsetDateTime offsetDateTime = OffsetDateTime.parse(data.qbo_created_at());
         // Convert to ZonedDateTime in the "America/Toronto" time zone
         ZonedDateTime torontoZonedDateTime = offsetDateTime.atZoneSameInstant(ZoneId.of("America/Toronto")).toOffsetDateTime().toZonedDateTime();
@@ -74,13 +69,11 @@ public class PurchaseOrderService {
                 OffsetDateTime.parse(data.qbo_created_at()).toLocalDateTime(),
                 OffsetDateTime.parse(data.qbo_updated_at()).toLocalDateTime(),
                 supplier,
-//                data.status(),
                 "watchingPo"
         ));
         purchaseOrderRepository.save(purchaseOrder);
 
         // Create PO Items
-
         for (int i = 0; i < 5; i++) {
             var poi = new PurchaseOrderItem(new PurchaseOrderItemRegisterDTO(
                     "name " + i,
@@ -98,16 +91,11 @@ public class PurchaseOrderService {
         var items = purchaseOrderItemRepository.findAllByPurchaseOrderId(purchaseOrder.getId());
 
         return new PurchaseOrderInfoDTO(purchaseOrder, supplier, items);
-//        return new PurchaseOrderInfoDTO(1L, "123", "a", torontoLocalDateTime, "asdasd");
-
     }
 
     public PurchaseOrderInfoReceivedDTO show(Long id) {
-        System.out.println("id " + id);
         var purchaseOrder = purchaseOrderRepository.findById(id).orElseThrow(() -> new ValidationException("Purchase order not found"));
         var supplier = purchaseOrder.getSupplier();
-
-//        var items = purchaseOrderItemRepository.findAllByPurchaseOrderId(purchaseOrder.getId());
 
         var items = purchaseOrderItemRepository.findAllByPurchaseOrderId(purchaseOrder.getId())
                 .stream()
