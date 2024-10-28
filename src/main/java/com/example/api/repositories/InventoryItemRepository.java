@@ -27,16 +27,4 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, Lo
             ORDER BY ii.createdAt DESC
             """)
     List<InventoryItemsByReceivingItemDTO> findByReceivingItemId(@Param("receivingItemId") Long receivingItemId);
-
-
-//    @Query("""
-//            SELECT new com.example.api.domain.inventoryitems.InventoryItemsByReceivingItemDTO(
-//            ii, m, m2, ic)
-//            from InventoryItem ii
-//            join MPN m on ii.mpn.id = m.id
-//            join Model m2 on ii.model.id = m2.id
-//            join ItemCondition ic on ii.itemCondition.id = ic.id
-//            WHERE ii.receivingItem.id = :receivingItemId
-//            """)
-//    List<InventoryItemsByReceivingItemDTO> findByReceivingItemId(@Param("receivingItemId") Long receivingItemId);
 }
