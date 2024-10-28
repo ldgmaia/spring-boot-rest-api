@@ -7,6 +7,8 @@ import com.example.api.domain.fieldsvalues.FieldValueRegisterDTO;
 import com.example.api.domain.modelfieldsvalues.ModelFieldValueInfoDTO;
 import com.example.api.domain.modelfieldsvalues.ModelFieldValueRegisterDTO;
 import com.example.api.domain.modelfieldsvalues.ModelFieldsValues;
+import com.example.api.domain.sectionareamodels.SectionAreaModel;
+import com.example.api.domain.sectionareamodels.SectionAreaModelRegisterDTO;
 import com.example.api.domain.sectionareas.SectionArea;
 import com.example.api.domain.sectionareas.SectionAreaInfoDTO;
 import com.example.api.domain.sectionareas.SectionAreaRegisterDTO;
@@ -15,12 +17,14 @@ import com.example.api.domain.sections.SectionRegisterDTO;
 import com.example.api.domain.sections.SectionWithAreasDTO;
 import com.example.api.domain.values.Value;
 import com.example.api.domain.values.ValueRegisterDTO;
+import com.example.api.infra.exception.UniqueConstraintViolationException;
 import com.example.api.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -54,9 +58,11 @@ public class ModelService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private SectionAreaModelRepository sectionAreaModelRepository;
+
 //    @Autowired
 //    private List<ReceivingValidator> validators; // Spring boot will automatically detect that a List is being ejected and will get all classes that implements this interface and will inject the validators automatically
-
 
     public ModelInfoDTO register(ModelRequestDTO data) {
 //        validators.forEach(v -> v.validate(data));
@@ -99,9 +105,15 @@ public class ModelService {
                         s.areas().forEach(sa -> {
                             var sectionArea = new SectionArea(new SectionAreaRegisterDTO(sa.name(), section, sa.areaOrder(), sa.printOnLabel(), sa.printAreaNameOnLabel(), sa.orderOnLabel(), sa.isCritical()));
                             sectionAreaRepository.save(sectionArea);
+
+                            if (sa.models() != null) {
+                                sa.models().forEach(sam -> {
+                                    var sectionAreaModel = new SectionAreaModel(new SectionAreaModelRegisterDTO(sectionArea, modelRepository.getReferenceById(sam)));
+                                    sectionAreaModelRepository.save(sectionAreaModel);
+                                });
+                            }
                         });
                     }
-
                 });
             }
 
@@ -117,12 +129,24 @@ public class ModelService {
         var model = modelRepository.findById(id)
                 .orElseThrow(() -> new ValidationException("Model not found"));
 
-        List<SectionWithAreasDTO> sections = sectionRepository.findAllByModelId(id).stream().map(s -> {
-            List<SectionAreaInfoDTO> areas = sectionAreaRepository.findSectionAreasBySectionId(s.getId());
+        // Fetch sections and areas with models
+        List<SectionWithAreasDTO> sections = sectionRepository.findAllByModelIdOrderBySectionOrder(id).stream().map(s -> {
+            List<SectionAreaInfoDTO> areas = sectionAreaRepository.findSectionAreasBySectionIdOrderByAreaOrder(s.getId()).stream().map(area -> {
+                // Fetch model IDs for each area
+                List<Long> modelIds = sectionAreaModelRepository.findModelIdsBySectionAreaId(area.id());
+
+                // Replace the previous logic with the newly created repository call
+//                List<SectionAreaModelInfoDTO> models = modelIds.stream()
+//                        .map(SectionAreaModelInfoDTO::new)
+//                        .collect(Collectors.toList());
+
+                // Return area with models
+                return new SectionAreaInfoDTO(area, modelIds);
+            }).collect(Collectors.toList());
+
             return new SectionWithAreasDTO(s, areas);
         }).collect(Collectors.toList());
 
-//        List<ModelFieldValueInfoDTO> fields = modelFieldValueRepository.findFieldsValuesByModelId(id);
         // Fetch fields and sort by fieldId
         List<ModelFieldValueInfoDTO> fields = modelFieldValueRepository.findFieldsValuesByModelId(id).stream()
                 .sorted(Comparator.comparingLong(ModelFieldValueInfoDTO::fieldId))  // Sort by fieldId
@@ -215,91 +239,111 @@ public class ModelService {
         }
 
         // Handle sections and areas
-        Map<Long, Section> existingSectionsMap = sectionRepository.findAllByModelId(modelId).stream()
+        // Create a map to hold existing sections
+        Map<Long, Section> existingSectionsMap = sectionRepository.findAllByModelIdOrderBySectionOrder(modelId).stream()
                 .collect(Collectors.toMap(Section::getId, section -> section));
 
         // Create a map to hold new sections with their areas
         Map<Long, Section> newSectionsMap = new HashMap<>();
         data.sections().forEach(s -> {
-            Section section = new Section(new SectionRegisterDTO(s.name(), s.sectionOrder(), model));
+            Section section;
+            // For each new section, save it to the database if not already saved
             if (s.id() != null) {
-                section.setId(s.id()); // Ensure the section ID is set for existing sections
+                // Existing section - update it
+                section = existingSectionsMap.get(s.id());
+                section.setName(s.name());
+                section.setSectionOrder(s.sectionOrder());
+            } else {
+                // New section - create and save it
+                section = new Section(new SectionRegisterDTO(s.name(), s.sectionOrder(), model));
+                sectionRepository.save(section);  // Save the section
+                section = sectionRepository.findById(section.getId()).orElseThrow(); // Ensure section is persisted and fetched
             }
             newSectionsMap.put(section.getId(), section);
 
+            // Create a final copy of section for use in lambdas
+            final Section finalSection = section;
+
+            // Handling areas within a section
+            Map<Long, SectionArea> existingAreasMap = finalSection.getAreas().stream()
+                    .collect(Collectors.toMap(SectionArea::getId, area -> area));
+
             // Handle areas for the section
-            List<SectionArea> areas = s.areas().stream()
-                    .map(sa -> {
-                        SectionArea area = new SectionArea(new SectionAreaRegisterDTO(
-                                sa.name(), section, sa.areaOrder(), sa.printOnLabel(),
+            Map<Long, SectionArea> newAreasMap = new HashMap<>();
+            s.areas().forEach(sa -> {
+                SectionArea area;
+
+                if (sa.id() != null && existingAreasMap.containsKey(sa.id())) {
+                    // Update existing area
+                    area = existingAreasMap.get(sa.id());
+                    area.setName(sa.name());
+                    area.setAreaOrder(sa.areaOrder());
+                    area.setPrintOnLabel(sa.printOnLabel());
+                    area.setPrintAreaNameOnLabel(sa.printAreaNameOnLabel());
+                    area.setOrderOnLabel(sa.orderOnLabel());
+                    area.setIsCritical(sa.isCritical());
+                } else {
+                    // Check if an area with the same name and section already exists to avoid duplicates
+                    Optional<SectionArea> existingAreaOpt = sectionAreaRepository.findBySectionIdAndName(finalSection.getId(), sa.name());
+                    if (existingAreaOpt.isPresent()) {
+                        throw new UniqueConstraintViolationException(MessageFormat.format("Duplicate area \"{0}\" in the section \"{1}\"", sa.name(), finalSection.getName()));
+                    } else {
+                        // Create new area
+                        area = new SectionArea(new SectionAreaRegisterDTO(
+                                sa.name(), finalSection, sa.areaOrder(), sa.printOnLabel(),
                                 sa.printAreaNameOnLabel(), sa.orderOnLabel(), sa.isCritical()
                         ));
-                        if (sa.id() != null) {
-                            area.setId(sa.id()); // Ensure the area ID is set for existing areas
-                        }
-                        area.setSection(section); // Set the section for the area
-                        return area;
-                    }).collect(Collectors.toList());
-            section.setAreas(areas);
+                    }
+                }
+                newAreasMap.put(area.getId(), area);
+                // Handle models for each area
+                List<Long> newModelIds = sa.models(); // Model IDs from JSON
+
+                // Fetch existing models for the current area from the section_areas_models table
+                List<SectionAreaModel> existingModels = sectionAreaModelRepository.findBySectionAreaId(area.getId());
+                Map<Long, SectionAreaModel> existingModelMap = existingModels.stream()
+                        .collect(Collectors.toMap(sam -> sam.getModel().getId(), sam -> sam));
+
+                // Remove any models that are no longer in the new list
+                for (var existingModel : existingModels) {
+                    if (!newModelIds.contains(existingModel.getModel().getId())) {
+                        sectionAreaModelRepository.delete(existingModel);
+                    }
+                }
+
+                // Add new models that are not in the existing models
+                for (Long newModelId : newModelIds) {
+                    if (!existingModelMap.containsKey(newModelId)) {
+                        Model newModel = modelRepository.findById(newModelId)
+                                .orElseThrow(() -> new RuntimeException("Model not found with id: " + newModelId));
+
+                        SectionAreaModel newSectionAreaModel = new SectionAreaModel(
+                                new SectionAreaModelRegisterDTO(area, newModel)
+                        );
+                        sectionAreaModelRepository.save(newSectionAreaModel);
+                    }
+                }
+            });
+
+            // Handle additions and updates in-place
+            final List<SectionArea> currentAreas = finalSection.getAreas();
+
+            // Remove areas that are no longer present
+            currentAreas.removeIf(existingArea -> !newAreasMap.containsKey(existingArea.getId()));
+
+            // Add or update areas in the section
+            newAreasMap.forEach((areaId, newArea) -> {
+                if (!currentAreas.contains(newArea)) {
+                    currentAreas.add(newArea); // Add new area
+                }
+            });
+            sectionRepository.save(finalSection);
         });
 
-        // Update or delete existing sections
+        // Delete existing sections
         for (var id : existingSectionsMap.keySet()) {
             if (!newSectionsMap.containsKey(id)) {
                 sectionRepository.delete(existingSectionsMap.get(id));
-            } else {
-                Section section = existingSectionsMap.get(id);
-                var newSection = data.sections().stream().filter(s -> Objects.equals(s.id(), id)).findFirst().orElseThrow();
-                section.setName(newSection.name());
-                section.setSectionOrder(newSection.sectionOrder());
-
-                // Handle areas for the section
-                Map<Long, SectionArea> existingAreasMap = sectionAreaRepository.findAllBySectionId(section.getId()).stream()
-                        .collect(Collectors.toMap(SectionArea::getId, area -> area));
-
-                Map<Long, SectionArea> newAreasMap = new HashMap<>();
-                newSection.areas().forEach(sa -> {
-                    SectionArea area = new SectionArea(new SectionAreaRegisterDTO(
-                            sa.name(), section, sa.areaOrder(), sa.printOnLabel(),
-                            sa.printAreaNameOnLabel(), sa.orderOnLabel(), sa.isCritical()
-                    ));
-                    if (sa.id() != null) {
-                        area.setId(sa.id()); // Ensure the area ID is set for existing areas
-                    }
-                    area.setSection(section); // Set the section for the area
-                    newAreasMap.put(area.getId(), area);
-                });
-
-                // Update or delete existing areas
-                for (var areaId : existingAreasMap.keySet()) {
-                    if (!newAreasMap.containsKey(areaId)) {
-                        sectionAreaRepository.delete(existingAreasMap.get(areaId));
-                    } else {
-                        SectionArea area = existingAreasMap.get(areaId);
-                        var newArea = newSection.areas().stream().filter(a -> Objects.equals(a.id(), areaId)).findFirst().orElseThrow();
-                        area.setName(newArea.name());
-                        area.setAreaOrder(newArea.areaOrder());
-                        area.setPrintOnLabel(newArea.printOnLabel());
-                        area.setPrintAreaNameOnLabel(newArea.printAreaNameOnLabel());
-                        area.setOrderOnLabel(newArea.orderOnLabel());
-                        area.setIsCritical(newArea.isCritical());
-                    }
-                }
-
-                // Add new areas
-                for (var areaId : newAreasMap.keySet()) {
-                    if (!existingAreasMap.containsKey(areaId)) {
-                        sectionAreaRepository.save(newAreasMap.get(areaId));
-                    }
-                }
-            }
-        }
-
-        // Add new sections
-        for (var section : newSectionsMap.values()) {
-            if (!existingSectionsMap.containsKey(section.getId())) {
-                sectionRepository.save(section);
-                section.getAreas().forEach(sectionAreaRepository::save);
             }
         }
 

@@ -29,9 +29,6 @@ public class ModelController {
     @Autowired
     private ModelRepository modelRepository;
 
-//    @Autowired
-//    private FieldGroupRepository fieldGroupRepository;
-
     @PostMapping
     @Transactional
     public ResponseEntity register(@RequestBody @Valid ModelRequestDTO data, UriComponentsBuilder uriBuilder) {
@@ -67,6 +64,12 @@ public class ModelController {
     @GetMapping("/list/needs-mpn")
     public ResponseEntity listModelsNeedsMpn() {
         var models = modelRepository.findAllByNeedsMpnTrue();
+        return ResponseEntity.ok(models);
+    }
+
+    @GetMapping("/list/model-component")
+    public ResponseEntity listModelComponent() {
+        var models = modelRepository.listModelComponent();
         return ResponseEntity.ok(models);
     }
 
