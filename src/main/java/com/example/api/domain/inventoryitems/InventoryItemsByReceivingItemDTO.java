@@ -26,7 +26,7 @@ public record InventoryItemsByReceivingItemDTO(
         this(
                 inventoryItem.getId(),
                 inventoryItem.getSerialNumber(),
-                inventoryItem.getGrade(),
+                inventoryItem.getCompanyGrade(),
                 inventoryItem.getUpdatedAt(),
                 inventoryItem.getRbid(),
                 inventoryItem.getPost(),

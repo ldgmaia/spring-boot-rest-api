@@ -3,14 +3,12 @@ package com.example.api.controller;
 import com.example.api.domain.inventoryitems.*;
 import com.example.api.repositories.InventoryItemRepository;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,10 +29,9 @@ public class InventoryItemController {
     @Autowired
     private InventoryItemRepository inventoryRepository;
 
-
     @PostMapping
     @Transactional
-    public ResponseEntity register(@RequestBody @Valid InventoryItemRequestDTO data) {
+    public ResponseEntity<List<InventoryItemResponseDTO>> register(@RequestBody @Valid InventoryItemRequestDTO data) {
 
 //        var inventory = inventoryService.register(data);
 //        var uri = uriBuilder.path("/inventory/{id}")
@@ -53,10 +50,23 @@ public class InventoryItemController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<InventoryInfoDTO>> list(HttpServletRequest request, @PageableDefault(size = 100, page = 0, sort = {"id"}) Pageable pagination, @RequestHeader HttpHeaders headers) {
+    public ResponseEntity<Page<InventoryItemInfoDTO>> list(@PageableDefault(size = 100, page = 0, sort = {"id"}) Pageable pagination) {
         var page = inventoryRepository.findAll(pagination)
-                .map((InventoryItem inventoryItem) -> new InventoryInfoDTO(inventoryItem));
+                .map((InventoryItem inventoryItem) -> new InventoryItemInfoDTO(inventoryItem));
         return ResponseEntity.ok(page);
+    }
+
+    @GetMapping("{id}")
+    public ResponseEntity<InventoryItemInfoDTO> listById(@PathVariable Long id) {
+        try {
+            var inventoryItem = inventoryItemService.listById(id);
+            if (inventoryItem != null) {
+                return ResponseEntity.ok(inventoryItem);
+            }
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @DeleteMapping("{id}")
@@ -91,7 +101,7 @@ public class InventoryItemController {
     }
 
     @GetMapping("/by-receiving-item/{receivingItemId}")
-    public ResponseEntity getInventoryItemsByReceivingItemId(@PathVariable Long receivingItemId) {
+    public ResponseEntity<List<InventoryItemsByReceivingItemDTO>> getInventoryItemsByReceivingItemId(@PathVariable Long receivingItemId) {
         List<InventoryItemsByReceivingItemDTO> items = inventoryItemService.getInventoryItemsByReceivingItemId(receivingItemId);
 
         return ResponseEntity.ok(items);

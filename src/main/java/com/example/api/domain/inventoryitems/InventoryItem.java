@@ -38,7 +38,7 @@ public class InventoryItem {
     private Model model;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "mpn_id", nullable = true)
+    @JoinColumn(name = "mpn_id")
     private MPN mpn;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -49,7 +49,9 @@ public class InventoryItem {
     @JoinColumn(name = "item_statuses_id")
     private ItemStatus itemStatus;
 
-    private String grade;
+    private String companyGrade;
+    private String functionalGrade;
+    private String cosmeticGrade;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "receiving_items_id")
@@ -58,6 +60,10 @@ public class InventoryItem {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
     private User createdBy;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "inspected_by")
+    private User inspectedBy;
 
     private String post;
 
@@ -71,6 +77,9 @@ public class InventoryItem {
 
     @LastModifiedDate
     private LocalDateTime updatedAt;
+
+    @CreatedDate
+    private LocalDateTime lastInspectedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "location_id")

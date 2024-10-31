@@ -5,7 +5,9 @@ import java.time.LocalDateTime;
 public record InventoryItemResponseDTO(
         Long id,
         String serialNumber,
-        String grade,
+        String companyGrade,
+        String functionalGrade,
+        String cosmeticGrade,
         LocalDateTime lastUpdated,
         String rbid,
         String mpn,
@@ -18,7 +20,9 @@ public record InventoryItemResponseDTO(
         this(
                 inventoryItem.getId(),
                 inventoryItem.getSerialNumber(),
-                inventoryItem.getGrade(),
+                inventoryItem.getCompanyGrade(),
+                inventoryItem.getFunctionalGrade(),
+                inventoryItem.getCosmeticGrade(),
                 inventoryItem.getUpdatedAt(),
                 inventoryItem.getRbid(),
                 inventoryItem.getMpn() != null ? inventoryItem.getMpn().getName() : null,

@@ -20,7 +20,7 @@ public class InventoryItemService {
     private UserRepository userRepository;
 
     @Autowired
-    private InventoryItemRepository inventoryRepository;
+    private InventoryItemRepository inventoryItemRepository;
 
     @Autowired
     private ReceivingItemRepository receivingItemRepository;
@@ -66,7 +66,7 @@ public class InventoryItemService {
                 .orElseThrow(() -> new ValidationException("Receiving item not found"));
 
         // Get the total number of items already in the inventory for the given receiving_item_id
-        var totalItemsInInventory = inventoryRepository.countByReceivingItemId(data.receivingItemId());
+        var totalItemsInInventory = inventoryItemRepository.countByReceivingItemId(data.receivingItemId());
 
         // Check if the current quantity to be added will exceed the quantity received
         var quantityRemainingToAdd = receivingItem.getQuantityToReceive() - totalItemsInInventory;
@@ -80,7 +80,7 @@ public class InventoryItemService {
 
         var poiUnitPrice = receivingItem.getPurchaseOrderItem().getId() != null ? purchaseOrderItemRepository.getReferenceById(receivingItem.getPurchaseOrderItem().getId()).getUnitPrice() : BigDecimal.valueOf(0L);//from purchare order item table on column unit cost
 
-        var unitsAdded = inventoryRepository.countByReceivingItemId(data.receivingItemId());
+        var unitsAdded = inventoryItemRepository.countByReceivingItemId(data.receivingItemId());
         var numberOfReceivedItems = receivingItemRepository.findQuantityReceivedByPurchaseOrderItemId(data.receivingItemId());
 
         var location = locationRepository.getReferenceById(1L); // change the id for the correct data when we work on Locations
@@ -117,7 +117,7 @@ public class InventoryItemService {
                             receivingItem.getAdditionalItem() ? BigDecimal.valueOf(0L) : poiUnitPrice
                     ), currentUser);
 
-                    inventoryRepository.save(inventory);
+                    inventoryItemRepository.save(inventory);
                     receivingItemRepository.getReferenceById(receivingItem.getId()).setQuantityReceived(receivingItemRepository.getReferenceById(receivingItem.getId()).getQuantityReceived() + 1);
 
                     //-----receivingItemRepository.getReferenceById(receivingItem.getId()).setStatus("Partially Received");
@@ -140,7 +140,7 @@ public class InventoryItemService {
             }
         } else {
             if ((unitsAdded + 1) > numberOfReceivedItems) {
-                throw new ValidationException(String.format("Cannot add the item. because exceed the quantity received of: ", numberOfReceivedItems));
+                throw new ValidationException(String.format("Cannot add the item because exceed the quantity received of: %d", numberOfReceivedItems));
             }
             // Add individually by serial number
             // If byQuantity is false, quantity can be null, and we default to 1 for individual items
@@ -170,7 +170,7 @@ public class InventoryItemService {
             ), currentUser);
 
             // Save the inventory to generate the ID
-            inventoryRepository.save(inventory);
+            inventoryItemRepository.save(inventory);
             receivingItemRepository.getReferenceById(receivingItem.getId()).setStatus("Partially Received");
 
             inventoryItems.add(new InventoryItemResponseDTO(inventory));
@@ -184,6 +184,10 @@ public class InventoryItemService {
     }
 
     public List<InventoryItemsByReceivingItemDTO> getInventoryItemsByReceivingItemId(Long receivingItemId) {
-        return inventoryRepository.findByReceivingItemId(receivingItemId);
+        return inventoryItemRepository.findByReceivingItemId(receivingItemId);
+    }
+
+    public InventoryItemInfoDTO listById(Long id) {
+        return new InventoryItemInfoDTO(inventoryItemRepository.getReferenceById(id));
     }
 }
