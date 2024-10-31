@@ -3,6 +3,7 @@ services:
     volumes:
       - ~/documents/projects/volumes/mysqlspringboot:/var/lib/mysql
     image: mysql:8.0
+    shm_size: 1g
     container_name: mysql-springboot
     command: --default-authentication-plugin=caching_sha2_password
     restart: unless-stopped
