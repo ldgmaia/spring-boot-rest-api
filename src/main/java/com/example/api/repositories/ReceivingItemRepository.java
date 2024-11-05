@@ -5,7 +5,6 @@ import com.example.api.domain.receivingitems.ReceivingItemAssessmentListDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -16,9 +15,9 @@ public interface ReceivingItemRepository extends JpaRepository<ReceivingItem, Lo
     @Query("SELECT COALESCE(SUM(ri.quantityAlreadyReceived), 0) FROM ReceivingItem ri WHERE ri.purchaseOrderItem.id = :purchaseOrderItemId")
     Long findSumAlreadyReceivedByPurchaseOrderItemId(@Param("purchaseOrderItemId") Long purchaseOrderItemId);
 
-    @Modifying
-    @Query("UPDATE ReceivingItem ri SET ri.status = :status WHERE ri.purchaseOrderItem.id = :purchaseOrderItemId")
-    void updateStatusByPurchaseOrderItemId(@Param("purchaseOrderItemId") Long purchaseOrderItemId, @Param("status") String status);
+//    @Modifying
+//    @Query("UPDATE ReceivingItem ri SET ri.status = :status WHERE ri.purchaseOrderItem.id = :purchaseOrderItemId")
+//    void updateStatusByPurchaseOrderItemId(@Param("purchaseOrderItemId") Long purchaseOrderItemId, @Param("status") String status);
 
     @Query("SELECT COALESCE(SUM(ri.quantityAlreadyReceived), 0) FROM ReceivingItem ri WHERE ri.purchaseOrderItem.id = :purchaseOrderItemId")
     Long findTotalReceivedQuantityByPurchaseOrderItemId(@Param("purchaseOrderItemId") Long purchaseOrderItemId);
@@ -32,7 +31,7 @@ public interface ReceivingItemRepository extends JpaRepository<ReceivingItem, Lo
 
     @Query("""
             SELECT new com.example.api.domain.receivingitems.ReceivingItemAssessmentListDTO(
-                ri.id, po.poNumber, ri.description, ri.status, poi.quantityOrdered, ri.quantityAlreadyReceived, s.name, ri.createdAt
+                r.id, po.poNumber, ri.description, ri.status, poi.quantityOrdered, ri.quantityAlreadyReceived, s.name, ri.createdAt
             )
             FROM ReceivingItem ri
             JOIN ri.purchaseOrderItem poi
@@ -44,11 +43,27 @@ public interface ReceivingItemRepository extends JpaRepository<ReceivingItem, Lo
                 AND ri.status in (:status)
                 order by ri.createdAt DESC
             """)
-    Page<ReceivingItemAssessmentListDTO> findReceivingsByStatus(Pageable pageable, @Param("status") String[] status);
+    Page<ReceivingItemAssessmentListDTO> listPagedReceivingsByStatus(Pageable pageable, @Param("status") String[] status);
 
     @Query("""
             SELECT new com.example.api.domain.receivingitems.ReceivingItemAssessmentListDTO(
-                ri.id, po.poNumber, ri.description, ri.status, poi.quantityOrdered, ri.quantityAlreadyReceived, s.name, ri.createdAt
+                r.id, po.poNumber, ri.description, ri.status, poi.quantityOrdered, ri.quantityAlreadyReceived, s.name, ri.createdAt
+            )
+            FROM ReceivingItem ri
+            JOIN ri.purchaseOrderItem poi
+            JOIN poi.purchaseOrder po
+            JOIN po.supplier s
+            JOIN ri.receiving r
+            WHERE r.type = 'PO'
+                AND ri.quantityAlreadyReceived > 0
+                AND ri.status in (:status)
+                order by ri.createdAt DESC
+            """)
+    List<ReceivingItemAssessmentListDTO> listReceivingsByStatus(@Param("status") String[] status);
+
+    @Query("""
+            SELECT new com.example.api.domain.receivingitems.ReceivingItemAssessmentListDTO(
+                r.id, po.poNumber, ri.description, ri.status, poi.quantityOrdered, ri.quantityAlreadyReceived, s.name, ri.createdAt
             )
             FROM ReceivingItem ri
             JOIN ri.purchaseOrderItem poi
@@ -65,7 +80,7 @@ public interface ReceivingItemRepository extends JpaRepository<ReceivingItem, Lo
 
     @Query("""
             SELECT new com.example.api.domain.receivingitems.ReceivingItemAssessmentListDTO(
-                ri.id, po.poNumber, ri.description, ri.status, poi.quantityOrdered, ri.quantityAlreadyReceived, s.name, ri.createdAt
+                r.id, po.poNumber, ri.description, ri.status, poi.quantityOrdered, ri.quantityAlreadyReceived, s.name, ri.createdAt
             )
             FROM ReceivingItem ri
             JOIN InventoryItem ii on ri.id = ii.receivingItem.id
@@ -82,7 +97,7 @@ public interface ReceivingItemRepository extends JpaRepository<ReceivingItem, Lo
 
     @Query("""
             SELECT new com.example.api.domain.receivingitems.ReceivingItemAssessmentListDTO(
-                ri.id, po.poNumber, ri.description, ri.status, poi.quantityOrdered, ri.quantityAlreadyReceived, s.name, ri.createdAt
+                r.id, po.poNumber, ri.description, ri.status, poi.quantityOrdered, ri.quantityAlreadyReceived, s.name, ri.createdAt
             )
             FROM ReceivingItem ri
             JOIN ri.receiving r
@@ -98,7 +113,7 @@ public interface ReceivingItemRepository extends JpaRepository<ReceivingItem, Lo
 
     @Query("""
             SELECT new com.example.api.domain.receivingitems.ReceivingItemAssessmentListDTO(
-                ri.id, po.poNumber, ri.description, ri.status, poi.quantityOrdered, ri.quantityAlreadyReceived, s.name, ri.createdAt
+                r.id, po.poNumber, ri.description, ri.status, poi.quantityOrdered, ri.quantityAlreadyReceived, s.name, ri.createdAt
             )
             FROM ReceivingItem ri
             JOIN ri.receiving r
@@ -114,7 +129,7 @@ public interface ReceivingItemRepository extends JpaRepository<ReceivingItem, Lo
 
     @Query("""
             SELECT new com.example.api.domain.receivingitems.ReceivingItemAssessmentListDTO(
-                ri.id, po.poNumber, ri.description, ri.status, poi.quantityOrdered, ri.quantityAlreadyReceived, s.name, ri.createdAt
+                r.id, po.poNumber, ri.description, ri.status, poi.quantityOrdered, ri.quantityAlreadyReceived, s.name, ri.createdAt
             )
             FROM ReceivingItem ri
             JOIN ri.receiving r
@@ -131,7 +146,7 @@ public interface ReceivingItemRepository extends JpaRepository<ReceivingItem, Lo
 
     @Query("""
             SELECT new com.example.api.domain.receivingitems.ReceivingItemAssessmentListDTO(
-                ri.id, po.poNumber, ri.description, ri.status, poi.quantityOrdered, ri.quantityAlreadyReceived, s.name, ri.createdAt
+                r.id, po.poNumber, ri.description, ri.status, poi.quantityOrdered, ri.quantityAlreadyReceived, s.name, ri.createdAt
             )
             FROM ReceivingItem ri
             JOIN ri.receiving r

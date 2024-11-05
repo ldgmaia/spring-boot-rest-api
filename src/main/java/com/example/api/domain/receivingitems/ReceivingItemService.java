@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class ReceivingItemService {
@@ -23,6 +24,11 @@ public class ReceivingItemService {
     }
 
     public List<ReceivingItemAssessmentListDTO> list(ReceivingItemListByRequestDTO data) {
+
+        if (Objects.equals(data.value(), "") || data.value() == null) {
+            return receivingItemRepository.listReceivingsByStatus(data.status());
+        }
+
         switch (data.criteria()) {
             case "serialNumber" -> {
                 return receivingItemRepository.findReceivedItemsBySerialNumber(data.value());
@@ -43,7 +49,7 @@ public class ReceivingItemService {
                 return receivingItemRepository.findReceivedItemsByPurchaseOrderNumber(data.status(), data.value());
             }
             default -> {
-                throw new IllegalArgumentException("Invalid criteria: " + data.criteria() + ". Expected criteria are 'serialNumber' or 'receivingId'.");
+                throw new IllegalArgumentException("Invalid criteria: " + data.criteria() + ". Expected criteria.");
             }
         }
     }

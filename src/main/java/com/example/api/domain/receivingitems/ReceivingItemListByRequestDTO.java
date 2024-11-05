@@ -6,8 +6,7 @@ public record ReceivingItemListByRequestDTO(
 
         @NotBlank
         String criteria,
-
-        @NotBlank
+        
         String value,
 
         String[] status

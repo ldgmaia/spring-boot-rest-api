@@ -39,7 +39,7 @@ public class ReceivingItemController {
 //        Arrays.stream(status).forEach(System.out::println);
 //        System.out.println("status 1 -> " + status[0]);
 //        System.out.println("status 2 -> " + status[1]);
-        Page<ReceivingItemAssessmentListDTO> receivingsByStatus = receivingItemRepository.findReceivingsByStatus(pagination, status);
+        Page<ReceivingItemAssessmentListDTO> receivingsByStatus = receivingItemRepository.listPagedReceivingsByStatus(pagination, status);
         return ResponseEntity.ok(receivingsByStatus);
     }
 
