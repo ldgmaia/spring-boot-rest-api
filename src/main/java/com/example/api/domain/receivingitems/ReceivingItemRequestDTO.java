@@ -13,22 +13,36 @@ public record ReceivingItemRequestDTO(
         Long quantityToReceive,
 
         @NotBlank
-        Long quantityReceived,
+        Long quantity,
 
         @NotNull
         Boolean receivableItem,
 
         Boolean additionalItem
 ) {
-    // Custom constructor for setting default value for additionalItem
-    public ReceivingItemRequestDTO(ReceivingItem receivingItem) {
-        // Set default value for additionalItem if not provided (i.e., null)
-        this(
-                receivingItem.getPurchaseOrderItem().getQboPurchaseOrderItemId(),
-                receivingItem.getDescription(),
-                receivingItem.getQuantityToReceive(),
-                receivingItem.getQuantityReceived(),
-                receivingItem.getReceivableItem(),
-                receivingItem.getAdditionalItem() != null ? receivingItem.getAdditionalItem() : false);
+    // Primary constructor
+    public ReceivingItemRequestDTO(
+            Long purchaseOrderItemId,
+            String description,
+            Long quantityToReceive,
+            Long quantity,
+            Boolean receivableItem,
+            Boolean additionalItem) {
+        this.purchaseOrderItemId = purchaseOrderItemId;
+        this.description = description;
+        this.quantityToReceive = quantityToReceive;
+        this.quantity = quantity;
+        this.receivableItem = receivableItem;
+        this.additionalItem = additionalItem != null ? additionalItem : null; // Set to null if not provided
     }
+
+//        // Overloaded constructor with additionalItem defaulted to null
+//        public ReceivingItemRequestDTO(
+//                Long purchaseOrderItemId,
+//                String description,
+//                Long quantityToReceive,
+//                Long quantity,
+//                Boolean receivableItem) {
+//                this(purchaseOrderItemId, description, quantityToReceive, quantity, receivableItem, null);
+//        }
 }

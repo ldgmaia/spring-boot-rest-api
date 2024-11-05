@@ -1,24 +1,24 @@
-package com.example.api.domain.assessments;
+package com.example.api.domain.receivingitems;
 
 
 import java.time.LocalDateTime;
 
-public record PendingAssessmentListDTO(
+public record ReceivingItemAssessmentListDTO(
         Long id,
         String poNumber,
         String description,
         String status,
         Long quantityOrdered,
-        Long quantityReceived,
+        Long quantityAlreadyReceived,
         String supplierName,
         LocalDateTime createdAt) {
-    public PendingAssessmentListDTO(
+    public ReceivingItemAssessmentListDTO(
             Long id,
             String poNumber,
             String description,
             String status,
             Long quantityOrdered,
-            Long quantityReceived,
+            Long quantityAlreadyReceived,
             String supplierName,
             LocalDateTime createdAt) {
         this.id = id;
@@ -26,7 +26,7 @@ public record PendingAssessmentListDTO(
         this.description = description;
         this.status = status;
         this.quantityOrdered = quantityOrdered;
-        this.quantityReceived = quantityReceived;
+        this.quantityAlreadyReceived = quantityAlreadyReceived;
         this.supplierName = supplierName;
         this.createdAt = createdAt;
     }

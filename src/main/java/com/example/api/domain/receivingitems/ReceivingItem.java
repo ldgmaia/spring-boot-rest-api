@@ -36,8 +36,8 @@ public class ReceivingItem {
     @Column(name = "quantity_to_receive", nullable = true)
     private Long quantityToReceive;
 
-    @Column(name = "quantity_received")
-    private Long quantityReceived;
+    @Column(name = "quantity_already_received")
+    private Long quantityAlreadyReceived;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
@@ -62,9 +62,9 @@ public class ReceivingItem {
         this.purchaseOrderItem = receivingItemRegister.purchaseOrderItem();
         this.description = receivingItemRegister.description();
         this.quantityToReceive = receivingItemRegister.quantityToReceive();
-        this.quantityReceived = receivingItemRegister.quantityReceived();
+        this.quantityAlreadyReceived = receivingItemRegister.quantity();
         this.createdBy = receivingItemRegister.createdBy();
-        this.status = "Pending receiving";
+        this.status = "Pending Items";
         this.receivableItem = receivingItemRegister.receivableItem();
         this.additionalItem = receivingItemRegister.additionalItem();
         this.createdAt = LocalDateTime.now();

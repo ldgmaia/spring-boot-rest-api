@@ -61,12 +61,14 @@ public class ReceivingService {
             carrier = carrierRepository.findById(data.carrierId()).orElseThrow(() -> new RuntimeException("Carrier not found"));
         }
 
+        var purchaseOrder = purchaseOrderRepository.findById(data.purchaseOrderId()).orElseThrow(() -> new ValidationException("Purchase order not found"));
+
         // Create the receiving header to generate the ID
         var receiving = new Receiving(new ReceivingRegisterDTO(
                 data.trackingCode(),
                 data.type(),
                 supplierRepository.getReferenceById(data.supplierId()),
-                purchaseOrderRepository.getReferenceById(data.purchaseOrderId()),
+                purchaseOrder,
                 carrier,
                 data.notes()
         ), currentUser);
@@ -102,12 +104,12 @@ public class ReceivingService {
 
                                 //var receivingId = receiving.getId();
                                 var quantityToReceive = receivingItem.quantityToReceive();
-                                var quantityReceived = receivingItem.quantityReceived();
-                                var totalQuantityReceived = receivingItemRepository.findQuantityReceivedByPurchaseOrderItemId(receivingItem.purchaseOrderItemId());// Get total quantity already received for this receiving_id
+                                var quantityReceived = receivingItem.quantity();
+                                var totalQuantityReceived = receivingItemRepository.findQuantityAlreadyReceivedByPurchaseOrderItemId(receivingItem.purchaseOrderItemId());// Get total quantity already received for this receiving_id
 
                                 // Check if adding the current item exceeds the allowed quantity
                                 if (!receivingItem.additionalItem() && totalQuantityReceived + quantityReceived > quantityToReceive) {
-//                                    System.err.println("Can not add " + quantityReceived + " item(s) into " + quantityToReceive + " because there is Already " + totalQuantityReceived + " added");
+//                                    System.err.println("Can not add " + quantity + " item(s) into " + quantityToReceive + " because there is Already " + totalQuantityReceived + " added");
                                     var poi = purchaseOrderItemRepository.getReferenceById(receivingItem.purchaseOrderItemId());
                                     throw new ValidationException("Total received quantity exceeds the quantity ordered for the item: " + poi.getDescription());
                                 }
@@ -120,19 +122,18 @@ public class ReceivingService {
                                         receivingItem.purchaseOrderItemId() == null ? null : purchaseOrderItemRepository.getReferenceById(receivingItem.purchaseOrderItemId()),
                                         receivingItem.description(),
                                         receivingItem.quantityToReceive(),
-                                        receivingItem.quantityReceived(),
+                                        receivingItem.quantity(),
                                         currentUser,
                                         receivingItem.receivableItem(),
                                         receivingItem.additionalItem()
                                 ));
 
-//                                System.out.println("receivingItems - before save" + receivingItems);
-
                                 if (!Objects.equals(quantityReceived, quantityToReceive)) {
-                                    receivingItems.setStatus("Partially Received");
+                                    purchaseOrder.setStatus("Partially Received");
                                 } else {
-                                    receivingItems.setStatus("Fully Received");
-                                    purchaseOrderRepository.getReferenceById(receivingItem.purchaseOrderItemId()).setStatus("Fully Received");
+                                    purchaseOrder.setStatus("Fully Received");
+//                                    receivingItems.setStatus("Fully Received");
+//                                    purchaseOrderRepository.getReferenceById(receivingItem.purchaseOrderItemId()).setStatus("Fully Received");
                                 }
 
                                 //before this step validate if there are enough spaces to add the items
@@ -164,13 +165,14 @@ public class ReceivingService {
         // Fetch the ordered quantity for the given purchase order item
         var quantityOrdered = purchaseOrderItemRepository.findQuantityOrderedById(purchaseOrderItemId);
 
-        // Compare and update the status
-        if (Objects.equals(totalReceived, quantityOrdered)) {
-            receivingItemRepository.updateStatusByPurchaseOrderItemId(purchaseOrderItemId, "Fully Received");
-            purchaseOrderRepository.getReferenceById(purchaseOrderItemId).setStatus("Fully Received");
-        } else {
-            receivingItemRepository.updateStatusByPurchaseOrderItemId(purchaseOrderItemId, "Partially Received");
-        }
+        // This must be done after we are dealing with quantity added as well
+//        // Compare and update the status
+//        if (Objects.equals(totalReceived, quantityOrdered)) {
+//            receivingItemRepository.updateStatusByPurchaseOrderItemId(purchaseOrderItemId, "Fully Received");
+//            purchaseOrderRepository.getReferenceById(purchaseOrderItemId).setStatus("Fully Received");
+//        } else {
+//            receivingItemRepository.updateStatusByPurchaseOrderItemId(purchaseOrderItemId, "Partially Received");
+//        }
     }
 
 }

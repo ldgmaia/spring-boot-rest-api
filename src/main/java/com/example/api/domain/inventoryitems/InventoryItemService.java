@@ -81,7 +81,7 @@ public class InventoryItemService {
         var poiUnitPrice = receivingItem.getPurchaseOrderItem().getId() != null ? purchaseOrderItemRepository.getReferenceById(receivingItem.getPurchaseOrderItem().getId()).getUnitPrice() : BigDecimal.valueOf(0L);//from purchare order item table on column unit cost
 
         var unitsAdded = inventoryItemRepository.countByReceivingItemId(data.receivingItemId());
-        var numberOfReceivedItems = receivingItemRepository.findQuantityReceivedByPurchaseOrderItemId(data.receivingItemId());
+        var numberOfReceivedItems = receivingItemRepository.findQuantityAlreadyReceivedByPurchaseOrderItemId(data.receivingItemId());
 
         var location = locationRepository.getReferenceById(1L); // change the id for the correct data when we work on Locations
 
@@ -118,12 +118,12 @@ public class InventoryItemService {
                     ), currentUser);
 
                     inventoryItemRepository.save(inventory);
-                    receivingItemRepository.getReferenceById(receivingItem.getId()).setQuantityReceived(receivingItemRepository.getReferenceById(receivingItem.getId()).getQuantityReceived() + 1);
+                    receivingItemRepository.getReferenceById(receivingItem.getId()).setQuantityAlreadyReceived(receivingItemRepository.getReferenceById(receivingItem.getId()).getQuantityAlreadyReceived() + 1);
 
                     //-----receivingItemRepository.getReferenceById(receivingItem.getId()).setStatus("Partially Received");
 
                     var quantityToReceive = receivingItemRepository.getReferenceById(receivingItem.getId()).getQuantityToReceive();
-                    var quantityReceived = receivingItemRepository.getReferenceById(receivingItem.getId()).getQuantityReceived();
+                    var quantityReceived = receivingItemRepository.getReferenceById(receivingItem.getId()).getQuantityAlreadyReceived();
 
                     receivingItemRepository.getReferenceById(receivingItem.getId()).setStatus("Fully Received"); // this line works properly
 

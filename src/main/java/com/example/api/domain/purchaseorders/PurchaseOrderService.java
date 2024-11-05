@@ -101,15 +101,14 @@ public class PurchaseOrderService {
                 .stream()
                 .map(poi -> {
                     var receivingItem = receivingItemRepository.findByPurchaseOrderItemId(poi.id());
-                    if (receivingItem != null) {
-                        Long quantityReceived = receivingItemRepository.findQuantityReceivedByPurchaseOrderItemId(poi.id());
-                        return new PurchaseOrderItemInfoReceivedDTO(purchaseOrderItemRepository.getReferenceById(poi.id()), quantityReceived != null ? quantityReceived : 0L, receivingItem);  // Include quantityReceived
+                    if (!receivingItem.isEmpty()) {
+                        Long quantityReceived = receivingItemRepository.findQuantityAlreadyReceivedByPurchaseOrderItemId(poi.id());
+                        return new PurchaseOrderItemInfoReceivedDTO(purchaseOrderItemRepository.getReferenceById(poi.id()), quantityReceived != null ? quantityReceived : 0L, receivingItem.get(0));  // Include quantity
                     } else {
-                        return new PurchaseOrderItemInfoReceivedDTO(purchaseOrderItemRepository.getReferenceById(poi.id()), 0L, receivingItem);  // Include quantityReceived
+                        return new PurchaseOrderItemInfoReceivedDTO(purchaseOrderItemRepository.getReferenceById(poi.id()), 0L, null);  // Include quantity
                     }
                 })
                 .toList();
-
 
         return new PurchaseOrderInfoReceivedDTO(purchaseOrder, supplier, items);
     }

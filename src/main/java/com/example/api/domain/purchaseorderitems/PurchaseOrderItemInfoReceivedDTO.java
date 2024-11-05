@@ -10,18 +10,18 @@ public record PurchaseOrderItemInfoReceivedDTO(
         String name,
         String description,
         Long quantityOrdered,
-        Long quantityReceived,
+        Long quantityAlreadyReceived,
         BigDecimal unitPrice,
         BigDecimal total,
         ReceivingItemInfoDTO receivingItems
 ) {
-    public PurchaseOrderItemInfoReceivedDTO(PurchaseOrderItem poi, Long quantityReceived, ReceivingItem receivingItem) {
+    public PurchaseOrderItemInfoReceivedDTO(PurchaseOrderItem poi, Long quantityAlreadyReceived, ReceivingItem receivingItem) {
         this(
                 poi.getId(),
                 poi.getName(),
                 poi.getDescription(),
                 poi.getQuantityOrdered(),
-                quantityReceived,
+                quantityAlreadyReceived,
                 poi.getUnitPrice(),
                 poi.getTotal(),
                 receivingItem != null ? new ReceivingItemInfoDTO(receivingItem) : null

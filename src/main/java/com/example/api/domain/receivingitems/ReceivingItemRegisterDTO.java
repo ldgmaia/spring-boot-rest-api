@@ -17,7 +17,7 @@ public record ReceivingItemRegisterDTO(
         Long quantityToReceive,
 
         @NotBlank
-        Long quantityReceived,
+        Long quantity,
 
         @NotBlank
         User createdBy,
