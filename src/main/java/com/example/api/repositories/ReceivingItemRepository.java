@@ -14,7 +14,7 @@ import java.util.List;
 public interface ReceivingItemRepository extends JpaRepository<ReceivingItem, Long> {
 
     @Query("SELECT COALESCE(SUM(ri.quantityAlreadyReceived), 0) FROM ReceivingItem ri WHERE ri.purchaseOrderItem.id = :purchaseOrderItemId")
-    Long findQuantityAlreadyReceivedByPurchaseOrderItemId(@Param("purchaseOrderItemId") Long purchaseOrderItemId);
+    Long findSumAlreadyReceivedByPurchaseOrderItemId(@Param("purchaseOrderItemId") Long purchaseOrderItemId);
 
     @Modifying
     @Query("UPDATE ReceivingItem ri SET ri.status = :status WHERE ri.purchaseOrderItem.id = :purchaseOrderItemId")
@@ -24,8 +24,8 @@ public interface ReceivingItemRepository extends JpaRepository<ReceivingItem, Lo
     Long findTotalReceivedQuantityByPurchaseOrderItemId(@Param("purchaseOrderItemId") Long purchaseOrderItemId);
 
     @Query("""
-                SELECT r 
-                FROM ReceivingItem r 
+                SELECT r
+                FROM ReceivingItem r
                 WHERE r.purchaseOrderItem.id = :purchaseOrderItemId
             """)
     List<ReceivingItem> findByPurchaseOrderItemId(@Param("purchaseOrderItemId") Long purchaseOrderItemId);

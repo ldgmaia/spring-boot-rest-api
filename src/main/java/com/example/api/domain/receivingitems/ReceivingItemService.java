@@ -1,6 +1,7 @@
 package com.example.api.domain.receivingitems;
 
 import com.example.api.domain.ValidationException;
+import com.example.api.repositories.InventoryItemRepository;
 import com.example.api.repositories.ReceivingItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,37 +14,33 @@ public class ReceivingItemService {
     @Autowired
     private ReceivingItemRepository receivingItemRepository;
 
+    @Autowired
+    private InventoryItemRepository inventoryItemRepository;
+
     public ReceivingItemInfoDTO show(Long id) {
         var receivingItem = receivingItemRepository.findById(id).orElseThrow(() -> new ValidationException("Receiving not found"));
-        return new ReceivingItemInfoDTO(receivingItem);
+        return new ReceivingItemInfoDTO(receivingItem, inventoryItemRepository);
     }
 
     public List<ReceivingItemAssessmentListDTO> list(ReceivingItemListByRequestDTO data) {
         switch (data.criteria()) {
             case "serialNumber" -> {
-                List<ReceivingItemAssessmentListDTO> receivingItemsBySerialNumber = receivingItemRepository.findReceivedItemsBySerialNumber(data.value());
-
-                return receivingItemsBySerialNumber;
+                return receivingItemRepository.findReceivedItemsBySerialNumber(data.value());
             }
             case "receivingId" -> {
-                List<ReceivingItemAssessmentListDTO> receivingItemsReceivingId = receivingItemRepository.findReceivedItemsByReceivingId(data.status(), Long.valueOf(data.value()));
-                return receivingItemsReceivingId;
+                return receivingItemRepository.findReceivedItemsByReceivingId(data.status(), Long.valueOf(data.value()));
             }
             case "description" -> {
-                List<ReceivingItemAssessmentListDTO> receivingItemsByDescription = receivingItemRepository.findReceivedItemsByDescription(data.status(), data.value());
-                return receivingItemsByDescription;
+                return receivingItemRepository.findReceivedItemsByDescription(data.status(), data.value());
             }
             case "trackingLading" -> {
-                List<ReceivingItemAssessmentListDTO> receivingsItemsByTrakingLading = receivingItemRepository.findReceivedItemsByTrackinglading(data.status(), data.value());
-                return receivingsItemsByTrakingLading;
+                return receivingItemRepository.findReceivedItemsByTrackinglading(data.status(), data.value());
             }
             case "supplierId" -> {
-                List<ReceivingItemAssessmentListDTO> receivingsItemsBySupplierId = receivingItemRepository.findReceivedItemsBySupplierId(data.status(), Long.valueOf(data.value()));
-                return receivingsItemsBySupplierId;
+                return receivingItemRepository.findReceivedItemsBySupplierId(data.status(), Long.valueOf(data.value()));
             }
             case "poNumber" -> {
-                List<ReceivingItemAssessmentListDTO> receivingItemsByPoNumber = receivingItemRepository.findReceivedItemsByPurchaseOrderNumber(data.status(), data.value());
-                return receivingItemsByPoNumber;
+                return receivingItemRepository.findReceivedItemsByPurchaseOrderNumber(data.status(), data.value());
             }
             default -> {
                 throw new IllegalArgumentException("Invalid criteria: " + data.criteria() + ". Expected criteria are 'serialNumber' or 'receivingId'.");

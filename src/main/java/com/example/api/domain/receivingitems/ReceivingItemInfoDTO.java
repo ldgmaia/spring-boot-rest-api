@@ -3,6 +3,7 @@ package com.example.api.domain.receivingitems;
 import com.example.api.domain.purchaseorderitems.PurchaseOrderItemInfoDTO;
 import com.example.api.domain.purchaseorders.PurchaseOrderInfoDetailsDTO;
 import com.example.api.domain.suppliers.SupplierInfoDTO;
+import com.example.api.repositories.InventoryItemRepository;
 
 import java.time.LocalDateTime;
 
@@ -12,6 +13,7 @@ public record ReceivingItemInfoDTO(
         String description,
         Long quantityToReceive,
         Long quantityAlreadyReceived,
+        Long quantityAdded,
         Long receivingId,
         String createdBy,
         String status,
@@ -20,6 +22,24 @@ public record ReceivingItemInfoDTO(
         PurchaseOrderInfoDetailsDTO purchaseOrder,
         SupplierInfoDTO supplier
 ) {
+    public ReceivingItemInfoDTO(ReceivingItem receivingItem, InventoryItemRepository inventoryItemRepository) {
+        this(
+                receivingItem.getId(),
+                receivingItem.getPurchaseOrderItem() != null ? receivingItem.getPurchaseOrderItem().getId() : null,
+                receivingItem.getDescription(),
+                receivingItem.getQuantityToReceive(),
+                receivingItem.getQuantityAlreadyReceived(),
+                inventoryItemRepository.countByReceivingItemId(receivingItem.getId()),  // Fetch quantityAdded
+                receivingItem.getReceiving().getId(),
+                receivingItem.getCreatedBy().getUsername(),
+                receivingItem.getStatus(),
+                receivingItem.getUpdatedAt(),
+                receivingItem.getPurchaseOrderItem() != null ? new PurchaseOrderItemInfoDTO(receivingItem.getPurchaseOrderItem()) : null,
+                receivingItem.getPurchaseOrderItem() != null ? new PurchaseOrderInfoDetailsDTO(receivingItem.getPurchaseOrderItem().getPurchaseOrder()) : null,
+                new SupplierInfoDTO(receivingItem.getReceiving().getSupplier())
+        );
+    }
+
     public ReceivingItemInfoDTO(ReceivingItem receivingItem) {
         this(
                 receivingItem.getId(),
@@ -27,6 +47,7 @@ public record ReceivingItemInfoDTO(
                 receivingItem.getDescription(),
                 receivingItem.getQuantityToReceive(),
                 receivingItem.getQuantityAlreadyReceived(),
+                null,
                 receivingItem.getReceiving().getId(),
                 receivingItem.getCreatedBy().getUsername(),
                 receivingItem.getStatus(),

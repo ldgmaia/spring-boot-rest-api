@@ -66,10 +66,10 @@ public class InventoryItemService {
                 .orElseThrow(() -> new ValidationException("Receiving item not found"));
 
         // Get the total number of items already in the inventory for the given receiving_item_id
-        var totalItemsInInventory = inventoryItemRepository.countByReceivingItemId(data.receivingItemId());
+        var unitsAdded = inventoryItemRepository.countByReceivingItemId(data.receivingItemId());
 
         // Check if the current quantity to be added will exceed the quantity received
-        var quantityRemainingToAdd = receivingItem.getQuantityToReceive() - totalItemsInInventory;
+        var quantityRemainingToAdd = receivingItem.getQuantityToReceive() - unitsAdded;
 
         if (data.byQuantity() && data.quantity() > quantityRemainingToAdd) {
             throw new ValidationException(
@@ -80,8 +80,8 @@ public class InventoryItemService {
 
         var poiUnitPrice = receivingItem.getPurchaseOrderItem().getId() != null ? purchaseOrderItemRepository.getReferenceById(receivingItem.getPurchaseOrderItem().getId()).getUnitPrice() : BigDecimal.valueOf(0L);//from purchare order item table on column unit cost
 
-        var unitsAdded = inventoryItemRepository.countByReceivingItemId(data.receivingItemId());
-        var numberOfReceivedItems = receivingItemRepository.findQuantityAlreadyReceivedByPurchaseOrderItemId(data.receivingItemId());
+//        var numberOfReceivedItems = receivingItemRepository.findSumAlreadyReceivedByPurchaseOrderItemId(receivingItem.getPurchaseOrderItem().getId());
+//        System.out.println("numberOfReceivedItems " + numberOfReceivedItems);
 
         var location = locationRepository.getReferenceById(1L); // change the id for the correct data when we work on Locations
 
@@ -94,8 +94,8 @@ public class InventoryItemService {
                                 quantityRemainingToAdd, data.quantity()));
             }
 
-            if ((unitsAdded + data.quantity()) > numberOfReceivedItems) {
-                throw new ValidationException(String.format("Cannot add %d item(s). because exceed %d that is the quantity received.", data.quantity(), numberOfReceivedItems));
+            if ((unitsAdded + data.quantity()) > receivingItem.getQuantityAlreadyReceived()) {
+                throw new ValidationException(String.format("Cannot add %d item(s). because exceed %d that is the quantity received.", data.quantity(), receivingItem.getQuantityAlreadyReceived()));
             }
 
             if (data.quantity() > 0) {
@@ -139,8 +139,8 @@ public class InventoryItemService {
                 throw new ValidationException("Quantity must be positive. Current value: " + data.quantity());
             }
         } else {
-            if ((unitsAdded + 1) > numberOfReceivedItems) {
-                throw new ValidationException(String.format("Cannot add the item because exceed the quantity received of: %d", numberOfReceivedItems));
+            if ((unitsAdded + 1) > receivingItem.getQuantityAlreadyReceived()) {
+                throw new ValidationException(String.format("Cannot add the item because exceed the quantity received of: %d", receivingItem.getQuantityAlreadyReceived()));
             }
             // Add individually by serial number
             // If byQuantity is false, quantity can be null, and we default to 1 for individual items

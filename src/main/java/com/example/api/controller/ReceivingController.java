@@ -1,9 +1,7 @@
 package com.example.api.controller;
 
-import com.example.api.domain.receivings.Receiving;
-import com.example.api.domain.receivings.ReceivingListDTO;
-import com.example.api.domain.receivings.ReceivingRequestDTO;
-import com.example.api.domain.receivings.ReceivingService;
+import com.example.api.domain.receivings.*;
+import com.example.api.repositories.InventoryItemRepository;
 import com.example.api.repositories.ReceivingRepository;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.transaction.Transactional;
@@ -30,9 +28,12 @@ public class ReceivingController {
     @Autowired
     private ReceivingRepository receivingRepository;
 
+    @Autowired
+    private InventoryItemRepository inventoryItemRepository;
+
     @PostMapping
     @Transactional
-    public ResponseEntity register(
+    public ResponseEntity<ReceivingInfoDTO> register(
             @RequestPart("data") @Valid ReceivingRequestDTO data,  // For complex form data
             @RequestPart("pictures") MultipartFile[] pictures,
             UriComponentsBuilder uriBuilder) throws IOException {
@@ -44,19 +45,25 @@ public class ReceivingController {
 
     @GetMapping
     public ResponseEntity<Page<ReceivingListDTO>> list(@PageableDefault(size = 100, page = 0, sort = {"id"}) Pageable pagination) {
-//        Page<Receiving> page = receivingRepository.findAll(pagination);
-        Page<Receiving> page = receivingRepository.findAllWithPictures(pagination);
 
-        Page<ReceivingListDTO> dtoPage = page.map(ReceivingListDTO::new);
+        // Fetch paginated data from repository
+        Page<Receiving> receivingsPage = receivingRepository.findAllWithPictures(pagination);
 
-        return ResponseEntity.ok(dtoPage);
-//        var page = receivingRepository.findAll(pagination).map(ReceivingListDTO::new);
-////        page.getContent().forEach(System.out::println); // Inspect the data here
-//        return ResponseEntity.ok(page);
+        // Map each Receiving to ReceivingListDTO
+        Page<ReceivingListDTO> receivings = receivingsPage.map(receiving ->
+                new ReceivingListDTO(receiving, inventoryItemRepository)
+        );
+
+        // Return the paginated DTOs
+        return ResponseEntity.ok(receivings);
+
+//        Page<Receiving> page = receivingRepository.findAllWithPictures(pagination);
+//        Page<ReceivingListDTO> dtoPage = page.map(ReceivingListDTO::new);
+//        return ResponseEntity.ok(dtoPage);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity detail(@PathVariable Long id) {
+    public ResponseEntity<ReceivingInfoDTO> detail(@PathVariable Long id) {
         var receiving = receivingService.show(id);
 
         return ResponseEntity.ok(receiving);

@@ -2,6 +2,7 @@ package com.example.api.domain.receivings;
 
 import com.example.api.domain.receivingitems.ReceivingItemInfoDTO;
 import com.example.api.domain.receivingpictures.ReceivingPicturesInfoDTO;
+import com.example.api.repositories.InventoryItemRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,7 +23,7 @@ public record ReceivingListDTO(
         List<ReceivingItemInfoDTO> receivingItems,
         List<ReceivingPicturesInfoDTO> pictures
 ) {
-    public ReceivingListDTO(Receiving receiving) {
+    public ReceivingListDTO(Receiving receiving, InventoryItemRepository inventoryItemRepository) {
         this(
                 receiving.getId(),
                 receiving.getTrackingLading(),
@@ -36,7 +37,7 @@ public record ReceivingListDTO(
                 receiving.getUpdatedAt(),
                 receiving.getCreatedBy().getFullName(),
                 receiving.getReceivingItems().stream()
-                        .map(ReceivingItemInfoDTO::new)
+                        .map(item -> new ReceivingItemInfoDTO(item, inventoryItemRepository)) // Pass the repository
                         .collect(Collectors.toList()),
                 receiving.getPictures().stream()
                         .map(ReceivingPicturesInfoDTO::new)

@@ -105,7 +105,7 @@ public class ReceivingService {
                                 //var receivingId = receiving.getId();
                                 var quantityToReceive = receivingItem.quantityToReceive();
                                 var quantityReceived = receivingItem.quantity();
-                                var totalQuantityReceived = receivingItemRepository.findQuantityAlreadyReceivedByPurchaseOrderItemId(receivingItem.purchaseOrderItemId());// Get total quantity already received for this receiving_id
+                                var totalQuantityReceived = receivingItemRepository.findSumAlreadyReceivedByPurchaseOrderItemId(receivingItem.purchaseOrderItemId());// Get total quantity already received for this receiving_id
 
                                 // Check if adding the current item exceeds the allowed quantity
                                 if (!receivingItem.additionalItem() && totalQuantityReceived + quantityReceived > quantityToReceive) {
