@@ -33,7 +33,7 @@ public record ReceivingItemRequestDTO(
         this.quantityToReceive = quantityToReceive;
         this.quantity = quantity;
         this.receivableItem = receivableItem;
-        this.additionalItem = additionalItem != null ? additionalItem : null; // Set to null if not provided
+        this.additionalItem = additionalItem; // Set to null if not provided
     }
 
 //        // Overloaded constructor with additionalItem defaulted to null

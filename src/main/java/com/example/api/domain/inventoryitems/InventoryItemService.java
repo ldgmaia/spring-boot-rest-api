@@ -69,7 +69,7 @@ public class InventoryItemService {
         var unitsAdded = inventoryItemRepository.countByReceivingItemId(data.receivingItemId());
 
         // Check if the current quantity to be added will exceed the quantity received
-        var quantityRemainingToAdd = receivingItem.getQuantityToReceive() - unitsAdded;
+        var quantityRemainingToAdd = receivingItem.getAdditionalItem() ? receivingItem.getQuantityAlreadyReceived() - unitsAdded : receivingItem.getQuantityToReceive() - unitsAdded;
 
         if (data.byQuantity() && data.quantity() > quantityRemainingToAdd) {
             throw new ValidationException(
@@ -78,10 +78,7 @@ public class InventoryItemService {
 
         var typeValue = data.type();
 
-        var poiUnitPrice = receivingItem.getPurchaseOrderItem().getId() != null ? purchaseOrderItemRepository.getReferenceById(receivingItem.getPurchaseOrderItem().getId()).getUnitPrice() : BigDecimal.valueOf(0L);//from purchare order item table on column unit cost
-
-//        var numberOfReceivedItems = receivingItemRepository.findSumAlreadyReceivedByPurchaseOrderItemId(receivingItem.getPurchaseOrderItem().getId());
-//        System.out.println("numberOfReceivedItems " + numberOfReceivedItems);
+        var poiUnitPrice = receivingItem.getAdditionalItem() ? BigDecimal.valueOf(0L) : receivingItem.getPurchaseOrderItem().getId() != null ? purchaseOrderItemRepository.getReferenceById(receivingItem.getPurchaseOrderItem().getId()).getUnitPrice() : BigDecimal.valueOf(0L);//from purchare order item table on column unit cost
 
         var location = locationRepository.getReferenceById(1L); // change the id for the correct data when we work on Locations
 
@@ -120,18 +117,8 @@ public class InventoryItemService {
                     inventoryItemRepository.save(inventory);
                     receivingItemRepository.getReferenceById(receivingItem.getId()).setQuantityAlreadyReceived(receivingItemRepository.getReferenceById(receivingItem.getId()).getQuantityAlreadyReceived() + 1);
 
-                    //-----receivingItemRepository.getReferenceById(receivingItem.getId()).setStatus("Partially Received");
 
-                    var quantityToReceive = receivingItemRepository.getReferenceById(receivingItem.getId()).getQuantityToReceive();
-                    var quantityReceived = receivingItemRepository.getReferenceById(receivingItem.getId()).getQuantityAlreadyReceived();
-
-                    receivingItemRepository.getReferenceById(receivingItem.getId()).setStatus("Fully Received"); // this line works properly
-
-                    if (!Objects.equals(quantityReceived, quantityToReceive)) {
-                        receivingItemRepository.getReferenceById(receivingItem.getId()).setStatus("Partially Received");
-                    } else {
-                        receivingItemRepository.getReferenceById(receivingItem.getId()).setStatus("Fully Received");
-                    }
+                    receivingItemRepository.getReferenceById(receivingItem.getId()).setStatus("Pending Assessment"); // this line works properly
 
                     inventoryItems.add(new InventoryItemResponseDTO(inventory));
                 }
@@ -171,9 +158,19 @@ public class InventoryItemService {
 
             // Save the inventory to generate the ID
             inventoryItemRepository.save(inventory);
-            receivingItemRepository.getReferenceById(receivingItem.getId()).setStatus("Partially Received");
+            receivingItemRepository.getReferenceById(receivingItem.getId()).setStatus("Pending Assessment");
 
             inventoryItems.add(new InventoryItemResponseDTO(inventory));
+        }
+
+        if (!receivingItem.getAdditionalItem()) {
+            var totalByPurchaseOrderId = inventoryItemRepository.countByPurchaseOrderId(receivingItem.getPurchaseOrderItem().getPurchaseOrder().getId());
+            var totalOrderedByPurchaseOrderId = purchaseOrderItemRepository.findSumQuantityOrderedByPurchaseOrderId(receivingItem.getPurchaseOrderItem().getPurchaseOrder().getId());
+
+            if (Objects.equals(totalByPurchaseOrderId, totalOrderedByPurchaseOrderId)) {
+                var poi = purchaseOrderItemRepository.getReferenceById(receivingItem.getPurchaseOrderItem().getId());
+                poi.getPurchaseOrder().setStatus("Fully Added");
+            }
         }
         return inventoryItems;
     }

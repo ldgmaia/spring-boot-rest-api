@@ -62,27 +62,13 @@ public class MPNService {
     public List<MPNFieldsValuesDTO> listMpnFields(Long modelId) {
         var fieldList = mpnRepository.findMPNFieldsByModelId(modelId);
 
-        List<MPNFieldsValuesDTO> mpnFieldsValues = fieldList.stream()
+        return fieldList.stream()
                 .map(f -> {
                     List<ValueInfoDTO> values = fieldValueRepository.findAllEnabledValuesByFieldId(f.id());
                     MPNFieldsDTO fieldWithValues = new MPNFieldsDTO(f.id(), f.name(), values);
                     return new MPNFieldsValuesDTO(fieldWithValues);
                 }).toList();
-
-        return mpnFieldsValues;
     }
-
-//    public MPNInfoDTO get(Long id) {
-//        var mpn = mpnRepository.getReferenceById(id);
-//
-//        // Collect the updated MPN field values for the response
-//        List<MPNFieldValueInfoDTO> mpnFieldsValues = mpnFieldValueRepository.findAllByMpnId(id).stream()
-//                .map(MPNFieldValueInfoDTO::new)
-//                .toList();
-//
-//        return new MPNInfoDTO(mpn, mpnFieldsValues);
-//    }
-
 
     public MPNInfoDTO update(MPNRequestDTO data, Long id) {
         var mpn = mpnRepository.findById(id).orElseThrow(() -> new RuntimeException("MPN not found"));

@@ -20,6 +20,15 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, Lo
 //            """)
 //    Long countByPurchaseOrderItemId(@Param("purchaseOrderItemId") Long purchaseOrderItemId);
 
+    @Query("""
+                SELECT COUNT(ii)
+                FROM InventoryItem ii
+                JOIN ii.receivingItem ri
+                JOIN ri.purchaseOrderItem poi
+                WHERE poi.purchaseOrder.id = :purchaseOrderId
+            """)
+    Long countByPurchaseOrderId(@Param("purchaseOrderId") Long purchaseOrderId);
+
     Long countByReceivingItemId(@NotNull Long receivingItemId);
 
     @Query("""

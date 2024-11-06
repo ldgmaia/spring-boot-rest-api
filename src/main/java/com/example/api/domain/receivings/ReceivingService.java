@@ -76,7 +76,7 @@ public class ReceivingService {
         receivingRepository.save(receiving);
 
         // Save all pictures/files for the receiving. TODO: save files in some cloud service instead of the same server running the backend
-        List<File> savedFiles = null;
+        List<File> savedFiles;
         try {
             savedFiles = fileService.saveFiles(pictures);
             for (File file : savedFiles) {
@@ -128,18 +128,10 @@ public class ReceivingService {
                                         receivingItem.additionalItem()
                                 ));
 
-                                if (!Objects.equals(quantityReceived, quantityToReceive)) {
-                                    purchaseOrder.setStatus("Partially Received");
-                                } else {
-                                    purchaseOrder.setStatus("Fully Received");
-//                                    receivingItems.setStatus("Fully Received");
-//                                    purchaseOrderRepository.getReferenceById(receivingItem.purchaseOrderItemId()).setStatus("Fully Received");
-                                }
-
                                 //before this step validate if there are enough spaces to add the items
                                 receivingItemRepository.save(receivingItems);
                                 // Update the overall receiving status based on all items received
-                                updateReceivingStatus(receiving.getId(), receivingItem.purchaseOrderItemId());
+                                updatePurchaseOrderStatus(receiving.getPurchaseOrder().getId());
 
                             });
 
@@ -158,21 +150,14 @@ public class ReceivingService {
     /**
      * This method checks the total quantity received for each purchase order item and updates the status accordingly.
      */
-    private void updateReceivingStatus(Long receivingId, Long purchaseOrderItemId) {
-        // Fetch the total received quantity for the given purchase order item
-        var totalReceived = receivingItemRepository.findTotalReceivedQuantityByPurchaseOrderItemId(purchaseOrderItemId);
+    private void updatePurchaseOrderStatus(Long purchaseOrderId) {
+        var totalReceived = receivingItemRepository.findSumAlreadyReceivedByPurchaseOrderId(purchaseOrderId);
+        var totalOrdered = purchaseOrderItemRepository.findSumQuantityOrderedByPurchaseOrderId(purchaseOrderId);
 
-        // Fetch the ordered quantity for the given purchase order item
-        var quantityOrdered = purchaseOrderItemRepository.findQuantityOrderedById(purchaseOrderItemId);
-
-        // This must be done after we are dealing with quantity added as well
-//        // Compare and update the status
-//        if (Objects.equals(totalReceived, quantityOrdered)) {
-//            receivingItemRepository.updateStatusByPurchaseOrderItemId(purchaseOrderItemId, "Fully Received");
-//            purchaseOrderRepository.getReferenceById(purchaseOrderItemId).setStatus("Fully Received");
-//        } else {
-//            receivingItemRepository.updateStatusByPurchaseOrderItemId(purchaseOrderItemId, "Partially Received");
-//        }
+        if (Objects.equals(totalReceived, totalOrdered)) {
+            purchaseOrderRepository.getReferenceById(purchaseOrderId).setStatus("Fully Received");
+        } else {
+            purchaseOrderRepository.getReferenceById(purchaseOrderId).setStatus("Partially Received");
+        }
     }
-
 }

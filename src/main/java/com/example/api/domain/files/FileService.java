@@ -59,12 +59,12 @@ public class FileService {
         return savedFiles;
     }
 
-    public boolean deleteFile(Long id) {
+    public void deleteFile(Long id) {
         try {
             // Find the file in the database
             var file = fileRepository.findById(id).orElse(null);
             if (file == null) {
-                return false; // File not found in the database
+                return; // File not found in the database
             }
 
             // Delete the file from the server
@@ -74,10 +74,8 @@ public class FileService {
             // Delete the file entry from the database
             fileRepository.delete(file);
 
-            return true;
         } catch (IOException ex) {
             // Handle the error (log it, rethrow it, etc.)
-            return false;
         }
     }
 
