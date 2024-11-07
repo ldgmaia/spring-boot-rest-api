@@ -22,11 +22,6 @@ public record ModelInfoDTO(
                 model.getEnabled(),
                 model.getNeedsMpn(),
                 new CategoryInfoDTO(model.getCategory())
-
-//                field.getFieldGroup() != null ? new FieldGroupInfoDTO(field.getFieldGroup()) : null); // another way of doing the same check
-//                Optional.ofNullable(field.getFieldGroup()).map(FieldGroupInfoDTO::new).orElse(null));
         );
     }
 }
-
-

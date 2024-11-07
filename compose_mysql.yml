@@ -1,7 +1,7 @@
 services:
   mysql:
     volumes:
-      - ~/documents/projects/volumes/mysqlspringboot:/var/lib/mysql
+      - ~/documents/projects/volumes/mysql8:/var/lib/mysql
     image: mysql:8.0
     shm_size: 1g
     container_name: mysql-newrbms
