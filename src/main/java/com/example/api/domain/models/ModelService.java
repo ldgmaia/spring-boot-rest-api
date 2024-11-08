@@ -295,6 +295,9 @@ public class ModelService {
                         ));
                     }
                 }
+
+                sectionAreaRepository.save(area);
+
                 newAreasMap.put(area.getId(), area);
                 // Handle models for each area
                 List<Long> newModelIds = sa.models(); // Model IDs from JSON
@@ -354,5 +357,4 @@ public class ModelService {
     public List<ModelsByCategoryDTO> getModelsByCategoryId(Long categoryId) {
         return modelRepository.findAllByCategoryId(categoryId);
     }
-
 }
