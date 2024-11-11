@@ -4,11 +4,12 @@ import com.example.api.domain.receivingitems.ReceivingItemAssessmentListDTO;
 import com.example.api.domain.receivingitems.ReceivingItemInfoDTO;
 import com.example.api.domain.receivingitems.ReceivingItemListByRequestDTO;
 import com.example.api.domain.receivingitems.ReceivingItemService;
+import com.example.api.domain.receivings.ReceivingType;
+import com.example.api.repositories.InventoryItemRepository;
 import com.example.api.repositories.ReceivingItemRepository;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,9 @@ public class ReceivingItemController {
     @Autowired
     private ReceivingItemRepository receivingItemRepository;
 
+    @Autowired
+    private InventoryItemRepository inventoryItemRepository;
+
     @GetMapping("/{id}")
     public ResponseEntity<ReceivingItemInfoDTO> detail(@PathVariable Long id) {
         var receivingItem = receivingItemService.show(id);
@@ -35,12 +39,16 @@ public class ReceivingItemController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<ReceivingItemAssessmentListDTO>> listReceivingsByStatus(@RequestParam(required = false, defaultValue = "Pending assessment") String[] status, @PageableDefault(size = 100, page = 0, sort = {"createdAt"}) Pageable pagination) {
+    public ResponseEntity listReceivingsByStatus(@RequestParam(required = false, defaultValue = "Pending assessment") String[] status, @PageableDefault(size = 100, page = 0, sort = {"createdAt"}) Pageable pagination) {
 //        Arrays.stream(status).forEach(System.out::println);
 //        System.out.println("status 1 -> " + status[0]);
 //        System.out.println("status 2 -> " + status[1]);
-        Page<ReceivingItemAssessmentListDTO> receivingsByStatus = receivingItemRepository.listPagedReceivingsByStatus(pagination, status);
-        return ResponseEntity.ok(receivingsByStatus);
+//        Page<ReceivingItemAssessmentListDTO> receivingsByStatus =
+
+
+        return ResponseEntity.ok(receivingItemRepository.findByReceiving_TypeAndStatusInAndQuantityAlreadyReceivedGreaterThanOrderByUpdatedAtDesc(ReceivingType.PO, status, 0L, pagination).stream().map(ri -> {
+            return new ReceivingItemAssessmentListDTO(ri, inventoryItemRepository);
+        }).toList());
     }
 
     @PutMapping("/list/by-criteria")
