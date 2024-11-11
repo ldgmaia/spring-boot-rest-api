@@ -1,5 +1,6 @@
 package com.example.api.domain.receivingitems;
 
+import com.example.api.domain.inventoryitems.InventoryItem;
 import com.example.api.domain.purchaseorderitems.PurchaseOrderItem;
 import com.example.api.domain.receivings.Receiving;
 import com.example.api.domain.users.User;
@@ -9,6 +10,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Table(name = "receiving_items")
 @Entity(name = "ReceivingItem")
@@ -56,6 +59,9 @@ public class ReceivingItem {
 
     @LastModifiedDate
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "receivingItem", orphanRemoval = true)
+    private Set<InventoryItem> inventoryItems = new LinkedHashSet<>();
 
     public ReceivingItem(ReceivingItemRegisterDTO receivingItemRegister) {
         this.receiving = receivingItemRegister.receiving();
