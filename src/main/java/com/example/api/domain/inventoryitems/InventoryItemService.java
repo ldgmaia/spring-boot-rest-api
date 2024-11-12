@@ -41,6 +41,9 @@ public class InventoryItemService {
     private MPNRepository mpnRepository;
 
     @Autowired
+    private SectionRepository sectionRepository;
+
+    @Autowired
     private ItemConditionRepository itemConditionRepository;
 
     @Autowired
@@ -186,5 +189,9 @@ public class InventoryItemService {
 
     public InventoryItemInfoDTO listById(Long id) {
         return new InventoryItemInfoDTO(inventoryItemRepository.getReferenceById(id));
+    }
+
+    public InventoryItemAssessmentInfoDTO getAssessmentFieldsByInventoryItemId(Long inventoryItemId) {
+        return new InventoryItemAssessmentInfoDTO(Objects.requireNonNull(inventoryItemRepository.findById(inventoryItemId).orElse(null)));
     }
 }

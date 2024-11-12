@@ -52,7 +52,7 @@ public class InventoryItemController {
     @GetMapping
     public ResponseEntity<Page<InventoryItemInfoDTO>> list(@PageableDefault(size = 100, page = 0, sort = {"id"}) Pageable pagination) {
         var page = inventoryRepository.findAll(pagination)
-                .map((InventoryItem inventoryItem) -> new InventoryItemInfoDTO(inventoryItem));
+                .map(InventoryItemInfoDTO::new);
         return ResponseEntity.ok(page);
     }
 
@@ -107,4 +107,9 @@ public class InventoryItemController {
         return ResponseEntity.ok(items);
     }
 
+    @PutMapping("/assessment/fields/{inventoryItemId}")
+    public ResponseEntity<InventoryItemAssessmentInfoDTO> getAssessmentFieldsByInventoryItemId(@PathVariable Long inventoryItemId) {
+        var fields = inventoryItemService.getAssessmentFieldsByInventoryItemId(inventoryItemId);
+        return ResponseEntity.ok(fields);
+    }
 }

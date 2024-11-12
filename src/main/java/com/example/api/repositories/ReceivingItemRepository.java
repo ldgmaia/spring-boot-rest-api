@@ -27,7 +27,6 @@ public interface ReceivingItemRepository extends JpaRepository<ReceivingItem, Lo
             """)
     Long findSumAlreadyReceivedByPurchaseOrderId(@Param("purchaseOrderId") Long purchaseOrderId);
 
-
     @Query("""
                 SELECT r
                 FROM ReceivingItem r

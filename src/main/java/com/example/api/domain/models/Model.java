@@ -1,9 +1,13 @@
 package com.example.api.domain.models;
 
 import com.example.api.domain.categories.Category;
+import com.example.api.domain.sections.Section;
 import com.example.api.domain.users.User;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Table(name = "models")
 @Entity(name = "Model")
@@ -34,6 +38,9 @@ public class Model {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
     private User createdBy;
+
+    @OneToMany(mappedBy = "model", orphanRemoval = true)
+    private List<Section> sections = new ArrayList<>();
 
     public Model(ModelRegisterDTO data, User currentUser) {
         this.name = data.name();

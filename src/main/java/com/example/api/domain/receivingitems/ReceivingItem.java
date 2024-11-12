@@ -10,8 +10,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Table(name = "receiving_items")
 @Entity(name = "ReceivingItem")
@@ -61,7 +61,7 @@ public class ReceivingItem {
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "receivingItem", orphanRemoval = true)
-    private Set<InventoryItem> inventoryItems = new LinkedHashSet<>();
+    private List<InventoryItem> inventoryItems = new ArrayList<>();
 
     public ReceivingItem(ReceivingItemRegisterDTO receivingItemRegister) {
         this.receiving = receivingItemRegister.receiving();
