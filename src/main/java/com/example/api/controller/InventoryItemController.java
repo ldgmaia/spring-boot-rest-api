@@ -107,7 +107,7 @@ public class InventoryItemController {
         return ResponseEntity.ok(items);
     }
 
-    @PutMapping("/assessment/fields/{inventoryItemId}")
+    @GetMapping("/assessment/fields/{inventoryItemId}")
     public ResponseEntity<InventoryItemAssessmentInfoDTO> getAssessmentFieldsByInventoryItemId(@PathVariable Long inventoryItemId) {
         var fields = inventoryItemService.getAssessmentFieldsByInventoryItemId(inventoryItemId);
         return ResponseEntity.ok(fields);

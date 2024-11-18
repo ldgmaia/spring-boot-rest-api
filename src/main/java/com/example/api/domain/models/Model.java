@@ -1,6 +1,7 @@
 package com.example.api.domain.models;
 
 import com.example.api.domain.categories.Category;
+import com.example.api.domain.mpns.MPN;
 import com.example.api.domain.sections.Section;
 import com.example.api.domain.users.User;
 import jakarta.persistence.*;
@@ -41,6 +42,9 @@ public class Model {
 
     @OneToMany(mappedBy = "model", orphanRemoval = true)
     private List<Section> sections = new ArrayList<>();
+
+    @OneToMany(mappedBy = "model", orphanRemoval = true)
+    private List<MPN> mpns = new ArrayList<>();
 
     public Model(ModelRegisterDTO data, User currentUser) {
         this.name = data.name();

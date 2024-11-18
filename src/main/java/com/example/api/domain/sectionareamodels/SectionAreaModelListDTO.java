@@ -1,11 +1,11 @@
 package com.example.api.domain.sectionareamodels;
 
-public record SectionAreaModeIdListDTO(
+public record SectionAreaModelListDTO(
         Long id,
         Long modelId,
         String modelName
 ) {
-    public SectionAreaModeIdListDTO(SectionAreaModel sectionAreaModel) {
+    public SectionAreaModelListDTO(SectionAreaModel sectionAreaModel) {
         this(
                 sectionAreaModel.getId(),
                 sectionAreaModel.getModel().getId(),

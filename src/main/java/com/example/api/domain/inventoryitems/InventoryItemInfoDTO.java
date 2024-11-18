@@ -31,7 +31,7 @@ public record InventoryItemInfoDTO(
         this(
                 inventoryItem.getId(),
                 new ModelInfoDTO(inventoryItem.getModel()),
-                new MPNInfoDTO(inventoryItem.getMpn()),
+                inventoryItem.getMpn() == null ? null : new MPNInfoDTO(inventoryItem.getMpn()),
                 new ItemConditionInfoDTO(inventoryItem.getItemCondition()),
                 new ItemStatusInfoDTO(inventoryItem.getItemStatus()),
 //                new ReceivingItemInfoDTO(inventoryItem.getReceivingItem()),
