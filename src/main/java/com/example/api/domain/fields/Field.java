@@ -1,8 +1,12 @@
 package com.example.api.domain.fields;
 
 import com.example.api.domain.fieldgroups.FieldGroup;
+import com.example.api.domain.fieldsvalues.FieldValue;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Table(name = "fields")
 @Entity(name = "Field")
@@ -32,6 +36,9 @@ public class Field {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "field_groups_id")
     private FieldGroup fieldGroup;
+
+    @OneToMany(mappedBy = "field", orphanRemoval = true)
+    private List<FieldValue> fieldValues = new ArrayList<>();
 
 //    @CreatedDate
 //    private LocalDateTime createdAt;
