@@ -3,8 +3,12 @@ package com.example.api.domain.fields;
 import com.example.api.domain.ValidationException;
 import com.example.api.domain.fieldgroups.FieldGroup;
 import com.example.api.domain.fields.validations.FieldValidator;
+import com.example.api.domain.fieldsvalues.FieldValue;
+import com.example.api.domain.fieldsvalues.FieldValueRegisterDTO;
 import com.example.api.repositories.FieldGroupRepository;
 import com.example.api.repositories.FieldRepository;
+import com.example.api.repositories.FieldValueRepository;
+import com.example.api.repositories.ValueRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +22,13 @@ public class FieldService {
     private FieldRepository fieldRepository;
 
     @Autowired
+    private FieldValueRepository fieldValueRepository;
+
+    @Autowired
     private FieldGroupRepository fieldGroupRepository;
+
+    @Autowired
+    private ValueRepository valueRepository;
 
     @Autowired
     private List<FieldValidator> validators; // Spring boot will automatically detect that a List is being ejected and will get all classes that implements this interface and will inject the validators automatically
@@ -40,6 +50,11 @@ public class FieldService {
 
         fieldRepository.save(field);
 
+        // If field DataType is BOOLEAN, it should create the fieldValue records for true and false automatically with the pre-existing valueData IDs.
+        if (data.dataType() == DataType.BOOLEAN) {
+            fieldValueRepository.save(new FieldValue(new FieldValueRegisterDTO(valueRepository.findByValueData("true"), null, field)));
+            fieldValueRepository.save(new FieldValue(new FieldValueRegisterDTO(valueRepository.findByValueData("false"), null, field)));
+        }
         return new FieldInfoDTO(field);
     }
 
@@ -60,17 +75,8 @@ public class FieldService {
 
         field.setName(data.name());
 
-//        field.setFieldType(data.fieldType());
-//        field.setDataType(data.dataType());
-//        field.setUpdatedAt(LocalDateTime.now());
-//        field.setIsMultiple(data.isMultiple() != null ? data.isMultiple() : false);
-
         return new FieldInfoDTO(field);
     }
-
-//    public Page<Field> getAllEnabledFieldsByFieldGroupId(Long fieldGroupId, Pageable pageable) {
-//        return fieldRepository.findByEnabledTrueAndFieldGroup_Id(fieldGroupId, pageable);
-//    }
 
     public FieldsByGroupDTO getEnabledFieldsByFieldGroupId(Long fieldGroupId) {
         var fieldGroup = fieldGroupRepository.findById(fieldGroupId).orElse(null);
