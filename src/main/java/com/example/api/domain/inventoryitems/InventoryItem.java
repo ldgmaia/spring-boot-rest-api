@@ -38,7 +38,7 @@ public class InventoryItem {
     private Model model;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "mpn_id")
+    @JoinColumn(name = "mpn_id", nullable = true)
     private MPN mpn;
 
     @ManyToOne(fetch = FetchType.LAZY)

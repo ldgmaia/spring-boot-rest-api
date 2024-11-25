@@ -41,9 +41,6 @@ public class InventoryItemService {
     private MPNRepository mpnRepository;
 
     @Autowired
-    private SectionRepository sectionRepository;
-
-    @Autowired
     private ItemConditionRepository itemConditionRepository;
 
     @Autowired
