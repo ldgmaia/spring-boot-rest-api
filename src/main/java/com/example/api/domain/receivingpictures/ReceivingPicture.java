@@ -5,6 +5,7 @@ import com.example.api.domain.receivings.Receiving;
 import com.example.api.domain.users.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Table(name = "receiving_pictures")
@@ -31,6 +32,7 @@ public class ReceivingPicture {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
+    @CreatedBy
     private User createdBy;
 
     public ReceivingPicture(ReceivingPictureRegisterDTO receivingItemRegister) {

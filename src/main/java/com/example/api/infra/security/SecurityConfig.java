@@ -55,7 +55,6 @@ public class SecurityConfig {
 
     @Bean
     public AuditorAware<User> auditorAware() {
-        System.out.println("sdkjfhjsdkf ksfk sdfjkhsdkfh sdkjh fkjsdh fjksdh  jkfhsdjkfh skjd hfjskdh fkjsdh fkjsdhfjkh");
         return new ApplicationAuditAware();
     }
 

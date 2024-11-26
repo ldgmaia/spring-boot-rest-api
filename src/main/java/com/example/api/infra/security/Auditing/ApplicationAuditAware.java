@@ -14,9 +14,7 @@ public class ApplicationAuditAware implements AuditorAware<User> {
     public Optional<User> getCurrentAuditor() {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println("AUTH " + authentication.isAuthenticated());
         if (!authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {
-            System.out.println("I AM HERE");
             return Optional.empty();
         }
         User userPrincipal = (User) authentication.getPrincipal();
