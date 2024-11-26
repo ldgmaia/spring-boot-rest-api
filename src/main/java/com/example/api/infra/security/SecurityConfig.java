@@ -1,8 +1,11 @@
 package com.example.api.infra.security;
 
+import com.example.api.domain.users.User;
+import com.example.api.infra.security.Auditing.ApplicationAuditAware;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.domain.AuditorAware;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -49,6 +52,12 @@ public class SecurityConfig {
 //        source.registerCorsConfiguration("/**", configuration);
 //        return source;
 //    }
+
+    @Bean
+    public AuditorAware<User> auditorAware() {
+        System.out.println("sdkjfhjsdkf ksfk sdfjkhsdkfh sdkjh fkjsdh fjksdh  jkfhsdjkfh skjd hfjskdh fkjsdh fkjsdhfjkh");
+        return new ApplicationAuditAware();
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {

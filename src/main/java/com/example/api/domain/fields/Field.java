@@ -4,7 +4,11 @@ import com.example.api.domain.fieldgroups.FieldGroup;
 import com.example.api.domain.fieldsvalues.FieldValue;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +19,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
+@EntityListeners(AuditingEntityListener.class)
 public class Field {
 
     @Id
@@ -24,7 +29,8 @@ public class Field {
     @Column(unique = true, nullable = false)
     private String name;
 
-    private Boolean enabled;
+    private Boolean enabled = true;
+
     private Boolean isMultiple;
 
     @Enumerated(EnumType.STRING)
@@ -40,11 +46,11 @@ public class Field {
     @OneToMany(mappedBy = "field", orphanRemoval = true)
     private List<FieldValue> fieldValues = new ArrayList<>();
 
-//    @CreatedDate
-//    private LocalDateTime createdAt;
-//
-//    @LastModifiedDate
-//    private LocalDateTime updatedAt;
+    @CreatedDate
+    private LocalDateTime createdAt;
+
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
 
     public Field(FieldRegisterDTO data) {
         this.name = data.name();
@@ -52,17 +58,8 @@ public class Field {
         this.dataType = data.dataType();
         this.fieldType = data.fieldType();
         this.fieldGroup = data.fieldGroup();
-        this.enabled = true;
-//        this.createdAt = LocalDateTime.now();
-//        this.updatedAt = LocalDateTime.now();
     }
 
-    //    public void updateInfo(FieldUpdateDTO data) {
-//
-//        this.name = (data.name() != null) ? data.name() : this.name;
-//        this.updatedAt = LocalDateTime.now();
-//    }
-//
     public void deactivate() {
         this.enabled = false;
     }

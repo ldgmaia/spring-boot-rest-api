@@ -6,8 +6,10 @@ import com.example.api.domain.receivings.Receiving;
 import com.example.api.domain.users.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -20,6 +22,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id")
+@EntityListeners(AuditingEntityListener.class)
 public class ReceivingItem {
 
     @Id
@@ -44,6 +47,7 @@ public class ReceivingItem {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
+    @CreatedBy()
     private User createdBy;
 
     private String status;
@@ -69,7 +73,6 @@ public class ReceivingItem {
         this.description = receivingItemRegister.description();
         this.quantityToReceive = receivingItemRegister.quantityToReceive();
         this.quantityAlreadyReceived = receivingItemRegister.quantity();
-        this.createdBy = receivingItemRegister.createdBy();
         this.status = "Pending Items";
         this.receivableItem = receivingItemRegister.receivableItem();
         this.additionalItem = receivingItemRegister.additionalItem();

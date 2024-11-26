@@ -5,6 +5,7 @@ import com.example.api.domain.receivings.Receiving;
 import com.example.api.domain.users.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Table(name = "receiving_pictures")
 @Entity(name = "ReceivingPicture")
@@ -13,6 +14,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id")
+@EntityListeners(AuditingEntityListener.class)
 public class ReceivingPicture {
 
     @Id
@@ -34,6 +36,5 @@ public class ReceivingPicture {
     public ReceivingPicture(ReceivingPictureRegisterDTO receivingItemRegister) {
         this.receiving = receivingItemRegister.receiving();
         this.file = receivingItemRegister.file();
-        this.createdBy = receivingItemRegister.createdBy();
     }
 }

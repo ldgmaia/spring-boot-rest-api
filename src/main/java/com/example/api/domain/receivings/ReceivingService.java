@@ -41,19 +41,12 @@ public class ReceivingService {
     private PurchaseOrderItemRepository purchaseOrderItemRepository;
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
     private FileService fileService;
 
     @Autowired
     private CarrierRepository carrierRepository;
 
     public ReceivingInfoDTO register(ReceivingRequestDTO data, MultipartFile[] pictures) {
-
-        // Fetch the currently logged-in user
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        var currentUser = userRepository.findByUsername(username);
 
         // Get the carrier if necessary
         Carrier carrier = null;
@@ -71,7 +64,7 @@ public class ReceivingService {
                 purchaseOrder,
                 carrier,
                 data.notes()
-        ), currentUser);
+        ));
 
         receivingRepository.save(receiving);
 
@@ -80,7 +73,7 @@ public class ReceivingService {
         try {
             savedFiles = fileService.saveFiles(pictures);
             for (File file : savedFiles) {
-                receivingPictureRepository.save(new ReceivingPicture(new ReceivingPictureRegisterDTO(receiving, file, currentUser)));
+                receivingPictureRepository.save(new ReceivingPicture(new ReceivingPictureRegisterDTO(receiving, file)));
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -123,7 +116,6 @@ public class ReceivingService {
                                         receivingItem.description(),
                                         receivingItem.quantityToReceive(),
                                         receivingItem.quantity(),
-                                        currentUser,
                                         receivingItem.receivableItem(),
                                         receivingItem.additionalItem()
                                 ));

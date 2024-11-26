@@ -8,8 +8,10 @@ import com.example.api.domain.suppliers.Supplier;
 import com.example.api.domain.users.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -22,6 +24,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
+@EntityListeners(AuditingEntityListener.class)
 public class Receiving {
 
     @Id
@@ -51,6 +54,7 @@ public class Receiving {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
+    @CreatedBy()
     private User createdBy;
 
     @CreatedDate
@@ -65,15 +69,12 @@ public class Receiving {
     @OneToMany(mappedBy = "receiving", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<ReceivingPicture> pictures = new ArrayList<>();
 
-    public Receiving(ReceivingRegisterDTO data, User currentUser) {
+    public Receiving(ReceivingRegisterDTO data) {
         this.trackingLading = data.trackingLading();
         this.carrier = data.carrier();
         this.type = data.type();
         this.supplier = data.supplier();
         this.purchaseOrder = data.purchaseOrder();
         this.notes = data.notes();
-        this.createdBy = currentUser;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
     }
 }
