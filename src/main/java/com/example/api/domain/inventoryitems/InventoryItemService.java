@@ -106,13 +106,14 @@ public class InventoryItemService {
                             itemStatusRepository.getReferenceById(1L),
                             receivingItemRepository.getReferenceById(data.receivingItemId()),
                             location, // this needs to be fixed when we have locations done
-                            currentUser,
                             data.post(),
+                            null,
+                            null,
                             String.valueOf(uniqueIdentifier), // Serial number - must be given an appropriate value later
                             String.valueOf(uniqueIdentifier), // The RBID will be generated following a formula. This random nunmber is just temporary
                             typeValue,
                             receivingItem.getAdditionalItem() ? BigDecimal.valueOf(0L) : poiUnitPrice
-                    ), currentUser);
+                    ));
 
                     inventoryItemRepository.save(inventory);
                     receivingItemRepository.getReferenceById(receivingItem.getId()).setQuantityAlreadyReceived(receivingItemRepository.getReferenceById(receivingItem.getId()).getQuantityAlreadyReceived() + 1);
@@ -148,13 +149,14 @@ public class InventoryItemService {
                     itemStatusRepository.getReferenceById(1L),
                     receivingItemRepository.getReferenceById(data.receivingItemId()),
                     location, // this needs to be fixed when we have locations done
-                    currentUser,
                     data.post(),
+                    null,
+                    null,
                     data.serialNumber(), // Serial number
                     String.valueOf(uniqueIdentifier), // The RBID will be generated following a formula. This random nunmber is just temporary
                     typeValue,
                     receivingItem.getAdditionalItem() ? BigDecimal.valueOf(0L) : poiUnitPrice
-            ), currentUser);
+            ));
 
             // Save the inventory to generate the ID
             inventoryItemRepository.save(inventory);

@@ -7,8 +7,7 @@ import com.example.api.domain.locations.Location;
 import com.example.api.domain.models.Model;
 import com.example.api.domain.mpns.MPN;
 import com.example.api.domain.receivingitems.ReceivingItem;
-import com.example.api.domain.users.User;
-import jakarta.validation.constraints.NotBlank;
+import com.example.api.domain.sectionareas.SectionArea;
 import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
@@ -19,11 +18,11 @@ public record InventoryItemRegisterDTO(
         MPN mpn,
         @NotNull ItemCondition itemCondition,
         @NotNull ItemStatus itemStatus,
-//        @NotNull String grade,
         @NotNull ReceivingItem receivingItem,
         @NotNull Location location,
-        @NotNull User createdBy,
-        @NotBlank String post,
+        String post,
+        Boolean present,
+        SectionArea sectionArea,
         String serialNumber,
         String rbid,
         String type,

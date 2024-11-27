@@ -7,11 +7,14 @@ import com.example.api.domain.locations.Location;
 import com.example.api.domain.models.Model;
 import com.example.api.domain.mpns.MPN;
 import com.example.api.domain.receivingitems.ReceivingItem;
+import com.example.api.domain.sectionareas.SectionArea;
 import com.example.api.domain.users.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -23,6 +26,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id")
+@EntityListeners(AuditingEntityListener.class)
 public class InventoryItem {
 
     @Id
@@ -58,7 +62,14 @@ public class InventoryItem {
     private ReceivingItem receivingItem;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "section_area_id")
+    private SectionArea sectionArea;
+
+    private Boolean present;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
+    @CreatedBy()
     private User createdBy;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -88,20 +99,17 @@ public class InventoryItem {
     private String type;
     private BigDecimal cost;
 
-    public InventoryItem(InventoryItemRegisterDTO inventoryRegisterDTO, User currentUser) {
+    public InventoryItem(InventoryItemRegisterDTO inventoryRegisterDTO) {
         this.category = inventoryRegisterDTO.category();
         this.model = inventoryRegisterDTO.model();
         this.mpn = inventoryRegisterDTO.mpn();
         this.itemCondition = inventoryRegisterDTO.itemCondition();
         this.itemStatus = inventoryRegisterDTO.itemStatus();
-//        this.grade = inventoryRegisterDTO.grade();
         this.receivingItem = inventoryRegisterDTO.receivingItem();
-        this.createdBy = currentUser;
         this.post = inventoryRegisterDTO.post();
+        this.present = inventoryRegisterDTO.present();
         this.serialNumber = inventoryRegisterDTO.serialNumber();
         this.rbid = inventoryRegisterDTO.rbid();
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
         this.location = inventoryRegisterDTO.location();
         this.type = inventoryRegisterDTO.type();
         this.cost = inventoryRegisterDTO.cost();
