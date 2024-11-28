@@ -18,17 +18,5 @@ public interface SectionAreaRepository extends JpaRepository<SectionArea, Long> 
             """)
     List<SectionAreaInfoDTO> findSectionAreasBySectionIdOrderByAreaOrder(Long sectionId);
 
-//    @Query(value = """
-//                SELECT NEW com.example.api.domain.values.ValueInfoDTO(vd.id, vd.valueData, vd.enabled, fv.score)
-//                FROM Value vd
-//                JOIN FieldValue fv ON vd.id = fv.valueData.id
-//                WHERE fv.field.id = :fieldId
-//                AND fv.enabled = true
-//            """)
-//    List<ValueInfoDTO> findAllEnabledValuesByFieldId(Long fieldId);
-
-    List<SectionArea> findAllBySectionId(Long sectionId);
-
-    // SectionAreaRepository
     Optional<SectionArea> findBySectionIdAndName(Long sectionId, String name);
 }

@@ -11,15 +11,6 @@ import java.util.List;
 
 public interface InventoryItemRepository extends JpaRepository<InventoryItem, Long> {
 
-//    @Query("""
-//                SELECT COUNT(ii)
-//                FROM InventoryItem ii
-//                JOIN ii.receivingItem ri
-//                JOIN ri.purchaseOrderItem poi
-//                WHERE poi.id = :purchaseOrderItemId
-//            """)
-//    Long countByPurchaseOrderItemId(@Param("purchaseOrderItemId") Long purchaseOrderItemId);
-
     @Query("""
                 SELECT COUNT(ii)
                 FROM InventoryItem ii
