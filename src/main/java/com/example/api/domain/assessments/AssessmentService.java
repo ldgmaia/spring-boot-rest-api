@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 public class AssessmentService {
@@ -148,7 +149,98 @@ public class AssessmentService {
 
         var parentInventoryItem = inventoryItemRepository.getReferenceById(data.parentInventoryItemId());
 
-        data.specs().forEach(spec -> {
+        processAssessment(data.specs(), parentInventoryItem);
+        processAssessment(data.functional(), parentInventoryItem);
+        processAssessment(data.cosmetic(), parentInventoryItem);
+
+//        data.specs().forEach(spec -> {
+//            var area = sectionAreaRepository.getReferenceById(spec.areaId());
+//
+//            InventoryItem inventoryItem;
+//            if (spec.present()) {
+//                var model = modelRepository.getReferenceById(spec.modelId());
+//                inventoryItem = new InventoryItem(new InventoryItemRegisterDTO(
+//                        modelRepository.getReferenceById(spec.modelId()).getCategory(),
+//                        model,
+//                        spec.mpnId() != null ? mpnRepository.getReferenceById(spec.mpnId()) : null,
+//                        parentInventoryItem.getItemCondition(),
+//                        parentInventoryItem.getItemStatus(),
+//                        parentInventoryItem.getReceivingItem(),
+//                        parentInventoryItem.getLocation(),
+//                        "NA",
+//                        true,
+//                        area,
+//                        spec.serialNumber(),
+//                        "RBID TBD",
+//                        "Component",
+//                        BigDecimal.ZERO
+//                ));
+//                inventoryItemRepository.save(inventoryItem);
+//            } else {
+//                inventoryItem = null;
+//            }
+//
+//            var assessment = new Assessment(new AssessmentRegisterDTO(
+//                    spec.pulled() != null ? spec.pulled() : false,
+//                    spec.present(),
+//                    "status",
+//                    null,
+//                    null,
+//                    null,
+//                    area,
+//                    parentInventoryItem,
+//                    inventoryItem
+//            ));
+//            assessmentRepository.save(assessment);
+//
+//            if (spec.present()) {
+//                spec.fields().forEach(field -> {
+//                    if (field.fieldId() == null) {
+//                        throw new ValidationException("Field ID is required for " + field);
+//                    }
+//
+//                    var specField = fieldRepository.getReferenceById(field.fieldId());
+//
+//                    Value valueData;
+//
+//                    // Case 1: Both valueData and valueDataId are null
+//                    if (field.valueDataId() == null && (field.valueData() == null || field.valueData().isEmpty())) {
+//                        throw new ValidationException("Value is required for " + field);
+//                    }
+//
+//                    // Case 2: valueDataId exists
+//                    if (field.valueDataId() != null) {
+//                        valueData = valueRepository.getReferenceById(field.valueDataId());
+//                    } else {
+//                        // Case 3: valueData provided, valueDataId must be null
+//                        if (valueRepository.existsByValueData(field.valueData())) {
+//                            valueData = valueRepository.findByValueData(field.valueData());
+//                        } else {
+//                            valueData = valueRepository.save(new Value(new ValueRegisterDTO(field.valueData())));
+//                        }
+//                    }
+//
+//                    // check if field value already exists
+//                    FieldValue fieldValue;
+//                    if (fieldValueRepository.existsByValuesDataIdAndFieldsId(valueData.getId(), specField.getId())) {
+//                        fieldValue = fieldValueRepository.findByFieldIdAndValueDataId(specField.getId(), valueData.getId());
+//                    } else {
+//                        var newFieldvalue = new FieldValue(new FieldValueRegisterDTO(valueData, (double) 0, specField));
+//                        fieldValue = fieldValueRepository.save(newFieldvalue);
+//                    }
+//
+//                    var assessmentFieldsValues = new AssessmentFieldsValues(new AssessmentFieldsValuesRegisterDTO(fieldValue, assessment));
+//                    assessmentFieldValuesRepository.save(assessmentFieldsValues);
+//
+//                    var inventoryItemsFieldsValues = new InventoryItemsFieldsValues(new InventoryItemsFieldsValuesRegisterDTO(fieldValue, inventoryItem));
+//                    inventoryItemsFieldValuesRepository.save(inventoryItemsFieldsValues);
+//                });
+//            }
+//        });
+    }
+
+    private void processAssessment(List<AssessmentRequestInspectionDTO> data, InventoryItem parentInventoryItem) {
+        data.forEach(spec -> {
             var area = sectionAreaRepository.getReferenceById(spec.areaId());
 
             InventoryItem inventoryItem;
@@ -163,7 +255,7 @@ public class AssessmentService {
                         parentInventoryItem.getReceivingItem(),
                         parentInventoryItem.getLocation(),
                         "NA",
-                        spec.present(),
+                        true,
                         area,
                         spec.serialNumber(),
                         "RBID TBD",
@@ -232,32 +324,6 @@ public class AssessmentService {
                 });
             }
         });
-
-        // Validate and process "specs" details
-//        if (data.specs() != null) {
-//            data.specs().forEach(detail -> {
-//                System.out.println("Specs detail" + detail.modelId());
-////                validateSerialNumber(detail.serialNumber());
-////                saveAssessmentDetail(detail, request);
-//            });
-//        }
-//        // Validate and process "functional" details
-//        if (request.functional() != null) {
-//            request.functional().forEach(detail -> {
-//                System.out.println("Functional detail" + detail.modelId());
-////                validateSerialNumber(detail.serialNumber());
-////                saveAssessmentDetail(detail, request);
-//            });
-//        }
-//        // Validate and process "cosmetic" details
-//        if (request.cosmetic() != null) {
-//            request.cosmetic().forEach(detail -> {
-//                System.out.println("Cosmetic detail" + detail.modelId());
-////                validateSerialNumber(detail.serialNumber());
-////                saveAssessmentDetail(detail, request);
-//            });
-//        }
-//        return assessmentRepository.findTopByOrderByIdDesc();
     }
 
 //    private void saveAssessmentDetail(AssessmentRequestInspectionDTO data, AssessmentRequestDTO request) {
