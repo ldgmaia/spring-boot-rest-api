@@ -190,7 +190,7 @@ public class InventoryItemService {
         return new InventoryItemInfoDTO(inventoryItemRepository.getReferenceById(id));
     }
 
-    public InventoryItemAssessmentInfoDTO getAssessmentFieldsByInventoryItemId(Long inventoryItemId) {
+    public InventoryItemAssessmentInfoDTO getAssessmentComponentsFieldsByInventoryItemId(Long inventoryItemId) {
         return new InventoryItemAssessmentInfoDTO(Objects.requireNonNull(inventoryItemRepository.findById(inventoryItemId).orElse(null)));
     }
 }

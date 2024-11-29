@@ -4,14 +4,12 @@ import com.example.api.domain.ValidationException;
 import com.example.api.domain.categories.validations.CategoryValidator;
 import com.example.api.domain.categorycomponents.CategoryComponents;
 import com.example.api.domain.categorycomponents.CategoryComponentsRegisterDTO;
-import com.example.api.domain.categoryfields.CategoryFields;
-import com.example.api.domain.categoryfields.CategoryFieldsRegisterDTO;
-import com.example.api.domain.categoryfields.CategoryFieldsUpdateDTO;
-import com.example.api.domain.categoryfields.CategoryFieldsValuesInfoDTO;
+import com.example.api.domain.categoryfields.*;
 import com.example.api.domain.categorygroups.CategoryGroupsInfoDTO;
 import com.example.api.domain.fields.Field;
 import com.example.api.domain.values.ValueInfoDTO;
 import com.example.api.repositories.*;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -41,6 +39,8 @@ public class CategoryService {
 
     @Autowired
     private List<CategoryValidator> validators; // Spring boot will automatically detect that a List is being ejected and will get all classes that implements this interface and will inject the validators automatically
+    @Autowired
+    private InventoryItemRepository inventoryItemRepository;
 
     public CategoryInfoDTO register(CategoryRequestDTO data) {
 
@@ -225,6 +225,14 @@ public class CategoryService {
         );
     }
 
+    public List<CategoryFieldsAssessmentInfoDTO> getAssessmentMainItemFieldsByinventoryItemId(Long inventoryItemId) {
+        var categoryId = inventoryItemRepository.findById(inventoryItemId).orElseThrow().getCategory().getId();
+        return categoryRepository.findById(categoryId)
+                .map(category -> category.getCategoryFields().stream()
+                        .map(CategoryFieldsAssessmentInfoDTO::new)
+                        .toList())
+                .orElseThrow(() -> new EntityNotFoundException("Category not found with id: " + categoryId));
+    }
 ////    public Page<Field> getAllEnabledFieldsByFieldGroupId(Long fieldGroupId, Pageable pageable) {
 ////        return fieldRepository.findByEnabledTrueAndFieldGroup_Id(fieldGroupId, pageable);
 ////    }

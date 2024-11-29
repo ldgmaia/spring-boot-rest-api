@@ -1,5 +1,7 @@
 package com.example.api.controller;
 
+import com.example.api.domain.categories.CategoryService;
+import com.example.api.domain.categoryfields.CategoryFieldsAssessmentInfoDTO;
 import com.example.api.domain.inventoryitems.*;
 import com.example.api.repositories.InventoryItemRepository;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -28,6 +30,9 @@ public class InventoryItemController {
 
     @Autowired
     private InventoryItemRepository inventoryRepository;
+
+    @Autowired
+    private CategoryService categoryService;
 
     @PostMapping
     @Transactional
@@ -107,9 +112,16 @@ public class InventoryItemController {
         return ResponseEntity.ok(items);
     }
 
-    @GetMapping("/assessment/fields/{inventoryItemId}")
-    public ResponseEntity<InventoryItemAssessmentInfoDTO> getAssessmentFieldsByInventoryItemId(@PathVariable Long inventoryItemId) {
-        var fields = inventoryItemService.getAssessmentFieldsByInventoryItemId(inventoryItemId);
+    @GetMapping("/assessment/components-fields/{inventoryItemId}")
+    public ResponseEntity<InventoryItemAssessmentInfoDTO> getAssessmentComponentsFieldsByInventoryItemId(@PathVariable Long inventoryItemId) {
+        var fields = inventoryItemService.getAssessmentComponentsFieldsByInventoryItemId(inventoryItemId);
         return ResponseEntity.ok(fields);
     }
+
+    @GetMapping("/assessment/main-item-fields/{inventoryItemId}")
+    public ResponseEntity<List<CategoryFieldsAssessmentInfoDTO>> getAssessmentMainItemFieldsByCategoryId(@PathVariable Long inventoryItemId) {
+        List<CategoryFieldsAssessmentInfoDTO> fields = categoryService.getAssessmentMainItemFieldsByinventoryItemId(inventoryItemId);
+        return ResponseEntity.ok(fields);
+    }
+
 }
