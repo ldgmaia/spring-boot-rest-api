@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS assessments
     parent_inventory_item_id        BIGINT UNSIGNED NOT NULL,
     inventory_item_id               BIGINT UNSIGNED,
     created_by                      BIGINT UNSIGNED NOT NULL,
+    receiving_items_id  BIGINT UNSIGNED NOT NULL,
     created_at                      TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at                      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
 
@@ -19,10 +20,12 @@ CREATE TABLE IF NOT EXISTS assessments
     INDEX (parent_inventory_item_id),
     INDEX (inventory_item_id),
     INDEX (created_by),
+    INDEX (receiving_items_id),
     FOREIGN KEY (section_area_id)           REFERENCES section_areas (id),
     FOREIGN KEY (parent_inventory_item_id)  REFERENCES inventory_items (id),
     FOREIGN KEY (inventory_item_id)         REFERENCES inventory_items (id),
-    FOREIGN KEY (created_by)                REFERENCES users (id)
+    FOREIGN KEY (created_by)                REFERENCES users (id),
+    FOREIGN KEY (receiving_items_id)        REFERENCES receiving_items (id)
 );
 
 CREATE TABLE IF NOT EXISTS assessments_fields_values (

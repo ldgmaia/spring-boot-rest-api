@@ -1,6 +1,7 @@
 package com.example.api.domain.assessments;
 
 import com.example.api.domain.inventoryitems.InventoryItem;
+import com.example.api.domain.receivingitems.ReceivingItem;
 import com.example.api.domain.sectionareas.SectionArea;
 import com.example.api.domain.users.User;
 import jakarta.persistence.*;
@@ -55,6 +56,10 @@ public class Assessment {
     private InventoryItem inventoryItem;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "receiving_items_id")
+    private ReceivingItem receivingItem;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
     @CreatedBy
     private User createdBy;
@@ -75,5 +80,6 @@ public class Assessment {
         this.status = data.status();
         this.parentInventoryItem = data.parentInventoryItem();
         this.inventoryItem = data.inventoryItem();
+        this.receivingItem = data.receivingItem();
     }
 }

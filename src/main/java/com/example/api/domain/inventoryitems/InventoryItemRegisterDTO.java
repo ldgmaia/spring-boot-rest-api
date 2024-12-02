@@ -13,6 +13,7 @@ import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
 public record InventoryItemRegisterDTO(
+        InventoryItem parentInventoryItem,
         @NotNull Category category,
         @NotNull Model model,
         MPN mpn,

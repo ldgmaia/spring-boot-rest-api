@@ -34,6 +34,10 @@ public class InventoryItem {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_inventory_id")
+    private InventoryItem parentInventoryItem;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
 
@@ -100,6 +104,7 @@ public class InventoryItem {
     private BigDecimal cost;
 
     public InventoryItem(InventoryItemRegisterDTO inventoryRegisterDTO) {
+        this.parentInventoryItem = inventoryRegisterDTO.parentInventoryItem();
         this.category = inventoryRegisterDTO.category();
         this.model = inventoryRegisterDTO.model();
         this.mpn = inventoryRegisterDTO.mpn();

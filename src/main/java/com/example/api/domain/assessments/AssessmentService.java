@@ -31,13 +31,13 @@ public class AssessmentService {
     private SectionAreaRepository sectionAreaRepository;
 
     @Autowired
-    private SectionAreaModelRepository sectionAreaModelRepository;
+    private ItemStatusRepository itemStatusRepository;
 
     @Autowired
     private AssessmentFieldValuesRepository assessmentFieldValuesRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private ReceivingItemRepository receivingItemRepository;
 
     @Autowired
     private ModelRepository modelRepository;
@@ -148,10 +148,17 @@ public class AssessmentService {
     public void createAssessment(AssessmentRequestDTO data) {
 
         var parentInventoryItem = inventoryItemRepository.getReferenceById(data.parentInventoryItemId());
+        parentInventoryItem.setItemStatus(itemStatusRepository.getReferenceById(2L)); // In Stock
 
         processAssessment(data.specs(), parentInventoryItem);
         processAssessment(data.functional(), parentInventoryItem);
         processAssessment(data.cosmetic(), parentInventoryItem);
+
+//        As part of this story, the receiving (lots) will get status on the receiving_items table as below
+//        If #Added = 0, then Status = pending_items
+//        If #Received = #Assessed (different from zero), then Status = assessment_complete
+//        If #Added > #Assessed (different from zero), then Status = pending_assessment
+//        Else: pending_items
 
 //        data.specs().forEach(spec -> {
 //            var area = sectionAreaRepository.getReferenceById(spec.areaId());
@@ -240,24 +247,25 @@ public class AssessmentService {
     }
 
     private void processAssessment(List<AssessmentRequestInspectionDTO> data, InventoryItem parentInventoryItem) {
-        data.forEach(spec -> {
-            var area = sectionAreaRepository.getReferenceById(spec.areaId());
+        data.forEach(component -> {
+            var area = sectionAreaRepository.getReferenceById(component.areaId());
 
             InventoryItem inventoryItem;
-            if (spec.present()) {
-                var model = modelRepository.getReferenceById(spec.modelId());
+            if (component.present()) {
+                var model = modelRepository.getReferenceById(component.modelId());
                 inventoryItem = new InventoryItem(new InventoryItemRegisterDTO(
-                        modelRepository.getReferenceById(spec.modelId()).getCategory(),
+                        parentInventoryItem,
+                        modelRepository.getReferenceById(component.modelId()).getCategory(),
                         model,
-                        spec.mpnId() != null ? mpnRepository.getReferenceById(spec.mpnId()) : null,
+                        component.mpnId() != null ? mpnRepository.getReferenceById(component.mpnId()) : null,
                         parentInventoryItem.getItemCondition(),
-                        parentInventoryItem.getItemStatus(),
+                        itemStatusRepository.getReferenceById(3L), // In Use
                         parentInventoryItem.getReceivingItem(),
                         parentInventoryItem.getLocation(),
                         "NA",
                         true,
                         area,
-                        spec.serialNumber(),
+                        component.serialNumber(),
                         "RBID TBD",
                         "Component",
                         BigDecimal.ZERO
@@ -268,20 +276,21 @@ public class AssessmentService {
             }
 
             var assessment = new Assessment(new AssessmentRegisterDTO(
-                    spec.pulled() != null ? spec.pulled() : false,
-                    spec.present(),
-                    "status",
+                    component.pulled() != null ? component.pulled() : false,
+                    component.present(),
+                    "complete", // or draft if the assessment was saved, not completed
                     null,
                     null,
                     null,
                     area,
                     parentInventoryItem,
-                    inventoryItem
+                    inventoryItem,
+                    parentInventoryItem.getReceivingItem()
             ));
             assessmentRepository.save(assessment);
 
-            if (spec.present()) {
-                spec.fields().forEach(field -> {
+            if (component.present() && component.fields() != null) {
+                component.fields().forEach(field -> {
                     if (field.fieldId() == null) {
                         throw new ValidationException("Field ID is required for " + field);
                     }

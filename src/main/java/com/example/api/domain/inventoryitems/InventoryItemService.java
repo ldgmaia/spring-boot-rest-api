@@ -99,6 +99,7 @@ public class InventoryItemService {
                 for (int i = 0; i < data.quantity(); i++) {
                     var uniqueIdentifier = generateRandomLongInRange(1, Long.MAX_VALUE);
                     var inventory = new InventoryItem(new InventoryItemRegisterDTO(
+                            null,
                             categoryRepository.getReferenceById(data.categoryId()),
                             modelRepository.getReferenceById(data.modelId()),
                             data.mpnId() != null ? mpnRepository.getReferenceById(data.mpnId()) : null,
@@ -110,7 +111,7 @@ public class InventoryItemService {
                             null,
                             null,
                             String.valueOf(uniqueIdentifier), // Serial number - must be given an appropriate value later
-                            String.valueOf(uniqueIdentifier), // The RBID will be generated following a formula. This random nunmber is just temporary
+                            String.valueOf(uniqueIdentifier), // The RBID will be generated following a formula. This random number is just temporary
                             typeValue,
                             receivingItem.getAdditionalItem() ? BigDecimal.valueOf(0L) : poiUnitPrice
                     ));
@@ -142,6 +143,7 @@ public class InventoryItemService {
 
             var uniqueIdentifier = generateRandomLongInRange(1, Long.MAX_VALUE);
             var inventory = new InventoryItem(new InventoryItemRegisterDTO(
+                    null,
                     categoryRepository.getReferenceById(data.categoryId()),
                     modelRepository.getReferenceById(data.modelId()),
                     data.mpnId() != null ? mpnRepository.getReferenceById(data.mpnId()) : null,

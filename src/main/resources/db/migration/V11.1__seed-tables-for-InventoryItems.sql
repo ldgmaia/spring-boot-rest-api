@@ -14,4 +14,7 @@ VALUES
 INSERT INTO item_statuses
     (name, created_by)
 VALUES
-    ('PENDING ASSESSMENT', 1);
+    ('PENDING ASSESSMENT', 1),
+    ('IN STOCK', 1),
+    ('IN USE', 1),
+    ('SOLD', 1);
