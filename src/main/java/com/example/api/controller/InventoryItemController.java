@@ -106,8 +106,11 @@ public class InventoryItemController {
     }
 
     @GetMapping("/by-receiving-item/{receivingItemId}")
-    public ResponseEntity<List<InventoryItemsByReceivingItemDTO>> getInventoryItemsByReceivingItemId(@PathVariable Long receivingItemId) {
-        List<InventoryItemsByReceivingItemDTO> items = inventoryItemService.getInventoryItemsByReceivingItemId(receivingItemId);
+    public ResponseEntity<List<InventoryItemsByReceivingItemDTO>> getInventoryItemsByReceivingItemId(
+            @PathVariable Long receivingItemId,
+            @RequestParam(required = false, defaultValue = "Main") String type,
+            @RequestParam(required = false, defaultValue = "1") Long statusId) {
+        List<InventoryItemsByReceivingItemDTO> items = inventoryItemService.getInventoryItemsByReceivingItemId(receivingItemId, type, statusId);
 
         return ResponseEntity.ok(items);
     }

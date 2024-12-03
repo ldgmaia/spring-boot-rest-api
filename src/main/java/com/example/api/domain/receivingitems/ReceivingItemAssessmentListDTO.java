@@ -56,7 +56,7 @@ public record ReceivingItemAssessmentListDTO(
                 receivingItem.getStatus(),
                 receivingItem.getPurchaseOrderItem() != null ? receivingItem.getPurchaseOrderItem().getQuantityOrdered() : null,
                 receivingItem.getQuantityAlreadyReceived(),
-                inventoryItemRepository.countByReceivingItemId(receivingItem.getId()),  // Fetch quantityAdded
+                inventoryItemRepository.countByReceivingItemIdAndType(receivingItem.getId(), "Main"),  // Fetch quantityAdded
                 receivingItem.getReceiving().getSupplier().getName(),
                 receivingItem.getCreatedAt()
         );

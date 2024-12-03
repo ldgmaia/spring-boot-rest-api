@@ -29,7 +29,7 @@ public record ReceivingItemInfoDTO(
                 receivingItem.getDescription(),
                 receivingItem.getQuantityToReceive(),
                 receivingItem.getQuantityAlreadyReceived(),
-                inventoryItemRepository.countByReceivingItemId(receivingItem.getId()),  // Fetch quantityAdded
+                inventoryItemRepository.countByReceivingItemIdAndType(receivingItem.getId(), "Main"),  // Fetch quantityAdded
                 receivingItem.getReceiving().getId(),
                 receivingItem.getCreatedBy().getUsername(),
                 receivingItem.getStatus(),

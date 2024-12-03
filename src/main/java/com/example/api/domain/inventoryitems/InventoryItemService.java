@@ -66,7 +66,7 @@ public class InventoryItemService {
                 .orElseThrow(() -> new ValidationException("Receiving item not found"));
 
         // Get the total number of items already in the inventory for the given receiving_item_id
-        var unitsAdded = inventoryItemRepository.countByReceivingItemId(data.receivingItemId());
+        var unitsAdded = inventoryItemRepository.countByReceivingItemIdAndType(data.receivingItemId(), "Main");
 
         // Check if the current quantity to be added will exceed the quantity received
         var quantityRemainingToAdd = receivingItem.getAdditionalItem() ? receivingItem.getQuantityAlreadyReceived() - unitsAdded : receivingItem.getQuantityToReceive() - unitsAdded;
@@ -99,7 +99,6 @@ public class InventoryItemService {
                 for (int i = 0; i < data.quantity(); i++) {
                     var uniqueIdentifier = generateRandomLongInRange(1, Long.MAX_VALUE);
                     var inventory = new InventoryItem(new InventoryItemRegisterDTO(
-                            null,
                             categoryRepository.getReferenceById(data.categoryId()),
                             modelRepository.getReferenceById(data.modelId()),
                             data.mpnId() != null ? mpnRepository.getReferenceById(data.mpnId()) : null,
@@ -143,7 +142,6 @@ public class InventoryItemService {
 
             var uniqueIdentifier = generateRandomLongInRange(1, Long.MAX_VALUE);
             var inventory = new InventoryItem(new InventoryItemRegisterDTO(
-                    null,
                     categoryRepository.getReferenceById(data.categoryId()),
                     modelRepository.getReferenceById(data.modelId()),
                     data.mpnId() != null ? mpnRepository.getReferenceById(data.mpnId()) : null,
@@ -184,8 +182,8 @@ public class InventoryItemService {
         return min + (long) (random.nextDouble() * (max - min)); // Generates a random Long between min and max
     }
 
-    public List<InventoryItemsByReceivingItemDTO> getInventoryItemsByReceivingItemId(Long receivingItemId) {
-        return inventoryItemRepository.findByReceivingItemId(receivingItemId);
+    public List<InventoryItemsByReceivingItemDTO> getInventoryItemsByReceivingItemId(Long receivingItemId, String type, Long statusId) {
+        return inventoryItemRepository.findByReceivingItemId(receivingItemId, type, statusId);
     }
 
     public InventoryItemInfoDTO listById(Long id) {

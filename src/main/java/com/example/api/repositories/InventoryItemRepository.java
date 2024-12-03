@@ -20,7 +20,13 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, Lo
             """)
     Long countByPurchaseOrderId(@Param("purchaseOrderId") Long purchaseOrderId);
 
-    Long countByReceivingItemId(@NotNull Long receivingItemId);
+//    Long countByReceivingItemId(@NotNull Long receivingItemId);
+
+    // count by receiving item id and item type
+    Long countByReceivingItemIdAndType(@NotNull Long receivingItemId, @NotNull String type);
+
+    // count by receiving item id and item type and item status not in
+    Long countByReceivingItemIdAndTypeAndItemStatusIdNotIn(@NotNull Long receivingItemId, @NotNull String type, @NotNull List<Long> statusIds);
 
     @Query("""
             SELECT new com.example.api.domain.inventoryitems.InventoryItemsByReceivingItemDTO(
@@ -33,7 +39,12 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, Lo
             JOIN ii.itemStatus is2
             JOIN ii.location l
             WHERE ii.receivingItem.id = :receivingItemId
+            AND ii.type = :type
+            AND ii.itemStatus.id = :statusId
             ORDER BY ii.createdAt DESC
             """)
-    List<InventoryItemsByReceivingItemDTO> findByReceivingItemId(@Param("receivingItemId") Long receivingItemId);
+    List<InventoryItemsByReceivingItemDTO> findByReceivingItemId(
+            @Param("receivingItemId") Long receivingItemId,
+            @Param("type") String type,
+            @Param("statusId") Long statusId);
 }
