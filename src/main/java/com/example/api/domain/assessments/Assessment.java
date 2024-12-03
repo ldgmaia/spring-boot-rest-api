@@ -1,8 +1,8 @@
 package com.example.api.domain.assessments;
 
 import com.example.api.domain.inventoryitems.InventoryItem;
+import com.example.api.domain.itemcondition.ItemCondition;
 import com.example.api.domain.receivingitems.ReceivingItem;
-import com.example.api.domain.sectionareas.SectionArea;
 import com.example.api.domain.users.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -27,6 +27,19 @@ public class Assessment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String section;
+    private String area;
+    private Boolean present = true;
+    private String model;
+    private String mpn;
+
+    @Column(nullable = false)
+    private Boolean pulled = false;
+
+    private String status;
+
+    private String post;
+
     @Column(name = "company_grade")
     private String companyGrade;
 
@@ -36,16 +49,9 @@ public class Assessment {
     @Column(name = "functional_grade")
     private String functionalGrade;
 
-    @Column(nullable = false)
-    private Boolean pulled = false;
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "section_area_id")
-    private SectionArea sectionArea;
-
-    private Boolean present = true;
-
-    private String status;
+    @JoinColumn(name = "item_condition_id")
+    private ItemCondition itemCondition;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_inventory_item_id")
@@ -71,13 +77,18 @@ public class Assessment {
     private LocalDateTime updatedAt;
 
     public Assessment(AssessmentRegisterDTO data) {
+        this.section = data.section();
+        this.area = data.area();
+        this.present = data.present();
+        this.model = data.model();
+        this.mpn = data.mpn();
+        this.pulled = data.pulled();
+        this.status = data.status();
+        this.post = data.post();
         this.companyGrade = data.companyGrade();
         this.cosmeticGrade = data.cosmeticGrade();
         this.functionalGrade = data.functionalGrade();
-        this.pulled = data.pulled();
-        this.sectionArea = data.sectionArea();
-        this.present = data.present();
-        this.status = data.status();
+        this.itemCondition = data.itemCondition();
         this.parentInventoryItem = data.parentInventoryItem();
         this.inventoryItem = data.inventoryItem();
         this.receivingItem = data.receivingItem();

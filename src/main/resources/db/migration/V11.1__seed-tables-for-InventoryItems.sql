@@ -3,6 +3,7 @@ INSERT INTO item_conditions
 VALUES
     ('NEW', 1),
     ('USED', 1),
+    ('OPEN BOX', 1),
     ('REFURBISHED', 1),
     ('DOA', 1);
 

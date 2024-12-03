@@ -55,6 +55,8 @@ public class AssessmentService {
     private FieldRepository fieldRepository;
     @Autowired
     private FieldValueRepository fieldValueRepository;
+    @Autowired
+    private ItemConditionRepository itemConditionRepository;
 
 //    public AssessmentListSpecFuncFieldsDTO findSpecFuncFieldsByInventoryItemId(Long inventoryItemId) {
 //
@@ -150,15 +152,29 @@ public class AssessmentService {
         var parentInventoryItem = inventoryItemRepository.getReferenceById(data.parentInventoryItemId());
         parentInventoryItem.setItemStatus(itemStatusRepository.getReferenceById(2L)); // In Stock
 
-        processAssessment(data.specs(), parentInventoryItem);
-        processAssessment(data.functional(), parentInventoryItem);
-        processAssessment(data.cosmetic(), parentInventoryItem);
+        processComponentAssessment(data.specs(), parentInventoryItem);
+        processComponentAssessment(data.functional(), parentInventoryItem);
+        processComponentAssessment(data.cosmetic(), parentInventoryItem);
+
+//        System.out.println("Added " + inventoryItemRepository.countByReceivingItemIdAndType(parentInventoryItem.getReceivingItem().getId(), "Main"));
+        System.out.println("Received " + parentInventoryItem.getReceivingItem().getQuantityAlreadyReceived());
+        System.out.println("Assessed " + inventoryItemRepository.countByReceivingItemIdAndTypeAndItemStatusIdNotIn(parentInventoryItem.getReceivingItem().getId(), "Main", List.of(1L)));
+
+        var received = parentInventoryItem.getReceivingItem().getQuantityAlreadyReceived();
+        var assessed = inventoryItemRepository.countByReceivingItemIdAndTypeAndItemStatusIdNotIn(parentInventoryItem.getReceivingItem().getId(), "Main", List.of(1L));
+
+        if (received > 0 && received.equals(assessed)) {
+            parentInventoryItem.getReceivingItem().setStatus("Assessment Complete");
+        } else {
+            parentInventoryItem.getReceivingItem().setStatus("Pending Assessment");
+        }
+
+        // get qty of units assessed by receiving item
+
 
 //        As part of this story, the receiving (lots) will get status on the receiving_items table as below
-//        If #Added = 0, then Status = pending_items
 //        If #Received = #Assessed (different from zero), then Status = assessment_complete
 //        If #Added > #Assessed (different from zero), then Status = pending_assessment
-//        Else: pending_items
 
 //        data.specs().forEach(spec -> {
 //            var area = sectionAreaRepository.getReferenceById(spec.areaId());
@@ -246,7 +262,7 @@ public class AssessmentService {
 //        });
     }
 
-    private void processAssessment(List<AssessmentRequestInspectionDTO> data, InventoryItem parentInventoryItem) {
+    private void processComponentAssessment(List<AssessmentRequestInspectionDTO> data, InventoryItem parentInventoryItem) {
         data.forEach(component -> {
             var area = sectionAreaRepository.getReferenceById(component.areaId());
 
@@ -254,12 +270,11 @@ public class AssessmentService {
             if (component.present()) {
                 var model = modelRepository.getReferenceById(component.modelId());
                 inventoryItem = new InventoryItem(new InventoryItemRegisterDTO(
-                        parentInventoryItem,
                         modelRepository.getReferenceById(component.modelId()).getCategory(),
                         model,
                         component.mpnId() != null ? mpnRepository.getReferenceById(component.mpnId()) : null,
                         parentInventoryItem.getItemCondition(),
-                        itemStatusRepository.getReferenceById(3L), // In Use
+                        itemStatusRepository.getReferenceById(1L), // Pending assessment
                         parentInventoryItem.getReceivingItem(),
                         parentInventoryItem.getLocation(),
                         "NA",
@@ -275,19 +290,46 @@ public class AssessmentService {
                 inventoryItem = null;
             }
 
-            var assessment = new Assessment(new AssessmentRegisterDTO(
-                    component.pulled() != null ? component.pulled() : false,
-                    component.present(),
-                    "complete", // or draft if the assessment was saved, not completed
-                    null,
-                    null,
-                    null,
-                    area,
-                    parentInventoryItem,
-                    inventoryItem,
-                    parentInventoryItem.getReceivingItem()
-            ));
-            assessmentRepository.save(assessment);
+            Assessment assessment;
+            if (component.present()) {
+                assessment = new Assessment(new AssessmentRegisterDTO(
+                        sectionAreaRepository.getReferenceById(component.areaId()).getSection().getName(),
+                        sectionAreaRepository.getReferenceById(component.areaId()).getName(),
+                        true,
+                        modelRepository.getReferenceById(component.modelId()).getName(),
+                        component.mpnId() != null ? mpnRepository.getReferenceById(component.mpnId()).getName() : null,
+                        component.pulled(),
+                        "complete",
+                        inventoryItem.getPost() != null ? inventoryItem.getPost() : null,
+                        null,
+                        null,
+                        null,
+                        itemConditionRepository.getReferenceById(1L),
+                        parentInventoryItem,
+                        inventoryItem,
+                        inventoryItem.getReceivingItem()
+                ));
+                assessmentRepository.save(assessment);
+            } else {
+                assessment = new Assessment(new AssessmentRegisterDTO(
+                        sectionAreaRepository.getReferenceById(component.areaId()).getSection().getName(),
+                        sectionAreaRepository.getReferenceById(component.areaId()).getName(),
+                        false,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null
+                ));
+                assessmentRepository.save(assessment);
+            }
 
             if (component.present() && component.fields() != null) {
                 component.fields().forEach(field -> {
