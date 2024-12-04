@@ -1,12 +1,13 @@
 CREATE TABLE IF NOT EXISTS assessments
 (
     id                              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    data_level                      VARCHAR(255),
     section                         VARCHAR(255),
     area                            VARCHAR(255),
-    present                         BIT,
+    present                         BIT DEFAULT 1,
     model                           VARCHAR(255),
     mpn                             VARCHAR(255),
-    pulled                          BIT,
+    pulled                          BIT DEFAULT 0,
     status                          VARCHAR(255),
     post                            VARCHAR(255),
     company_grade                   VARCHAR(255),

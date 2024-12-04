@@ -27,6 +27,7 @@ public class Assessment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String dataLevel;
     private String section;
     private String area;
     private Boolean present = true;
@@ -77,6 +78,7 @@ public class Assessment {
     private LocalDateTime updatedAt;
 
     public Assessment(AssessmentRegisterDTO data) {
+        this.dataLevel = data.dataLevel();
         this.section = data.section();
         this.area = data.area();
         this.present = data.present();

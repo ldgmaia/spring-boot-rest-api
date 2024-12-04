@@ -5,6 +5,7 @@ import com.example.api.domain.itemcondition.ItemCondition;
 import com.example.api.domain.receivingitems.ReceivingItem;
 
 public record AssessmentRegisterDTO(
+        String dataLevel,
         String section,
         String area,
         Boolean present,
