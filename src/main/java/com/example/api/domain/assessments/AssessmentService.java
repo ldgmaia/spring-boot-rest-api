@@ -7,6 +7,8 @@ import com.example.api.domain.fieldsvalues.FieldValue;
 import com.example.api.domain.fieldsvalues.FieldValueRegisterDTO;
 import com.example.api.domain.inventoryitems.InventoryItem;
 import com.example.api.domain.inventoryitems.InventoryItemRegisterDTO;
+import com.example.api.domain.inventoryitemscomponents.InventoryItemComponentRegisterDTO;
+import com.example.api.domain.inventoryitemscomponents.InventoryItemComponents;
 import com.example.api.domain.inventoryitemsfieldsvalues.InventoryItemsFieldsValues;
 import com.example.api.domain.inventoryitemsfieldsvalues.InventoryItemsFieldsValuesRegisterDTO;
 import com.example.api.domain.values.Value;
@@ -26,6 +28,9 @@ public class AssessmentService {
 
     @Autowired
     private InventoryItemRepository inventoryItemRepository;
+
+    @Autowired
+    private InventoryItemComponentRepository inventoryItemComponentRepository;
 
     @Autowired
     private SectionAreaRepository sectionAreaRepository;
@@ -152,9 +157,13 @@ public class AssessmentService {
         var parentInventoryItem = inventoryItemRepository.getReferenceById(data.parentInventoryItemId());
         parentInventoryItem.setItemStatus(itemStatusRepository.getReferenceById(2L)); // In Stock
 
-        processComponentAssessment(data.specs(), parentInventoryItem);
-        processComponentAssessment(data.functional(), parentInventoryItem);
-        processComponentAssessment(data.cosmetic(), parentInventoryItem);
+        processMainItemAssessment(data.mainItemSpecs(), parentInventoryItem, "Specs");
+        processMainItemAssessment(data.mainItemFunctional(), parentInventoryItem, "Functional");
+        processMainItemAssessment(data.mainItemCosmetic(), parentInventoryItem, "Cosmetic");
+
+        processComponentAssessment(data.specs(), parentInventoryItem, "Specs");
+        processComponentAssessment(data.functional(), parentInventoryItem, "Functional");
+        processComponentAssessment(data.cosmetic(), parentInventoryItem, "Cosmetic");
 
 //        System.out.println("Added " + inventoryItemRepository.countByReceivingItemIdAndType(parentInventoryItem.getReceivingItem().getId(), "Main"));
         System.out.println("Received " + parentInventoryItem.getReceivingItem().getQuantityAlreadyReceived());
@@ -262,7 +271,73 @@ public class AssessmentService {
 //        });
     }
 
-    private void processComponentAssessment(List<AssessmentRequestInspectionDTO> data, InventoryItem parentInventoryItem) {
+    private void processMainItemAssessment(List<AssessmentRequestFieldsDTO> fields, InventoryItem parentInventoryItem, String dataLevel) {
+        Assessment assessment = new Assessment(new AssessmentRegisterDTO(
+                dataLevel,
+                "Item",
+                "Item",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                parentInventoryItem,
+                null
+        ));
+        assessmentRepository.save(assessment);
+
+        if (fields != null) {
+            fields.forEach(field -> {
+                if (field.fieldId() == null) {
+                    throw new ValidationException("Field ID is required for " + field);
+                }
+
+                var specField = fieldRepository.getReferenceById(field.fieldId());
+
+                Value valueData;
+
+                // Case 1: Both valueData and valueDataId are null
+                if (field.valueDataId() == null && (field.valueData() == null || field.valueData().isEmpty())) {
+                    throw new ValidationException("Value is required for " + field);
+                }
+
+                // Case 2: valueDataId exists
+                if (field.valueDataId() != null) {
+                    valueData = valueRepository.getReferenceById(field.valueDataId());
+                } else {
+                    // Case 3: valueData provided, valueDataId must be null
+                    if (valueRepository.existsByValueData(field.valueData())) {
+                        valueData = valueRepository.findByValueData(field.valueData());
+                    } else {
+                        valueData = valueRepository.save(new Value(new ValueRegisterDTO(field.valueData())));
+                    }
+                }
+
+                // check if field value already exists
+                FieldValue fieldValue;
+                if (fieldValueRepository.existsByValuesDataIdAndFieldsId(valueData.getId(), specField.getId())) {
+                    fieldValue = fieldValueRepository.findByFieldIdAndValueDataId(specField.getId(), valueData.getId());
+                } else {
+                    var newFieldvalue = new FieldValue(new FieldValueRegisterDTO(valueData, (double) 0, specField));
+                    fieldValue = fieldValueRepository.save(newFieldvalue);
+                }
+
+                var assessmentFieldsValues = new AssessmentFieldsValues(new AssessmentFieldsValuesRegisterDTO(fieldValue, assessment));
+                assessmentFieldValuesRepository.save(assessmentFieldsValues);
+
+                var inventoryItemsFieldsValues = new InventoryItemsFieldsValues(new InventoryItemsFieldsValuesRegisterDTO(fieldValue, parentInventoryItem));
+                inventoryItemsFieldValuesRepository.save(inventoryItemsFieldsValues);
+            });
+        }
+    }
+
+    private void processComponentAssessment(List<AssessmentRequestInspectionDTO> data, InventoryItem parentInventoryItem, String dataLevel) {
         data.forEach(component -> {
             var area = sectionAreaRepository.getReferenceById(component.areaId());
 
@@ -286,6 +361,7 @@ public class AssessmentService {
                         BigDecimal.ZERO
                 ));
                 inventoryItemRepository.save(inventoryItem);
+                inventoryItemComponentRepository.save(new InventoryItemComponents(new InventoryItemComponentRegisterDTO(component.pulled() ? null : parentInventoryItem, inventoryItem)));
             } else {
                 inventoryItem = null;
             }
@@ -293,6 +369,7 @@ public class AssessmentService {
             Assessment assessment;
             if (component.present()) {
                 assessment = new Assessment(new AssessmentRegisterDTO(
+                        dataLevel,
                         sectionAreaRepository.getReferenceById(component.areaId()).getSection().getName(),
                         sectionAreaRepository.getReferenceById(component.areaId()).getName(),
                         true,
@@ -312,6 +389,7 @@ public class AssessmentService {
                 assessmentRepository.save(assessment);
             } else {
                 assessment = new Assessment(new AssessmentRegisterDTO(
+                        dataLevel,
                         sectionAreaRepository.getReferenceById(component.areaId()).getSection().getName(),
                         sectionAreaRepository.getReferenceById(component.areaId()).getName(),
                         false,
