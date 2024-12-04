@@ -42,7 +42,6 @@ CREATE TABLE IF NOT EXISTS item_statuses
 CREATE TABLE IF NOT EXISTS inventory_items
 (
     id                  BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    parent_inventory_id BIGINT UNSIGNED,
     category_id         BIGINT UNSIGNED,
     model_id            BIGINT UNSIGNED,
     mpn_id              BIGINT UNSIGNED,
@@ -67,7 +66,6 @@ CREATE TABLE IF NOT EXISTS inventory_items
     updated_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
 
     PRIMARY KEY (id),
-    INDEX (parent_inventory_id),
     INDEX (category_id),
     INDEX (model_id),
     INDEX (mpn_id),
@@ -80,7 +78,6 @@ CREATE TABLE IF NOT EXISTS inventory_items
     INDEX (inspected_by),
     INDEX (rbid),
     INDEX (serial_number),
-    FOREIGN KEY (parent_inventory_id)   REFERENCES inventory_items (id),
     FOREIGN KEY (inspected_by)          REFERENCES users (id),
     FOREIGN KEY (category_id)           REFERENCES categories (id),
     FOREIGN KEY (model_id)              REFERENCES models (id),
@@ -105,4 +102,21 @@ CREATE TABLE IF NOT EXISTS inventory_items_fields_values (
   INDEX (field_values_id),
   FOREIGN KEY (inventory_item_id)   REFERENCES inventory_items (id),
   FOREIGN KEY (field_values_id) REFERENCES fields_values (id)
+);
+
+CREATE TABLE IF NOT EXISTS inventory_items_components (
+  id                            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  parent_inventory_item_id      BIGINT UNSIGNED NOT NULL,
+  inventory_item_id             BIGINT UNSIGNED NOT NULL,
+  created_at                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+  updated_at                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
+
+  PRIMARY KEY (id),
+
+  INDEX (inventory_item_id),
+  INDEX (parent_inventory_item_id),
+  INDEX (parent_inventory_item_id, inventory_item_id),
+
+  FOREIGN KEY (inventory_item_id)   REFERENCES inventory_items (id),
+  FOREIGN KEY (parent_inventory_item_id) REFERENCES inventory_items (id)
 );

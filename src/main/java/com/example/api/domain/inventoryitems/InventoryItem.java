@@ -34,10 +34,6 @@ public class InventoryItem {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_inventory_id")
-    private InventoryItem parentInventoryItem;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
 
@@ -103,20 +99,19 @@ public class InventoryItem {
     private String type;
     private BigDecimal cost;
 
-    public InventoryItem(InventoryItemRegisterDTO inventoryRegisterDTO) {
-        this.parentInventoryItem = inventoryRegisterDTO.parentInventoryItem();
-        this.category = inventoryRegisterDTO.category();
-        this.model = inventoryRegisterDTO.model();
-        this.mpn = inventoryRegisterDTO.mpn();
-        this.itemCondition = inventoryRegisterDTO.itemCondition();
-        this.itemStatus = inventoryRegisterDTO.itemStatus();
-        this.receivingItem = inventoryRegisterDTO.receivingItem();
-        this.post = inventoryRegisterDTO.post();
-        this.present = inventoryRegisterDTO.present();
-        this.serialNumber = inventoryRegisterDTO.serialNumber();
-        this.rbid = inventoryRegisterDTO.rbid();
-        this.location = inventoryRegisterDTO.location();
-        this.type = inventoryRegisterDTO.type();
-        this.cost = inventoryRegisterDTO.cost();
+    public InventoryItem(InventoryItemRegisterDTO inventory) {
+        this.category = inventory.category();
+        this.model = inventory.model();
+        this.mpn = inventory.mpn();
+        this.itemCondition = inventory.itemCondition();
+        this.itemStatus = inventory.itemStatus();
+        this.receivingItem = inventory.receivingItem();
+        this.post = inventory.post();
+        this.present = inventory.present();
+        this.serialNumber = inventory.serialNumber();
+        this.rbid = inventory.rbid();
+        this.location = inventory.location();
+        this.type = inventory.type();
+        this.cost = inventory.cost();
     }
 }
