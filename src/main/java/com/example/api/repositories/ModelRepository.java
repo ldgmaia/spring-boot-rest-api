@@ -23,8 +23,8 @@ public interface ModelRepository extends JpaRepository<Model, Long> {
             select m
             from Model m
             join m.category c
-            where c.id not in (
-            	select cc.parentCategory.id from CategoryComponent cc
+            where c.id in (
+            	select cc.childCategory.id from CategoryComponent cc
             	)
             """)
     List<ModelComponentInfoDTO> listModelComponent();

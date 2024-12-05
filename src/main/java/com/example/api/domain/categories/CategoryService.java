@@ -106,7 +106,7 @@ public class CategoryService {
         // handling parent category
         // handling parent categories
         List<Long> newParentCategoryIds = data.parentCategory();
-        List<CategoryComponents> currentParentCategories = categoryComponentRepository.findByChildCategoryId(id);
+        List<CategoryComponents> currentParentCategories = categoryComponentRepository.findByChildCategoryIdAndChildCategoryEnabledTrue(id);
 
         if (newParentCategoryIds == null || newParentCategoryIds.isEmpty()) {
             // If no parent categories are provided, delete all current parent categories
@@ -187,7 +187,7 @@ public class CategoryService {
         var categoryGroup = categoryGroupRepository.getReferenceById(category.getCategoryGroup().getId());
 
         // Fetch parent category details
-        var parentCategory = categoryComponentRepository.findCategoryComponentByChildCategoryId(id).stream()
+        var parentCategory = categoryComponentRepository.findByChildCategoryIdAndChildCategoryEnabledTrue(id).stream()
                 .map(component -> new CategoryInfoDTO(categoryRepository.getReferenceById(component.getParentCategory().getId())))
                 .collect(Collectors.toList());
         ;
@@ -196,7 +196,7 @@ public class CategoryService {
         // NOTES: below are 2 ways of achieving the same outcome
         // NOTES: Here I am getting just the category ID of the component, and then create a list of instances using the DTO that I need
         // Fetch components
-        var components = categoryComponentRepository.findComponentsByParentCategoryId(id).stream()
+        var components = categoryComponentRepository.findByParentCategoryIdAndChildCategoryEnabledTrue(id).stream()
                 .map(component -> new CategoryInfoDTO(categoryRepository.getReferenceById(component.getChildCategory().getId())))
                 .collect(Collectors.toList());
 

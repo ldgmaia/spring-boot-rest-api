@@ -158,16 +158,17 @@ public class AssessmentService {
         parentInventoryItem.setItemStatus(itemStatusRepository.getReferenceById(2L)); // In Stock
 
         processMainItemAssessment(data.mainItemSpecs(), parentInventoryItem, "Specs");
-        processMainItemAssessment(data.mainItemFunctional(), parentInventoryItem, "Functional");
-        processMainItemAssessment(data.mainItemCosmetic(), parentInventoryItem, "Cosmetic");
-
         processComponentAssessment(data.specs(), parentInventoryItem, "Specs");
+
+        processMainItemAssessment(data.mainItemFunctional(), parentInventoryItem, "Functional");
         processComponentAssessment(data.functional(), parentInventoryItem, "Functional");
+
+        processMainItemAssessment(data.mainItemCosmetic(), parentInventoryItem, "Cosmetic");
         processComponentAssessment(data.cosmetic(), parentInventoryItem, "Cosmetic");
 
 //        System.out.println("Added " + inventoryItemRepository.countByReceivingItemIdAndType(parentInventoryItem.getReceivingItem().getId(), "Main"));
-        System.out.println("Received " + parentInventoryItem.getReceivingItem().getQuantityAlreadyReceived());
-        System.out.println("Assessed " + inventoryItemRepository.countByReceivingItemIdAndTypeAndItemStatusIdNotIn(parentInventoryItem.getReceivingItem().getId(), "Main", List.of(1L)));
+//        System.out.println("Received " + parentInventoryItem.getReceivingItem().getQuantityAlreadyReceived());
+//        System.out.println("Assessed " + inventoryItemRepository.countByReceivingItemIdAndTypeAndItemStatusIdNotIn(parentInventoryItem.getReceivingItem().getId(), "Main", List.of(1L)));
 
         var received = parentInventoryItem.getReceivingItem().getQuantityAlreadyReceived();
         var assessed = inventoryItemRepository.countByReceivingItemIdAndTypeAndItemStatusIdNotIn(parentInventoryItem.getReceivingItem().getId(), "Main", List.of(1L));
