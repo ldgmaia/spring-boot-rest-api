@@ -1,5 +1,6 @@
 package com.example.api.domain.categories;
 
+import com.example.api.domain.categorycomponents.CategoryComponents;
 import com.example.api.domain.categoryfields.CategoryFields;
 import com.example.api.domain.categorygroups.CategoryGroups;
 import jakarta.persistence.*;
@@ -36,6 +37,9 @@ public class Category {
 
     @OneToMany(mappedBy = "category", orphanRemoval = true)
     private List<CategoryFields> categoryFields = new ArrayList<>();
+
+    @OneToMany(mappedBy = "parentCategory", orphanRemoval = true)
+    private List<CategoryComponents> parentCategory = new ArrayList<>();
 
     public Category(CategoryRegisterDTO data) {
         this.name = data.name();

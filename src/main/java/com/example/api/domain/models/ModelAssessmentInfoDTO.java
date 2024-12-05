@@ -10,6 +10,7 @@ public record ModelAssessmentInfoDTO(
         String name,
         Boolean needsSerialNumber,
         Boolean needsMpn,
+        Boolean isParent,
         List<MPNInfoDTO> mpns,
         List<CategoryFieldsAssessmentInfoDTO> categoryFields
 ) {
@@ -19,6 +20,7 @@ public record ModelAssessmentInfoDTO(
                 model.getName(),
                 model.getCategory().getNeedsSerialNumber(),
                 model.getNeedsMpn(),
+                !model.getCategory().getParentCategory().isEmpty(),
                 model.getMpns().stream().map(MPNInfoDTO::new).toList(),
                 model.getCategory().getCategoryFields().stream().map(CategoryFieldsAssessmentInfoDTO::new).toList()
         );
