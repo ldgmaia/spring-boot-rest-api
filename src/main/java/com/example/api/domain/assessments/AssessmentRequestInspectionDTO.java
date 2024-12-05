@@ -11,4 +11,21 @@ public record AssessmentRequestInspectionDTO(
         String serialNumber,
         List<AssessmentRequestFieldsDTO> fields
 ) {
+    public AssessmentRequestInspectionDTO(
+            Boolean present,
+            Long areaId,
+            Long modelId,
+            Long mpnId,
+            Boolean pulled,
+            String serialNumber,
+            List<AssessmentRequestFieldsDTO> fields
+    ) {
+        this.present = present;
+        this.areaId = areaId;
+        this.modelId = modelId;
+        this.mpnId = mpnId;
+        this.pulled = pulled != null ? pulled : false;
+        this.serialNumber = serialNumber;
+        this.fields = fields;
+    }
 }

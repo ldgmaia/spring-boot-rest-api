@@ -106,7 +106,7 @@ CREATE TABLE IF NOT EXISTS inventory_items_fields_values (
 
 CREATE TABLE IF NOT EXISTS inventory_items_components (
   id                            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  parent_inventory_item_id      BIGINT UNSIGNED NOT NULL,
+  parent_inventory_item_id      BIGINT UNSIGNED,
   inventory_item_id             BIGINT UNSIGNED NOT NULL,
   created_at                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
   updated_at                    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
