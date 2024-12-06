@@ -1,7 +1,6 @@
 CREATE TABLE IF NOT EXISTS assessments
 (
     id                              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    data_level                      VARCHAR(255),
     section                         VARCHAR(255),
     area                            VARCHAR(255),
     present                         BIT DEFAULT 1,

@@ -26,6 +26,6 @@ public record AssessmentRequestInspectionDTO(
         this.mpnId = mpnId;
         this.pulled = pulled != null ? pulled : false;
         this.serialNumber = serialNumber;
-        this.fields = fields;
+        this.fields = fields != null ? fields : List.of();
     }
 }
