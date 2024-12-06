@@ -104,7 +104,7 @@ public class AssessmentService {
                         model,
                         component.mpnId() != null ? mpnRepository.getReferenceById(component.mpnId()) : null,
                         parentInventoryItem.getItemCondition(),
-                        itemStatusRepository.getReferenceById(1L), // Pending assessment
+                        component.pulled() ? itemStatusRepository.getReferenceById(1L) : itemStatusRepository.getReferenceById(3L),
                         parentInventoryItem.getReceivingItem(),
                         parentInventoryItem.getLocation(),
                         "NA",
@@ -177,7 +177,7 @@ public class AssessmentService {
 
         parentInventoryItem.setItemStatus(itemStatusRepository.getReferenceById(2L)); // In Stock
     }
-    
+
     private void processComponentAssessmentFields(List<AssessmentRequestFieldsDTO> fields, InventoryItem inventoryItem, Assessment assessment) {
 
         fields.forEach(field -> {
