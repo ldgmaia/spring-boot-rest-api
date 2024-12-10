@@ -75,7 +75,7 @@ public class AssessmentService {
                 "Item",
                 null,
                 parentInventoryItem.getModel().getName(),
-                parentInventoryItem.getMpn().getName(),
+                parentInventoryItem.getMpn() != null ? parentInventoryItem.getMpn().getName() : null,
                 null,
                 "complete",
                 parentInventoryItem.getPost(),
