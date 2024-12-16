@@ -11,10 +11,11 @@ public record ModelInspectionInfoDTO(
         Boolean needsSerialNumber,
         Boolean needsMpn,
         Boolean isParent,
+        Long currentMpnId,
         List<MPNInfoDTO> mpns,
         List<CategoryFieldsAssessmentInfoDTO> categoryFields
 ) {
-    public ModelInspectionInfoDTO(Model model) {
+    public ModelInspectionInfoDTO(Model model, Long currentMpnId) {
 
         this(
                 model.getId(),
@@ -22,6 +23,7 @@ public record ModelInspectionInfoDTO(
                 model.getCategory().getNeedsSerialNumber(),
                 model.getNeedsMpn(),
                 !model.getCategory().getParentCategory().isEmpty(),
+                model.getNeedsMpn() ? currentMpnId : null,
                 model.getMpns().stream().map(MPNInfoDTO::new).toList(),
                 model.getCategory().getCategoryFields().stream().map(CategoryFieldsAssessmentInfoDTO::new).toList()
         );

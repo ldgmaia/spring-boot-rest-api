@@ -18,7 +18,12 @@ public record SectionAreaInspectionInfoDTO(
                 sectionArea.getName(),
                 sectionArea.getAreaOrder(),
                 inventoryItemRepository.findComponentModelIdBySectionAreaId(inventoryItemId, sectionArea.getId()).getModel().getId(),
-                sectionArea.getSectionAreaModels().stream().map(sectionAreaModel -> new ModelInspectionInfoDTO(sectionAreaModel.getModel())).toList()
+                sectionArea.getSectionAreaModels().stream().map(sectionAreaModel -> new ModelInspectionInfoDTO(
+                                sectionAreaModel.getModel(),
+                                inventoryItemRepository.findComponentModelIdBySectionAreaId(inventoryItemId, sectionArea.getId()).getMpn() != null ?
+                                        inventoryItemRepository.findComponentModelIdBySectionAreaId(inventoryItemId, sectionArea.getId()).getMpn().getId() : null
+                        )
+                ).toList()
         );
     }
 }
