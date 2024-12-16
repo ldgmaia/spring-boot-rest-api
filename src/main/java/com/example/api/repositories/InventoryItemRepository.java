@@ -47,4 +47,17 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, Lo
             @Param("receivingItemId") Long receivingItemId,
             @Param("type") String type,
             @Param("statusId") Long statusId);
+
+    InventoryItem findBySerialNumber(String serialNumber);
+
+    @Query("""
+            SELECT ii2
+            FROM InventoryItem ii
+            JOIN ii.inventoryItemComponents iic
+            JOIN iic.inventoryItem ii2
+            WHERE ii.id = :parentInventoryItemId
+              AND ii2.sectionArea.id = :sectionAreaId
+            """)
+    InventoryItem findComponentModelIdBySectionAreaId(Long parentInventoryItemId, Long sectionAreaId);
+
 }

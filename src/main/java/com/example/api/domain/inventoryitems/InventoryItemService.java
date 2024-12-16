@@ -3,6 +3,7 @@ package com.example.api.domain.inventoryitems;
 import com.example.api.domain.ValidationException;
 import com.example.api.domain.inventoryitems.validations.InventoryValidator;
 import com.example.api.repositories.*;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -192,5 +193,9 @@ public class InventoryItemService {
 
     public InventoryItemAssessmentInfoDTO getAssessmentComponentsFieldsByInventoryItemId(Long inventoryItemId) {
         return new InventoryItemAssessmentInfoDTO(Objects.requireNonNull(inventoryItemRepository.findById(inventoryItemId).orElse(null)));
+    }
+
+    public InventoryItemInspectionInfoDTO getInspectionComponentsFieldsBySearch(@Valid InventoryItemInspectionRequestDTO data) {
+        return new InventoryItemInspectionInfoDTO(inventoryItemRepository.findBySerialNumber(data.serialNumber()), inventoryItemRepository);
     }
 }

@@ -1,6 +1,7 @@
 package com.example.api.domain.inventoryitems;
 
 import com.example.api.domain.categories.Category;
+import com.example.api.domain.inventoryitemscomponents.InventoryItemComponents;
 import com.example.api.domain.itemcondition.ItemCondition;
 import com.example.api.domain.itemstatus.ItemStatus;
 import com.example.api.domain.locations.Location;
@@ -18,6 +19,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Table(name = "inventory_items")
 @Entity(name = "InventoryItem")
@@ -99,6 +102,9 @@ public class InventoryItem {
     private String type;
     private BigDecimal cost;
 
+    @OneToMany(mappedBy = "parentInventoryItem", orphanRemoval = true)
+    private List<InventoryItemComponents> inventoryItemComponents = new ArrayList<>();
+
     public InventoryItem(InventoryItemRegisterDTO inventory) {
         this.category = inventory.category();
         this.model = inventory.model();
@@ -108,6 +114,7 @@ public class InventoryItem {
         this.receivingItem = inventory.receivingItem();
         this.post = inventory.post();
         this.present = inventory.present();
+        this.sectionArea = inventory.sectionArea();
         this.serialNumber = inventory.serialNumber();
         this.rbid = inventory.rbid();
         this.location = inventory.location();

@@ -13,7 +13,7 @@ public record InventoryItemAssessmentInfoDTO(
         this(
                 inventoryItem.getId(),
                 inventoryItem.getSerialNumber(),
-                inventoryItem.getModel().getSections().stream().map(SectionAssessmentInfoDTO::new).toList()
+                inventoryItem.getModel().getSections().stream().sorted((a, b) -> a.getSectionOrder().compareTo(b.getSectionOrder())).map(SectionAssessmentInfoDTO::new).toList()
         );
     }
 }

@@ -127,4 +127,10 @@ public class InventoryItemController {
         return ResponseEntity.ok(fields);
     }
 
+    @PutMapping("/inspection/components-fields")
+    public ResponseEntity getInspectionComponentsFieldsByInventoryItemId(@RequestBody @Valid InventoryItemInspectionRequestDTO data) {
+        var inspectionFields = inventoryItemService.getInspectionComponentsFieldsBySearch(data);
+        return ResponseEntity.ok(inspectionFields);
+    }
+
 }

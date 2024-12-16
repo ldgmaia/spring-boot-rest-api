@@ -94,7 +94,7 @@ public class AssessmentService {
         processMainItemAssessment(data.mainItemCosmetic(), parentInventoryItem, parentAssessment);
 
         all.components().forEach(component -> {
-            var area = sectionAreaRepository.getReferenceById(component.areaId());
+            var area = sectionAreaRepository.findById(component.areaId()).orElse(null);
 
             InventoryItem inventoryItem;
             if (component.present()) {
@@ -108,7 +108,7 @@ public class AssessmentService {
                         parentInventoryItem.getReceivingItem(),
                         parentInventoryItem.getLocation(),
                         "NA",
-                        true,
+                        !component.pulled(), // if component was pulled, it should not be present in the inventory items
                         area,
                         component.serialNumber(),
                         "RBID TBD",
