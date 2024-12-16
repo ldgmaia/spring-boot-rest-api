@@ -7,9 +7,11 @@ import com.example.api.domain.categorycomponents.CategoryComponentsRegisterDTO;
 import com.example.api.domain.categoryfields.*;
 import com.example.api.domain.categorygroups.CategoryGroupsInfoDTO;
 import com.example.api.domain.fields.Field;
+import com.example.api.domain.inventoryitems.InventoryItemInspectionRequestDTO;
 import com.example.api.domain.values.ValueInfoDTO;
 import com.example.api.repositories.*;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -233,19 +235,7 @@ public class CategoryService {
                         .toList())
                 .orElseThrow(() -> new EntityNotFoundException("Category not found with id: " + categoryId));
     }
-////    public Page<Field> getAllEnabledFieldsByFieldGroupId(Long fieldGroupId, Pageable pageable) {
-////        return fieldRepository.findByEnabledTrueAndFieldGroup_Id(fieldGroupId, pageable);
-////    }
-//
-//    public CategoryByGroupDTO getEnabledFieldsByFieldGroupId(Long fieldGroupId) {
-//        var fieldGroup = fieldGroupRepository.findById(fieldGroupId).orElse(null);
-//        if (fieldGroup == null) {
-//            throw new ValidationException("Field Group ID not found");
-//        }
-//
-//        List<Category> fields = fieldRepository.findByEnabledTrueAndFieldGroup_Id(fieldGroupId);
-//        List<FieldListDTO> fieldsListDTO = fields.stream().map(FieldListDTO::new).collect(Collectors.toList());
-//
-//        return new CategoryByGroupDTO(fieldGroup.getName(), fieldsListDTO);
-//    }
+
+
+
 }

@@ -14,7 +14,7 @@ import java.util.List;
 public interface MPNRepository extends JpaRepository<MPN, Long> {
 
     @Query("""
-            SELECT NEW com.example.api.domain.mpns.MPNFieldsDTO(f.id, f.name)
+            SELECT NEW com.example.api.domain.mpns.MPNFieldsDTO(f.id, f.name, f.dataType)
             from CategoryField cf
             join cf.field f
             join cf.category c
