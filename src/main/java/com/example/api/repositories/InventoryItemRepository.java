@@ -20,12 +20,8 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, Lo
             """)
     Long countByPurchaseOrderId(@Param("purchaseOrderId") Long purchaseOrderId);
 
-//    Long countByReceivingItemId(@NotNull Long receivingItemId);
-
-    // count by receiving item id and item type
     Long countByReceivingItemIdAndType(@NotNull Long receivingItemId, @NotNull String type);
 
-    // count by receiving item id and item type and item status not in
     Long countByReceivingItemIdAndTypeAndItemStatusIdNotIn(@NotNull Long receivingItemId, @NotNull String type, @NotNull List<Long> statusIds);
 
     @Query("""
@@ -55,9 +51,21 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, Lo
             FROM InventoryItem ii
             JOIN ii.inventoryItemComponents iic
             JOIN iic.inventoryItem ii2
-            WHERE ii.id = :parentInventoryItemId
+            WHERE ii.id = :inventoryItemId
               AND ii2.sectionArea.id = :sectionAreaId
             """)
-    InventoryItem findComponentModelIdBySectionAreaId(Long parentInventoryItemId, Long sectionAreaId);
+    InventoryItem findComponentModelIdBySectionAreaId(Long inventoryItemId, Long sectionAreaId);
+
+    @Query("""
+            SELECT fv.valueData.id
+            FROM InventoryItem ii
+            JOIN ii.inventoryItemComponents iic
+            JOIN iic.inventoryItem ii2
+            JOIN ii2.inventoryItemsFieldsValues iifv
+            JOIN iifv.fieldValue fv
+            WHERE ii.id = :inventoryItemId
+              AND fv.field.id = :fieldId
+            """)
+    Long findFieldValueDataIdByInventoryItemIdAndFieldId(Long inventoryItemId, Long fieldId);
 
 }

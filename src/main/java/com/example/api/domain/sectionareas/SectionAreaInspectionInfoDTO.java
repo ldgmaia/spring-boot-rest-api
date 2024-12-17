@@ -24,7 +24,8 @@ public record SectionAreaInspectionInfoDTO(
                 sectionArea.getSectionAreaModels().stream()
                         .map(sectionAreaModel -> new ModelInspectionInfoDTO(
                                 sectionAreaModel.getModel(),
-                                getMpnId(inventoryItemRepository, inventoryItemId, sectionArea.getId())
+                                getMpnId(inventoryItemRepository, inventoryItemId, sectionArea.getId()),
+                                inventoryItemRepository
                         ))
                         .toList()
         );

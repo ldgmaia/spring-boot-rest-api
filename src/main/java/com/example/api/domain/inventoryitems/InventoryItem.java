@@ -2,6 +2,7 @@ package com.example.api.domain.inventoryitems;
 
 import com.example.api.domain.categories.Category;
 import com.example.api.domain.inventoryitemscomponents.InventoryItemComponents;
+import com.example.api.domain.inventoryitemsfieldsvalues.InventoryItemsFieldsValues;
 import com.example.api.domain.itemcondition.ItemCondition;
 import com.example.api.domain.itemstatus.ItemStatus;
 import com.example.api.domain.locations.Location;
@@ -104,6 +105,9 @@ public class InventoryItem {
 
     @OneToMany(mappedBy = "parentInventoryItem", orphanRemoval = true)
     private List<InventoryItemComponents> inventoryItemComponents = new ArrayList<>();
+
+    @OneToMany(mappedBy = "inventoryItem", orphanRemoval = true)
+    private List<InventoryItemsFieldsValues> inventoryItemsFieldsValues = new ArrayList<>();
 
     public InventoryItem(InventoryItemRegisterDTO inventory) {
         this.category = inventory.category();

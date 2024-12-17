@@ -2,6 +2,7 @@ package com.example.api.domain.models;
 
 import com.example.api.domain.categoryfields.CategoryFieldsAssessmentInfoDTO;
 import com.example.api.domain.mpns.MPNInfoDTO;
+import com.example.api.repositories.InventoryItemRepository;
 
 import java.util.List;
 
@@ -15,7 +16,7 @@ public record ModelInspectionInfoDTO(
         List<MPNInfoDTO> mpns,
         List<CategoryFieldsAssessmentInfoDTO> categoryFields
 ) {
-    public ModelInspectionInfoDTO(Model model, Long currentMpnId) {
+    public ModelInspectionInfoDTO(Model model, Long currentMpnId, InventoryItemRepository inventoryItemRepository) {
 
         this(
                 model.getId(),
@@ -25,7 +26,7 @@ public record ModelInspectionInfoDTO(
                 !model.getCategory().getParentCategory().isEmpty(),
                 model.getNeedsMpn() ? currentMpnId : null,
                 model.getMpns().stream().map(MPNInfoDTO::new).toList(),
-                model.getCategory().getCategoryFields().stream().map(CategoryFieldsAssessmentInfoDTO::new).toList()
+                model.getCategory().getCategoryFields().stream().map(cf -> new CategoryFieldsAssessmentInfoDTO(cf, inventoryItemRepository)).toList()
         );
     }
 }
