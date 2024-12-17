@@ -191,11 +191,21 @@ public class InventoryItemService {
         return new InventoryItemInfoDTO(inventoryItemRepository.getReferenceById(id));
     }
 
+    public InventoryItemInfoDTO listBySerialNumber(String serialNumber) {
+        try {
+            return new InventoryItemInfoDTO(inventoryItemRepository.findBySerialNumber(serialNumber));
+        } catch (Exception e) {
+            throw new ValidationException("Serial number not found");
+        }
+
+    }
+
     public InventoryItemAssessmentInfoDTO getAssessmentComponentsFieldsByInventoryItemId(Long inventoryItemId) {
         return new InventoryItemAssessmentInfoDTO(Objects.requireNonNull(inventoryItemRepository.findById(inventoryItemId).orElse(null)));
     }
 
     public InventoryItemInspectionInfoDTO getInspectionComponentsFieldsBySearch(@Valid InventoryItemInspectionRequestDTO data) {
-        return new InventoryItemInspectionInfoDTO(inventoryItemRepository.findBySerialNumber(data.serialNumber()), inventoryItemRepository);
+        return new InventoryItemInspectionInfoDTO(inventoryItemRepository.findByRbid(data.rbid()), inventoryItemRepository);
+//        return new InventoryItemInspectionInfoDTO(inventoryItemRepository.findBySerialNumber(data.serialNumber()), inventoryItemRepository);
     }
 }

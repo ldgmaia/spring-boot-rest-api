@@ -48,19 +48,3 @@ public record InventoryItemInfoDTO(
         );
     }
 }
-//[x]Category
-//[x]Model
-//[x]Serial Number
-//[x]MPN
-//[x]Status
-//[x]Condition
-//[x]Functional Grade --
-//[ ]Assessed On -- need to get from assessment table
-//[x]POST
-//[x]Location
-//[x]RBID
-//[x]Last Inspected --
-//[x]Inspected By --
-//[x]Cosmetic Grade --
-//[x]Company Grade  --
-//[ ]Parent Item -- TBD

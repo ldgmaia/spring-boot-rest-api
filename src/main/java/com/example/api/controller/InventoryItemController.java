@@ -74,6 +74,12 @@ public class InventoryItemController {
         }
     }
 
+    @PutMapping("/get-by-serial-number")
+    public ResponseEntity listBySerialNumber(@RequestBody @Valid InventoryItemBySerialNumberRequestDTO data) {
+        var inventoryItem = inventoryItemService.listBySerialNumber(data.serialNumber());
+        return ResponseEntity.ok(inventoryItem);
+    }
+
     @DeleteMapping("{id}")
     @Transactional
     public ResponseEntity delete(@PathVariable Long id) {
