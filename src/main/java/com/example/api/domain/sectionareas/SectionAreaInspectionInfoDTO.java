@@ -4,12 +4,14 @@ import com.example.api.domain.models.ModelInspectionInfoDTO;
 import com.example.api.repositories.InventoryItemRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public record SectionAreaInspectionInfoDTO(
         Long id,
         String name,
         Long areaOrder,
         Long currentModelId,
+        Boolean present,
         List<ModelInspectionInfoDTO> models
 ) {
     public SectionAreaInspectionInfoDTO(SectionArea sectionArea, Long inventoryItemId, InventoryItemRepository inventoryItemRepository) {
@@ -17,13 +19,34 @@ public record SectionAreaInspectionInfoDTO(
                 sectionArea.getId(),
                 sectionArea.getName(),
                 sectionArea.getAreaOrder(),
-                inventoryItemRepository.findComponentModelIdBySectionAreaId(inventoryItemId, sectionArea.getId()).getModel().getId(),
-                sectionArea.getSectionAreaModels().stream().map(sectionAreaModel -> new ModelInspectionInfoDTO(
+                getCurrentModelId(inventoryItemRepository, inventoryItemId, sectionArea.getId()),
+                getPresentStatus(inventoryItemRepository, inventoryItemId, sectionArea.getId()),
+                sectionArea.getSectionAreaModels().stream()
+                        .map(sectionAreaModel -> new ModelInspectionInfoDTO(
                                 sectionAreaModel.getModel(),
-                                inventoryItemRepository.findComponentModelIdBySectionAreaId(inventoryItemId, sectionArea.getId()).getMpn() != null ?
-                                        inventoryItemRepository.findComponentModelIdBySectionAreaId(inventoryItemId, sectionArea.getId()).getMpn().getId() : null
-                        )
-                ).toList()
+                                getMpnId(inventoryItemRepository, inventoryItemId, sectionArea.getId())
+                        ))
+                        .toList()
         );
+    }
+
+    private static Long getCurrentModelId(InventoryItemRepository repository, Long inventoryItemId, Long sectionAreaId) {
+        return Optional.ofNullable(repository.findComponentModelIdBySectionAreaId(inventoryItemId, sectionAreaId))
+                .map(component -> component.getModel().getId())
+                .orElse(null);
+    }
+
+    private static Boolean getPresentStatus(InventoryItemRepository repository, Long inventoryItemId, Long sectionAreaId) {
+        return Optional.ofNullable(repository.findComponentModelIdBySectionAreaId(inventoryItemId, sectionAreaId))
+                .map(component -> component.getPresent())
+                .orElse(false);
+    }
+
+    private static Long getMpnId(InventoryItemRepository repository, Long inventoryItemId, Long sectionAreaId) {
+        return Optional.ofNullable(repository.findComponentModelIdBySectionAreaId(inventoryItemId, sectionAreaId))
+                .map(component -> Optional.ofNullable(component.getMpn())
+                        .map(mpn -> mpn.getId())
+                        .orElse(null))
+                .orElse(null);
     }
 }
