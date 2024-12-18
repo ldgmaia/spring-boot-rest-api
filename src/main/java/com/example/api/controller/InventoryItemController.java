@@ -2,6 +2,7 @@ package com.example.api.controller;
 
 import com.example.api.domain.categories.CategoryService;
 import com.example.api.domain.categoryfields.CategoryFieldsAssessmentInfoDTO;
+import com.example.api.domain.categoryfields.CategoryFieldsInspectionInfoDTO;
 import com.example.api.domain.inventoryitems.*;
 import com.example.api.repositories.InventoryItemRepository;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -133,10 +134,15 @@ public class InventoryItemController {
         return ResponseEntity.ok(fields);
     }
 
-    @PutMapping("/inspection/components-fields")
-    public ResponseEntity getInspectionComponentsFieldsByInventoryItemId(@RequestBody @Valid InventoryItemInspectionRequestDTO data) {
-        var inspectionFields = inventoryItemService.getInspectionComponentsFieldsBySearch(data);
+    @GetMapping("/inspection/components-fields/{inventoryItemId}")
+    public ResponseEntity getInspectionComponentsFieldsByInventoryItemId(@PathVariable Long inventoryItemId) {
+        var inspectionFields = inventoryItemService.getInspectionComponentsFieldsBySearch(inventoryItemId);
         return ResponseEntity.ok(inspectionFields);
     }
 
+    @GetMapping("/inspection/main-item-fields/{inventoryItemId}")
+    public ResponseEntity getInspectionMainItemFieldsByCategoryId(@PathVariable Long inventoryItemId) {
+        List<CategoryFieldsInspectionInfoDTO> fields = categoryService.getInspectionMainItemFieldsByinventoryItemId(inventoryItemId);
+        return ResponseEntity.ok(fields);
+    }
 }

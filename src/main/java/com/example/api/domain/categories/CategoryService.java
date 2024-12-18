@@ -7,11 +7,9 @@ import com.example.api.domain.categorycomponents.CategoryComponentsRegisterDTO;
 import com.example.api.domain.categoryfields.*;
 import com.example.api.domain.categorygroups.CategoryGroupsInfoDTO;
 import com.example.api.domain.fields.Field;
-import com.example.api.domain.inventoryitems.InventoryItemInspectionRequestDTO;
 import com.example.api.domain.values.ValueInfoDTO;
 import com.example.api.repositories.*;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -41,6 +39,7 @@ public class CategoryService {
 
     @Autowired
     private List<CategoryValidator> validators; // Spring boot will automatically detect that a List is being ejected and will get all classes that implements this interface and will inject the validators automatically
+
     @Autowired
     private InventoryItemRepository inventoryItemRepository;
 
@@ -236,6 +235,12 @@ public class CategoryService {
                 .orElseThrow(() -> new EntityNotFoundException("Category not found with id: " + categoryId));
     }
 
-
-
+    public List<CategoryFieldsInspectionInfoDTO> getInspectionMainItemFieldsByinventoryItemId(Long inventoryItemId) {
+        var categoryId = inventoryItemRepository.findById(inventoryItemId).orElseThrow().getCategory().getId();
+        return categoryRepository.findById(categoryId)
+                .map(category -> category.getCategoryFields().stream()
+                        .map(cf -> new CategoryFieldsInspectionInfoDTO(cf, inventoryItemRepository))
+                        .toList())
+                .orElseThrow(() -> new EntityNotFoundException("Category not found with id: " + categoryId));
+    }
 }

@@ -46,7 +46,7 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, Lo
 
     InventoryItem findBySerialNumber(String serialNumber);
 
-    InventoryItem findByRbid(String rbid);
+//    InventoryItem findByRbid(String rbid);
 
     @Query("""
             SELECT ii2
