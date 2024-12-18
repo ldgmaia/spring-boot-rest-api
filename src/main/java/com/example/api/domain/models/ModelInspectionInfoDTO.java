@@ -16,7 +16,7 @@ public record ModelInspectionInfoDTO(
         List<MPNInfoDTO> mpns,
         List<CategoryFieldsInspectionInfoDTO> categoryFields
 ) {
-    public ModelInspectionInfoDTO(Model model, Long currentMpnId, InventoryItemRepository inventoryItemRepository) {
+    public ModelInspectionInfoDTO(Model model, Long currentMpnId, InventoryItemRepository inventoryItemRepository, Long inventoryItemId) {
 
         this(
                 model.getId(),
@@ -26,7 +26,7 @@ public record ModelInspectionInfoDTO(
                 !model.getCategory().getParentCategory().isEmpty(),
                 model.getNeedsMpn() ? currentMpnId : null,
                 model.getMpns().stream().map(MPNInfoDTO::new).toList(),
-                model.getCategory().getCategoryFields().stream().map(cf -> new CategoryFieldsInspectionInfoDTO(cf, inventoryItemRepository)).toList()
+                model.getCategory().getCategoryFields().stream().map(cf -> new CategoryFieldsInspectionInfoDTO(cf, inventoryItemRepository, inventoryItemId)).toList()
         );
     }
 }
