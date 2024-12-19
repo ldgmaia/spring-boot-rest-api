@@ -11,6 +11,7 @@ public record SectionAreaInspectionInfoDTO(
         String name,
         Long areaOrder,
         Long currentModelId,
+        String currentSerialNumber,
         Boolean present,
         List<ModelInspectionInfoDTO> models
 ) {
@@ -20,6 +21,7 @@ public record SectionAreaInspectionInfoDTO(
                 sectionArea.getName(),
                 sectionArea.getAreaOrder(),
                 getCurrentModelId(inventoryItemRepository, inventoryItemId, sectionArea.getId()),
+                getCurrentSerialNumber(inventoryItemRepository, inventoryItemId, sectionArea.getId()),
                 getPresentStatus(inventoryItemRepository, inventoryItemId, sectionArea.getId()),
                 sectionArea.getSectionAreaModels().stream()
                         .map(sectionAreaModel -> new ModelInspectionInfoDTO(
@@ -42,6 +44,12 @@ public record SectionAreaInspectionInfoDTO(
         return Optional.ofNullable(repository.findComponentModelIdBySectionAreaId(inventoryItemId, sectionAreaId))
                 .map(component -> component.getPresent())
                 .orElse(false);
+    }
+
+    private static String getCurrentSerialNumber(InventoryItemRepository repository, Long inventoryItemId, Long sectionAreaId) {
+        return Optional.ofNullable(repository.findComponentModelIdBySectionAreaId(inventoryItemId, sectionAreaId))
+                .map(component -> component.getSerialNumber())
+                .orElse(null);
     }
 
     private static Long getMpnId(InventoryItemRepository repository, Long inventoryItemId, Long sectionAreaId) {
