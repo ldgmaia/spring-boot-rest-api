@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -62,13 +63,12 @@ public class MPNService {
 
                 var field = fieldRepository.getReferenceById(mfv.fieldId());
 
-                Value valueData;
-
                 // Case 1: Both valueData and valueDataId are null
                 if (mfv.valueDataId() == null && (mfv.valueData() == null || mfv.valueData().isEmpty())) {
                     throw new ValidationException("Value is required for " + mfv);
                 }
 
+                Value valueData;
                 // Case 2: valueDataId exists
                 if (mfv.valueDataId() != null) {
                     valueData = valueRepository.getReferenceById(mfv.valueDataId());
@@ -126,26 +126,52 @@ public class MPNService {
         Map<Long, Long> existingFieldValueMap = existingFieldValues.stream()
                 .collect(Collectors.toMap(
                         fv -> fv.getFieldValue().getField().getId(),
-                        fv -> fv.getFieldValue().getValueData().getId()
+                        fv -> fv.getFieldValue().getId()
                 ));
 
-        // Create a map of the new field values for quick lookup
+        // Create a map of the new field values
         Map<Long, Long> newFieldValueMap = data.mpnFieldsValues().stream()
-                .collect(Collectors.toMap(MPNFieldValueRequestDTO::fieldId, MPNFieldValueRequestDTO::valueDataId));
+                .filter(Objects::nonNull) // Ensure no null DTOs
+                .collect(Collectors.toMap(
+                        MPNFieldValueRequestDTO::fieldId,
+                        mfv -> {
+                            var field = fieldRepository.getReferenceById(mfv.fieldId());
+                            Value valueData;
 
-        // Identify and delete the field values that are not in the request
-        for (MPNFieldsValues existingFieldValue : existingFieldValues) {
+                            // Handle valueDataId or create a new Value entity
+                            if (mfv.valueDataId() != null) {
+                                valueData = valueRepository.findById(mfv.valueDataId())
+                                        .orElseThrow(() -> new RuntimeException("ValueDataId not found: " + mfv.valueDataId()));
+                            } else {
+                                valueData = valueRepository.existsByValueData(mfv.valueData())
+                                        ? valueRepository.findByValueData(mfv.valueData())
+                                        : valueRepository.save(new Value(new ValueRegisterDTO(mfv.valueData())));
+                            }
+
+                            // Check if field value already exists
+                            FieldValue fieldValue = fieldValueRepository.findByFieldIdAndValueDataId(field.getId(), valueData.getId());
+                            if (fieldValue == null) {
+                                fieldValue = fieldValueRepository.save(new FieldValue(new FieldValueRegisterDTO(valueData, 0.0, field)));
+                            }
+                            return fieldValue.getId();
+                        }
+                ));
+
+        // Update or delete existing field values
+        existingFieldValues.forEach(existingFieldValue -> {
             Long existingFieldId = existingFieldValue.getFieldValue().getField().getId();
-            Long existingValueDataId = existingFieldValue.getFieldValue().getValueData().getId();
-            if (!newFieldValueMap.containsKey(existingFieldId) || !newFieldValueMap.get(existingFieldId).equals(existingValueDataId)) {
+            Long existingFieldValueId = existingFieldValue.getFieldValue().getId();
+
+            if (!newFieldValueMap.containsKey(existingFieldId) || !newFieldValueMap.get(existingFieldId).equals(existingFieldValueId)) {
                 mpnFieldValueRepository.delete(existingFieldValue);
             }
-        }
+        });
 
-        // Identify and add new field values that are in the request but not in the existing values
-        for (MPNFieldValueRequestDTO mfv : data.mpnFieldsValues()) {
-            if (!existingFieldValueMap.containsKey(mfv.fieldId()) || !existingFieldValueMap.get(mfv.fieldId()).equals(mfv.valueDataId())) {
-                var fieldValue = fieldValueRepository.findByFieldIdAndValueDataId(mfv.fieldId(), mfv.valueDataId());
+        // Add or update new field values
+        data.mpnFieldsValues().forEach(mfv -> {
+            if (!existingFieldValueMap.containsKey(mfv.fieldId()) || !existingFieldValueMap.get(mfv.fieldId()).equals(newFieldValueMap.get(mfv.fieldId()))) {
+                var fieldValue = fieldValueRepository.findById(newFieldValueMap.get(mfv.fieldId()))
+                        .orElseThrow(() -> new RuntimeException("FieldValue not found: " + mfv.fieldId()));
 
                 MPNFieldsValues newMpnFieldValue = new MPNFieldsValues();
                 newMpnFieldValue.setMpn(mpn);
@@ -153,17 +179,12 @@ public class MPNService {
 
                 mpnFieldValueRepository.save(newMpnFieldValue);
             }
-        }
-
-//        // Collect the updated MPN field values for the response
-//        List<MPNFieldValueInfoDTO> mpnFieldsValues = mpnFieldValueRepository.findAllByMpnId(id).stream()
-//                .map(MPNFieldValueInfoDTO::new)
-//                .toList();
+        });
 
         mpnRepository.save(mpn);
-
         return new MPNInfoDTO(mpn);
     }
+
 
     public MPNInfoDetailsDTO getMpnDetails(Long id) {
         // Fetch category details

@@ -12,7 +12,7 @@ public interface MPNFieldValueRepository extends JpaRepository<MPNFieldsValues, 
 
     @Query(value = """
             SELECT NEW com.example.api.domain.mpnfieldsvalues.MPNFieldValueInfoDTO(
-                mfv.id, f.id, f.name, vd.id, vd.valueData)
+                mfv.id, f.id, f.name, vd.id, vd.valueData, f.dataType)
             FROM MPNFieldsValues mfv
             JOIN mfv.fieldValue fv
             JOIN fv.field f

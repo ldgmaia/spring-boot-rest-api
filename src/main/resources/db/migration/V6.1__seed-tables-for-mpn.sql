@@ -8,5 +8,5 @@ VALUES
 INSERT INTO mpns_field_values
 	(fields_values_id,mpns_id)
 VALUES
-	(18,3),
-	(19,1);
+	(21,3),
+	(20,1);
