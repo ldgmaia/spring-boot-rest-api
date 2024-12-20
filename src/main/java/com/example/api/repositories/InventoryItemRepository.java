@@ -67,6 +67,18 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, Lo
             JOIN iifv.fieldValue fv
             WHERE ii.id = :inventoryItemId
               AND fv.field.id = :fieldId
+              AND ii2.category.id = :categoryId
             """)
-    Long findFieldValueDataIdByInventoryItemIdAndFieldId(Long inventoryItemId, Long fieldId);
+    Long findComponentFieldValueDataIdByInventoryItemIdAndFieldIdAndCategoryId(Long inventoryItemId, Long fieldId, Long categoryId);
+
+    @Query("""
+            SELECT fv.valueData.id
+            FROM InventoryItem ii
+            JOIN ii.inventoryItemsFieldsValues iifv
+            JOIN iifv.fieldValue fv
+            WHERE ii.id = :inventoryItemId
+              AND fv.field.id = :fieldId
+            """)
+    Long findMainItemFieldValueDataIdByInventoryItemId(Long inventoryItemId, Long fieldId);
+
 }

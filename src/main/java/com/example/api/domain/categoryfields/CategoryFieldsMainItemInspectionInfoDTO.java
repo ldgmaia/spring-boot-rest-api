@@ -7,7 +7,7 @@ import com.example.api.repositories.InventoryItemRepository;
 
 import java.util.List;
 
-public record CategoryFieldsInspectionInfoDTO(
+public record CategoryFieldsMainItemInspectionInfoDTO(
         Long id,
         DataLevel dataLevel,
         Boolean isMandatory,
@@ -21,7 +21,7 @@ public record CategoryFieldsInspectionInfoDTO(
         Long currentValueDataId,
         List<ValueInfoDTO> values
 ) {
-    public CategoryFieldsInspectionInfoDTO(CategoryFields categoryField) {
+    public CategoryFieldsMainItemInspectionInfoDTO(CategoryFields categoryField, InventoryItemRepository inventoryItemRepository, Long inventoryItemId) {
         this(
                 categoryField.getId(),
                 categoryField.getDataLevel(),
@@ -33,24 +33,7 @@ public record CategoryFieldsInspectionInfoDTO(
                 categoryField.getField().getFieldType(),
                 categoryField.getField().getIsMultiple(),
                 categoryField.getField().getEnabled(),
-                null,
-                categoryField.getField().getFieldValues().stream().map(fieldValue -> new ValueInfoDTO(fieldValue.getValueData())).toList()
-        );
-    }
-
-    public CategoryFieldsInspectionInfoDTO(CategoryFields categoryField, InventoryItemRepository inventoryItemRepository, Long inventoryItemId) {
-        this(
-                categoryField.getId(),
-                categoryField.getDataLevel(),
-                categoryField.getIsMandatory(),
-                categoryField.getPrintOnLabel(),
-                categoryField.getField().getId(),
-                categoryField.getField().getName(),
-                categoryField.getField().getDataType(),
-                categoryField.getField().getFieldType(),
-                categoryField.getField().getIsMultiple(),
-                categoryField.getField().getEnabled(),
-                inventoryItemRepository.findComponentFieldValueDataIdByInventoryItemIdAndFieldIdAndCategoryId(inventoryItemId, categoryField.getField().getId(), categoryField.getCategory().getId()),
+                inventoryItemRepository.findMainItemFieldValueDataIdByInventoryItemId(inventoryItemId, categoryField.getField().getId()),
                 categoryField.getField().getFieldValues().stream().map(fieldValue -> new ValueInfoDTO(fieldValue.getValueData())).toList()
         );
     }

@@ -235,11 +235,11 @@ public class CategoryService {
                 .orElseThrow(() -> new EntityNotFoundException("Category not found with id: " + categoryId));
     }
 
-    public List<CategoryFieldsInspectionInfoDTO> getInspectionMainItemFieldsByinventoryItemId(Long inventoryItemId) {
+    public List<CategoryFieldsMainItemInspectionInfoDTO> getInspectionMainItemFieldsByinventoryItemId(Long inventoryItemId) {
         var categoryId = inventoryItemRepository.findById(inventoryItemId).orElseThrow().getCategory().getId();
         return categoryRepository.findById(categoryId)
                 .map(category -> category.getCategoryFields().stream()
-                        .map(cf -> new CategoryFieldsInspectionInfoDTO(cf, inventoryItemRepository, inventoryItemId))
+                        .map(cf -> new CategoryFieldsMainItemInspectionInfoDTO(cf, inventoryItemRepository, inventoryItemId))
                         .toList())
                 .orElseThrow(() -> new EntityNotFoundException("Category not found with id: " + categoryId));
     }
