@@ -2,6 +2,7 @@ package com.example.api.repositories;
 
 import com.example.api.domain.inventoryitems.InventoryItem;
 import com.example.api.domain.inventoryitems.InventoryItemsByReceivingItemDTO;
+import com.example.api.domain.values.Value;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -59,7 +60,7 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, Lo
     InventoryItem findComponentModelIdBySectionAreaId(Long inventoryItemId, Long sectionAreaId);
 
     @Query("""
-            SELECT fv.valueData.id
+            SELECT fv.valueData
             FROM InventoryItem ii
             JOIN ii.inventoryItemComponents iic
             JOIN iic.inventoryItem ii2
@@ -69,16 +70,16 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, Lo
               AND fv.field.id = :fieldId
               AND ii2.category.id = :categoryId
             """)
-    Long findComponentFieldValueDataIdByInventoryItemIdAndFieldIdAndCategoryId(Long inventoryItemId, Long fieldId, Long categoryId);
+    Value findComponentFieldValueDataIdByInventoryItemIdAndFieldIdAndCategoryId(Long inventoryItemId, Long fieldId, Long categoryId);
 
     @Query("""
-            SELECT fv.valueData.id
+            SELECT fv.valueData
             FROM InventoryItem ii
             JOIN ii.inventoryItemsFieldsValues iifv
             JOIN iifv.fieldValue fv
             WHERE ii.id = :inventoryItemId
               AND fv.field.id = :fieldId
             """)
-    Long findMainItemFieldValueDataIdByInventoryItemId(Long inventoryItemId, Long fieldId);
+    Value findMainItemFieldValueDataIdByInventoryItemId(Long inventoryItemId, Long fieldId);
 
 }

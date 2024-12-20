@@ -19,6 +19,7 @@ public record CategoryFieldsMainItemInspectionInfoDTO(
         Boolean isMultiple,
         Boolean enabled,
         Long currentValueDataId,
+        String currentValueData,
         List<ValueInfoDTO> values
 ) {
     public CategoryFieldsMainItemInspectionInfoDTO(CategoryFields categoryField, InventoryItemRepository inventoryItemRepository, Long inventoryItemId) {
@@ -33,7 +34,12 @@ public record CategoryFieldsMainItemInspectionInfoDTO(
                 categoryField.getField().getFieldType(),
                 categoryField.getField().getIsMultiple(),
                 categoryField.getField().getEnabled(),
-                inventoryItemRepository.findMainItemFieldValueDataIdByInventoryItemId(inventoryItemId, categoryField.getField().getId()),
+                inventoryItemRepository.findMainItemFieldValueDataIdByInventoryItemId(inventoryItemId, categoryField.getField().getId()) != null ?
+                        inventoryItemRepository.findMainItemFieldValueDataIdByInventoryItemId(inventoryItemId, categoryField.getField().getId()).getId() :
+                        null,
+                inventoryItemRepository.findMainItemFieldValueDataIdByInventoryItemId(inventoryItemId, categoryField.getField().getId()) != null ?
+                        inventoryItemRepository.findMainItemFieldValueDataIdByInventoryItemId(inventoryItemId, categoryField.getField().getId()).getValueData() :
+                        null,
                 categoryField.getField().getFieldValues().stream().map(fieldValue -> new ValueInfoDTO(fieldValue.getValueData())).toList()
         );
     }

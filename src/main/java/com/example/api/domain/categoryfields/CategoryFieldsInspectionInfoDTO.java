@@ -19,6 +19,7 @@ public record CategoryFieldsInspectionInfoDTO(
         Boolean isMultiple,
         Boolean enabled,
         Long currentValueDataId,
+        String currentValueData,
         List<ValueInfoDTO> values
 ) {
     public CategoryFieldsInspectionInfoDTO(CategoryFields categoryField) {
@@ -33,6 +34,7 @@ public record CategoryFieldsInspectionInfoDTO(
                 categoryField.getField().getFieldType(),
                 categoryField.getField().getIsMultiple(),
                 categoryField.getField().getEnabled(),
+                null,
                 null,
                 categoryField.getField().getFieldValues().stream().map(fieldValue -> new ValueInfoDTO(fieldValue.getValueData())).toList()
         );
@@ -50,7 +52,12 @@ public record CategoryFieldsInspectionInfoDTO(
                 categoryField.getField().getFieldType(),
                 categoryField.getField().getIsMultiple(),
                 categoryField.getField().getEnabled(),
-                inventoryItemRepository.findComponentFieldValueDataIdByInventoryItemIdAndFieldIdAndCategoryId(inventoryItemId, categoryField.getField().getId(), categoryField.getCategory().getId()),
+                inventoryItemRepository.findComponentFieldValueDataIdByInventoryItemIdAndFieldIdAndCategoryId(inventoryItemId, categoryField.getField().getId(), categoryField.getCategory().getId()) != null ?
+                        inventoryItemRepository.findComponentFieldValueDataIdByInventoryItemIdAndFieldIdAndCategoryId(inventoryItemId, categoryField.getField().getId(), categoryField.getCategory().getId()).getId() :
+                        null,
+                inventoryItemRepository.findComponentFieldValueDataIdByInventoryItemIdAndFieldIdAndCategoryId(inventoryItemId, categoryField.getField().getId(), categoryField.getCategory().getId()) != null ?
+                        inventoryItemRepository.findComponentFieldValueDataIdByInventoryItemIdAndFieldIdAndCategoryId(inventoryItemId, categoryField.getField().getId(), categoryField.getCategory().getId()).getValueData() :
+                        null,
                 categoryField.getField().getFieldValues().stream().map(fieldValue -> new ValueInfoDTO(fieldValue.getValueData())).toList()
         );
     }
