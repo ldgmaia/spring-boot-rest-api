@@ -122,6 +122,18 @@ public class InventoryItemController {
         return ResponseEntity.ok(items);
     }
 
+    @GetMapping("/by-location/{locationId}")
+    public ResponseEntity<List<InventoryItemsByLocationDTO>> getInventoryItemsByLocationId(
+            @PathVariable Long locationId,
+            @RequestParam(required = false, defaultValue = "Component") String type,
+            @RequestParam(required = false, defaultValue = "2") Long statusId) {
+        System.out.println("locationId " + locationId + type + statusId);
+        List<InventoryItemsByLocationDTO> items = inventoryItemService.getInventoryItemsByLocationId(locationId, type, statusId);
+        System.out.println("items " + items);
+
+        return ResponseEntity.ok(items);
+    }
+
     @GetMapping("/assessment/components-fields/{inventoryItemId}")
     public ResponseEntity<InventoryItemAssessmentInfoDTO> getAssessmentComponentsFieldsByInventoryItemId(@PathVariable Long inventoryItemId) {
         var fields = inventoryItemService.getAssessmentComponentsFieldsByInventoryItemId(inventoryItemId);

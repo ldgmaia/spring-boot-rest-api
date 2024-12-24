@@ -47,8 +47,6 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, Lo
 
     InventoryItem findBySerialNumber(String serialNumber);
 
-//    InventoryItem findByRbid(String rbid);
-
     @Query("""
             SELECT ii2
             FROM InventoryItem ii
@@ -82,4 +80,5 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, Lo
             """)
     Value findMainItemFieldValueDataIdByInventoryItemId(Long inventoryItemId, Long fieldId);
 
+    List<InventoryItem> findByLocationIdAndTypeAndItemStatusId(Long id, String type, Long itemStatusId);
 }
