@@ -186,8 +186,8 @@ public class InventoryItemService {
         return inventoryItemRepository.findByReceivingItemId(receivingItemId, type, statusId);
     }
 
-    public List<InventoryItemsByLocationDTO> getInventoryItemsByLocationId(Long locationId, String type, Long statusId) {
-        var inventoryList = inventoryItemRepository.findByLocationIdAndTypeAndItemStatusId(locationId, type, statusId);
+    public List<InventoryItemsByLocationDTO> getInventoryItemsByLocationId(Long locationId, String type, Long statusId, Long mainItemInventoryId, Long areaId) {
+        var inventoryList = inventoryItemRepository.findByLocationIdAndTypeAndItemStatusId(locationId, type, statusId, mainItemInventoryId, areaId);
         return inventoryList.stream().map(InventoryItemsByLocationDTO::new).toList();
     }
 

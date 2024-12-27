@@ -126,10 +126,11 @@ public class InventoryItemController {
     public ResponseEntity<List<InventoryItemsByLocationDTO>> getInventoryItemsByLocationId(
             @PathVariable Long locationId,
             @RequestParam(required = false, defaultValue = "Component") String type,
-            @RequestParam(required = false, defaultValue = "2") Long statusId) {
-        System.out.println("locationId " + locationId + type + statusId);
-        List<InventoryItemsByLocationDTO> items = inventoryItemService.getInventoryItemsByLocationId(locationId, type, statusId);
-        System.out.println("items " + items);
+            @RequestParam(required = false, defaultValue = "2") Long statusId,
+            @RequestParam(required = false) Long mainItemInventoryId,
+            @RequestParam(required = false) Long areaId) {
+
+        List<InventoryItemsByLocationDTO> items = inventoryItemService.getInventoryItemsByLocationId(locationId, type, statusId, mainItemInventoryId, areaId);
 
         return ResponseEntity.ok(items);
     }

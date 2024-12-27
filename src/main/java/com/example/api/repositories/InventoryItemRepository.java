@@ -80,5 +80,27 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, Lo
             """)
     Value findMainItemFieldValueDataIdByInventoryItemId(Long inventoryItemId, Long fieldId);
 
-    List<InventoryItem> findByLocationIdAndTypeAndItemStatusId(Long id, String type, Long itemStatusId);
+    @Query("""
+            SELECT ii
+            FROM InventoryItem ii
+            WHERE ii.location.id = :locationId
+              AND ii.type = :type
+              AND ii.itemStatus.id = :itemStatusId
+            and ii.model.id in (
+            	select sam.model.id
+            	from InventoryItem ii2
+            	left join Section s on s.model.id = ii2.model.id
+            	left join SectionArea sa on sa.section.id = s.id
+            	left join SectionAreaModel sam on sa.id = sam.sectionArea.id
+            	where ii2.id = :inventoryItemId
+            	and sa.id = :sectionAreaId
+            )
+            """)
+    List<InventoryItem> findByLocationIdAndTypeAndItemStatusId(
+            @Param("locationId") Long locationId,
+            @Param("type") String type,
+            @Param("itemStatusId") Long itemStatusId,
+            @Param("inventoryItemId") Long inventoryItemId,
+            @Param("sectionAreaId") Long sectionAreaId
+    );
 }
