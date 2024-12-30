@@ -142,7 +142,7 @@ public class InventoryItemController {
     }
 
     @GetMapping("/assessment/main-item-fields/{inventoryItemId}")
-    public ResponseEntity<List<CategoryFieldsAssessmentInfoDTO>> getAssessmentMainItemFieldsByCategoryId(@PathVariable Long inventoryItemId) {
+    public ResponseEntity<List<CategoryFieldsAssessmentInfoDTO>> getAssessmentMainItemFieldsByInventoryItemId(@PathVariable Long inventoryItemId) {
         List<CategoryFieldsAssessmentInfoDTO> fields = categoryService.getAssessmentMainItemFieldsByinventoryItemId(inventoryItemId);
         return ResponseEntity.ok(fields);
     }
@@ -154,8 +154,14 @@ public class InventoryItemController {
     }
 
     @GetMapping("/inspection/main-item-fields/{inventoryItemId}")
-    public ResponseEntity getInspectionMainItemFieldsByCategoryId(@PathVariable Long inventoryItemId) {
+    public ResponseEntity getInspectionMainItemFieldsByInventoryItemId(@PathVariable Long inventoryItemId) {
         List<CategoryFieldsMainItemInspectionInfoDTO> fields = categoryService.getInspectionMainItemFieldsByinventoryItemId(inventoryItemId);
         return ResponseEntity.ok(fields);
+    }
+
+    @GetMapping("/inspection/get/inspected-info/{inventoryItemId}")
+    public ResponseEntity getInspectedItemInfoByInventoryItemId(@PathVariable Long inventoryItemId) {
+        InventoryItemInspectedItemInfoDTO inspectedInfo = inventoryItemService.getInspectedItemInfoByInventoryItemId(inventoryItemId);
+        return ResponseEntity.ok(inspectedInfo);
     }
 }

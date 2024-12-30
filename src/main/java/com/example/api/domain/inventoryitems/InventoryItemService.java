@@ -210,4 +210,8 @@ public class InventoryItemService {
     public InventoryItemInspectionInfoDTO getInspectionComponentsFieldsByInventoryItemId(Long inventoryItemId) {
         return new InventoryItemInspectionInfoDTO(inventoryItemRepository.getReferenceById(inventoryItemId), inventoryItemRepository);
     }
+
+    public InventoryItemInspectedItemInfoDTO getInspectedItemInfoByInventoryItemId(Long inventoryItemId) {
+        return new InventoryItemInspectedItemInfoDTO(inventoryItemRepository.getReferenceById(inventoryItemId));
+    }
 }
