@@ -1,6 +1,7 @@
-package com.example.api.domain.inventoryitems;
+package com.example.api.domain.inventoryitems.inspection;
 
 import com.example.api.domain.fieldsvalues.FieldValueInfoDTO;
+import com.example.api.domain.inventoryitems.InventoryItem;
 import com.example.api.domain.models.ModelInfoDTO;
 import com.example.api.domain.mpns.MPNInfoDTO;
 

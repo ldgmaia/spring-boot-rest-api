@@ -1,5 +1,6 @@
-package com.example.api.domain.inventoryitems;
+package com.example.api.domain.inventoryitems.inspection;
 
+import com.example.api.domain.inventoryitems.InventoryItem;
 import com.example.api.domain.sections.SectionInspectionInfoDTO;
 import com.example.api.repositories.InventoryItemRepository;
 

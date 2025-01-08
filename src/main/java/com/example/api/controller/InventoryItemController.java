@@ -4,6 +4,8 @@ import com.example.api.domain.categories.CategoryService;
 import com.example.api.domain.categoryfields.CategoryFieldsAssessmentInfoDTO;
 import com.example.api.domain.categoryfields.CategoryFieldsMainItemInspectionInfoDTO;
 import com.example.api.domain.inventoryitems.*;
+import com.example.api.domain.inventoryitems.inspection.InventoryItemInspectedItemInfoDTO;
+import com.example.api.domain.inventoryitems.inspection.InventoryItemSaveInspectionRequestDTO;
 import com.example.api.repositories.InventoryItemRepository;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.transaction.Transactional;
@@ -35,8 +37,8 @@ public class InventoryItemController {
     @Autowired
     private CategoryService categoryService;
 
-    @PostMapping
     @Transactional
+    @PostMapping
     public ResponseEntity<List<InventoryItemResponseDTO>> register(@RequestBody @Valid InventoryItemRequestDTO data) {
 
 //        var inventory = inventoryService.register(data);
@@ -53,6 +55,27 @@ public class InventoryItemController {
         } catch (Exception e) {
             throw new RuntimeException(e); // change this to show a meaningful message
         }
+    }
+
+    @Transactional
+    @PostMapping("/inspection/save/asd")
+    public ResponseEntity saveInspection(@RequestBody @Valid InventoryItemSaveInspectionRequestDTO data) {
+
+//        var inventory = inventoryService.register(data);
+//        var uri = uriBuilder.path("/inventory/{id}")
+//                .buildAndExpand(inventory.id())
+//                .toUri();
+//        return ResponseEntity.created(uri).body(inventory);
+//        System.out.println("data " + data);
+//        return ResponseEntity.ok("OK");
+
+        return ResponseEntity.ok(data);
+//        try {
+//            var newInventoryItems = inventoryItemService.register(data);
+//            return ResponseEntity.ok(newInventoryItems);
+//        } catch (Exception e) {
+//            throw new RuntimeException(e); // change this to show a meaningful message
+//        }
     }
 
     @GetMapping

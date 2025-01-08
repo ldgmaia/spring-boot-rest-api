@@ -1,6 +1,8 @@
 package com.example.api.domain.inventoryitems;
 
 import com.example.api.domain.ValidationException;
+import com.example.api.domain.inventoryitems.inspection.InventoryItemInspectedItemInfoDTO;
+import com.example.api.domain.inventoryitems.inspection.InventoryItemInspectionInfoDTO;
 import com.example.api.domain.inventoryitems.validations.InventoryValidator;
 import com.example.api.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
