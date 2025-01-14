@@ -1,10 +1,18 @@
 package com.example.api.domain.inventoryitems;
 
 import com.example.api.domain.ValidationException;
+import com.example.api.domain.fieldsvalues.FieldValue;
+import com.example.api.domain.fieldsvalues.FieldValueRegisterDTO;
 import com.example.api.domain.inventoryitems.inspection.InventoryItemInspectedItemInfoDTO;
 import com.example.api.domain.inventoryitems.inspection.InventoryItemInspectionInfoDTO;
+import com.example.api.domain.inventoryitems.inspection.InventoryItemSaveInspectionRequestDTO;
 import com.example.api.domain.inventoryitems.validations.InventoryValidator;
+import com.example.api.domain.inventoryitemsfieldsvalues.InventoryItemsFieldsValues;
+import com.example.api.domain.inventoryitemsfieldsvalues.InventoryItemsFieldsValuesRegisterDTO;
+import com.example.api.domain.values.Value;
+import com.example.api.domain.values.ValueRegisterDTO;
 import com.example.api.repositories.*;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -25,6 +33,12 @@ public class InventoryItemService {
     private InventoryItemRepository inventoryItemRepository;
 
     @Autowired
+    private InventoryItemsFieldValuesRepository inventoryItemsFieldValuesRepository;
+
+    @Autowired
+    private InventoryItemComponentRepository inventoryItemComponentRepository;
+
+    @Autowired
     private ReceivingItemRepository receivingItemRepository;
 
     @Autowired
@@ -32,6 +46,15 @@ public class InventoryItemService {
 
     @Autowired
     private LocationRepository locationRepository;
+
+    @Autowired
+    private FieldRepository fieldRepository;
+
+    @Autowired
+    private ValueRepository valueRepository;
+
+    @Autowired
+    private FieldValueRepository fieldValueRepository;
 
     @Autowired
     private CategoryRepository categoryRepository;
@@ -47,6 +70,9 @@ public class InventoryItemService {
 
     @Autowired
     private ItemStatusRepository itemStatusRepository;
+
+    @Autowired
+    private SectionAreaRepository sectionAreaRepository;
 
     @Autowired
     private List<InventoryValidator> validators; // Spring boot will automatically detect that a List is being ejected and will get all classes that implements this interface and will inject the validators automatically
@@ -215,5 +241,335 @@ public class InventoryItemService {
 
     public InventoryItemInspectedItemInfoDTO getInspectedItemInfoByInventoryItemId(Long inventoryItemId) {
         return new InventoryItemInspectedItemInfoDTO(inventoryItemRepository.getReferenceById(inventoryItemId));
+    }
+
+    public void saveInspection(@Valid InventoryItemSaveInspectionRequestDTO data) {
+        // Removing all fields values from the main item and its components
+//        List<Long> allInventoryItemIds = new ArrayList<>();
+        List<Long> componentInventoryItemIds = new ArrayList<>();
+
+//        allInventoryItemIds.add(data.parentInventoryItemId());
+
+        var inventoryItem = inventoryItemRepository.getReferenceById(data.parentInventoryItemId());
+
+//        var components = inventoryItemComponentRepository.findByParentInventoryItemId(data.parentInventoryItemId());
+//        for (var component : components) {
+//            allInventoryItemIds.add(component.getInventoryItem().getId());
+//        }
+
+        inventoryItemsFieldValuesRepository.deleteByInventoryItemId(data.parentInventoryItemId());
+        inventoryItemComponentRepository.updateInventoryItemsPresenceToFalse(data.parentInventoryItemId());
+        inventoryItemComponentRepository.removeParentItemOfComponents(data.parentInventoryItemId());
+
+        for (var component : data.specs()) {
+            componentInventoryItemIds.add(component.inventoryItemId());
+        }
+        for (var component : data.functional()) {
+            componentInventoryItemIds.add(component.inventoryItemId());
+        }
+        for (var component : data.cosmetic()) {
+            componentInventoryItemIds.add(component.inventoryItemId());
+        }
+        inventoryItemsFieldValuesRepository.deleteByInventoryItemIdIn(componentInventoryItemIds);
+
+        // add the parent for the new components
+        for (var component : data.specs()) {
+            if (component.present()) {
+                var ii = inventoryItemRepository.getReferenceById(component.inventoryItemId());
+                ii.setModel(modelRepository.getReferenceById(component.modelId()));
+                ii.setSectionArea(sectionAreaRepository.getReferenceById(component.areaId()));
+                ii.setPresent(true);
+                if (component.mpnId() != null) {
+                    ii.setMpn(mpnRepository.getReferenceById(component.mpnId()));
+                } else {
+                    ii.setMpn(null);
+                }
+                inventoryItemRepository.save(ii);
+
+                if (component.fields() != null) {
+                    for (var field : component.fields()) {
+                        var specField = fieldRepository.getReferenceById(field.fieldId());
+
+                        Value valueData;
+
+                        // Case 1: Both valueData and valueDataId are null
+                        if (field.valueDataId() == null && (field.valueData() == null || field.valueData().isEmpty())) {
+                            throw new ValidationException("Value is required for " + field);
+                        }
+
+                        // Case 2: valueDataId exists
+                        if (field.valueDataId() != null) {
+                            valueData = valueRepository.getReferenceById(field.valueDataId());
+                        } else {
+                            // Case 3: valueData provided, valueDataId must be null
+                            if (valueRepository.existsByValueData(field.valueData())) {
+                                valueData = valueRepository.findByValueData(field.valueData());
+                            } else {
+                                valueData = valueRepository.save(new Value(new ValueRegisterDTO(field.valueData())));
+                            }
+                        }
+
+                        // check if field value already exists
+                        FieldValue fieldValue;
+                        if (fieldValueRepository.existsByValuesDataIdAndFieldsId(valueData.getId(), specField.getId())) {
+                            fieldValue = fieldValueRepository.findByFieldIdAndValueDataId(specField.getId(), valueData.getId());
+                        } else {
+                            var newFieldvalue = new FieldValue(new FieldValueRegisterDTO(valueData, (double) 0, specField));
+                            fieldValue = fieldValueRepository.save(newFieldvalue);
+                        }
+
+                        var inventoryItemsFieldsValues = new InventoryItemsFieldsValues(new InventoryItemsFieldsValuesRegisterDTO(fieldValue, ii));
+                        inventoryItemsFieldValuesRepository.save(inventoryItemsFieldsValues);
+                    }
+                }
+            }
+        }
+
+        for (var component : data.functional()) {
+            if (component.present()) {
+                var ii = inventoryItemRepository.getReferenceById(component.inventoryItemId());
+                ii.setModel(modelRepository.getReferenceById(component.modelId()));
+                ii.setSectionArea(sectionAreaRepository.getReferenceById(component.areaId()));
+                ii.setPresent(true);
+                if (component.mpnId() != null) {
+                    ii.setMpn(mpnRepository.getReferenceById(component.mpnId()));
+                } else {
+                    ii.setMpn(null);
+                }
+                inventoryItemRepository.save(ii);
+
+                if (component.fields() != null) {
+                    for (var field : component.fields()) {
+                        var specField = fieldRepository.getReferenceById(field.fieldId());
+
+                        Value valueData;
+
+                        // Case 1: Both valueData and valueDataId are null
+                        if (field.valueDataId() == null && (field.valueData() == null || field.valueData().isEmpty())) {
+                            throw new ValidationException("Value is required for " + field);
+                        }
+
+                        // Case 2: valueDataId exists
+                        if (field.valueDataId() != null) {
+                            valueData = valueRepository.getReferenceById(field.valueDataId());
+                        } else {
+                            // Case 3: valueData provided, valueDataId must be null
+                            if (valueRepository.existsByValueData(field.valueData())) {
+                                valueData = valueRepository.findByValueData(field.valueData());
+                            } else {
+                                valueData = valueRepository.save(new Value(new ValueRegisterDTO(field.valueData())));
+                            }
+                        }
+
+                        // check if field value already exists
+                        FieldValue fieldValue;
+                        if (fieldValueRepository.existsByValuesDataIdAndFieldsId(valueData.getId(), specField.getId())) {
+                            fieldValue = fieldValueRepository.findByFieldIdAndValueDataId(specField.getId(), valueData.getId());
+                        } else {
+                            var newFieldvalue = new FieldValue(new FieldValueRegisterDTO(valueData, (double) 0, specField));
+                            fieldValue = fieldValueRepository.save(newFieldvalue);
+                        }
+
+                        var inventoryItemsFieldsValues = new InventoryItemsFieldsValues(new InventoryItemsFieldsValuesRegisterDTO(fieldValue, ii));
+                        inventoryItemsFieldValuesRepository.save(inventoryItemsFieldsValues);
+                    }
+                }
+            }
+        }
+
+        for (var component : data.cosmetic()) {
+            if (component.present()) {
+                var ii = inventoryItemRepository.getReferenceById(component.inventoryItemId());
+                ii.setModel(modelRepository.getReferenceById(component.modelId()));
+                ii.setSectionArea(sectionAreaRepository.getReferenceById(component.areaId()));
+                ii.setPresent(true);
+                if (component.mpnId() != null) {
+                    ii.setMpn(mpnRepository.getReferenceById(component.mpnId()));
+                } else {
+                    ii.setMpn(null);
+                }
+                inventoryItemRepository.save(ii);
+
+                if (component.fields() != null) {
+                    for (var field : component.fields()) {
+                        var specField = fieldRepository.getReferenceById(field.fieldId());
+
+                        Value valueData;
+
+                        // Case 1: Both valueData and valueDataId are null
+                        if (field.valueDataId() == null && (field.valueData() == null || field.valueData().isEmpty())) {
+                            throw new ValidationException("Value is required for " + field);
+                        }
+
+                        // Case 2: valueDataId exists
+                        if (field.valueDataId() != null) {
+                            valueData = valueRepository.getReferenceById(field.valueDataId());
+                        } else {
+                            // Case 3: valueData provided, valueDataId must be null
+                            if (valueRepository.existsByValueData(field.valueData())) {
+                                valueData = valueRepository.findByValueData(field.valueData());
+                            } else {
+                                valueData = valueRepository.save(new Value(new ValueRegisterDTO(field.valueData())));
+                            }
+                        }
+
+                        // check if field value already exists
+                        FieldValue fieldValue;
+                        if (fieldValueRepository.existsByValuesDataIdAndFieldsId(valueData.getId(), specField.getId())) {
+                            fieldValue = fieldValueRepository.findByFieldIdAndValueDataId(specField.getId(), valueData.getId());
+                        } else {
+                            var newFieldvalue = new FieldValue(new FieldValueRegisterDTO(valueData, (double) 0, specField));
+                            fieldValue = fieldValueRepository.save(newFieldvalue);
+                        }
+
+                        var inventoryItemsFieldsValues = new InventoryItemsFieldsValues(new InventoryItemsFieldsValuesRegisterDTO(fieldValue, ii));
+                        inventoryItemsFieldValuesRepository.save(inventoryItemsFieldsValues);
+                    }
+                }
+            }
+        }
+        inventoryItemComponentRepository.addParentItemToComponents(data.parentInventoryItemId(), componentInventoryItemIds);
+
+        for (var field : data.mainItemSpecs()) {
+            var specField = fieldRepository.getReferenceById(field.fieldId());
+
+            Value valueData;
+
+            // Case 1: Both valueData and valueDataId are null
+            if (field.valueDataId() == null && (field.valueData() == null || field.valueData().isEmpty())) {
+                throw new ValidationException("Value is required for " + field);
+            }
+
+            // Case 2: valueDataId exists
+            if (field.valueDataId() != null) {
+                valueData = valueRepository.getReferenceById(field.valueDataId());
+            } else {
+                // Case 3: valueData provided, valueDataId must be null
+                if (valueRepository.existsByValueData(field.valueData())) {
+                    valueData = valueRepository.findByValueData(field.valueData());
+                } else {
+                    valueData = valueRepository.save(new Value(new ValueRegisterDTO(field.valueData())));
+                }
+            }
+
+            // check if field value already exists
+            FieldValue fieldValue;
+            if (fieldValueRepository.existsByValuesDataIdAndFieldsId(valueData.getId(), specField.getId())) {
+                fieldValue = fieldValueRepository.findByFieldIdAndValueDataId(specField.getId(), valueData.getId());
+            } else {
+                var newFieldvalue = new FieldValue(new FieldValueRegisterDTO(valueData, (double) 0, specField));
+                fieldValue = fieldValueRepository.save(newFieldvalue);
+            }
+
+            var inventoryItemsFieldsValues = new InventoryItemsFieldsValues(new InventoryItemsFieldsValuesRegisterDTO(fieldValue, inventoryItem));
+            inventoryItemsFieldValuesRepository.save(inventoryItemsFieldsValues);
+        }
+
+        for (var field : data.mainItemFunctional()) {
+            var specField = fieldRepository.getReferenceById(field.fieldId());
+
+            Value valueData;
+
+            // Case 1: Both valueData and valueDataId are null
+            if (field.valueDataId() == null && (field.valueData() == null || field.valueData().isEmpty())) {
+                throw new ValidationException("Value is required for " + field);
+            }
+
+            // Case 2: valueDataId exists
+            if (field.valueDataId() != null) {
+                valueData = valueRepository.getReferenceById(field.valueDataId());
+            } else {
+                // Case 3: valueData provided, valueDataId must be null
+                if (valueRepository.existsByValueData(field.valueData())) {
+                    valueData = valueRepository.findByValueData(field.valueData());
+                } else {
+                    valueData = valueRepository.save(new Value(new ValueRegisterDTO(field.valueData())));
+                }
+            }
+
+            // check if field value already exists
+            FieldValue fieldValue;
+            if (fieldValueRepository.existsByValuesDataIdAndFieldsId(valueData.getId(), specField.getId())) {
+                fieldValue = fieldValueRepository.findByFieldIdAndValueDataId(specField.getId(), valueData.getId());
+            } else {
+                var newFieldvalue = new FieldValue(new FieldValueRegisterDTO(valueData, (double) 0, specField));
+                fieldValue = fieldValueRepository.save(newFieldvalue);
+            }
+
+            var inventoryItemsFieldsValues = new InventoryItemsFieldsValues(new InventoryItemsFieldsValuesRegisterDTO(fieldValue, inventoryItem));
+            inventoryItemsFieldValuesRepository.save(inventoryItemsFieldsValues);
+        }
+
+        for (var field : data.mainItemCosmetic()) {
+            var specField = fieldRepository.getReferenceById(field.fieldId());
+
+            Value valueData;
+
+            // Case 1: Both valueData and valueDataId are null
+            if (field.valueDataId() == null && (field.valueData() == null || field.valueData().isEmpty())) {
+                throw new ValidationException("Value is required for " + field);
+            }
+
+            // Case 2: valueDataId exists
+            if (field.valueDataId() != null) {
+                valueData = valueRepository.getReferenceById(field.valueDataId());
+            } else {
+                // Case 3: valueData provided, valueDataId must be null
+                if (valueRepository.existsByValueData(field.valueData())) {
+                    valueData = valueRepository.findByValueData(field.valueData());
+                } else {
+                    valueData = valueRepository.save(new Value(new ValueRegisterDTO(field.valueData())));
+                }
+            }
+
+            // check if field value already exists
+            FieldValue fieldValue;
+            if (fieldValueRepository.existsByValuesDataIdAndFieldsId(valueData.getId(), specField.getId())) {
+                fieldValue = fieldValueRepository.findByFieldIdAndValueDataId(specField.getId(), valueData.getId());
+            } else {
+                var newFieldvalue = new FieldValue(new FieldValueRegisterDTO(valueData, (double) 0, specField));
+                fieldValue = fieldValueRepository.save(newFieldvalue);
+            }
+
+            var inventoryItemsFieldsValues = new InventoryItemsFieldsValues(new InventoryItemsFieldsValuesRegisterDTO(fieldValue, inventoryItem));
+            inventoryItemsFieldValuesRepository.save(inventoryItemsFieldsValues);
+        }
+
+
+//        System.out.println("data " + data);
+//        var parentInventoryItem = inventoryItemRepository.getReferenceById(data.parentInventoryItemId());
+//        var iifv2 = inventoryItemsFieldValuesRepository.findByInventoryItemId(data.parentInventoryItemId());
+//        // loop through the list of fields and print the values
+//        for (var field : iifv2) {
+//            System.out.println("Main item field " + field.getInventoryItem().getId() + " " + field.getFieldValue().getId() + " " + field.getFieldValue().getField().getId() + " " + field.getFieldValue().getValueData().getId());
+//        }
+//
+//        var components = inventoryItemComponentRepository.findByParentInventoryItemId(data.parentInventoryItemId());
+//        for (var component : components) {
+//            System.out.println("field " + component.getInventoryItem().getId() + " " + component.getInventoryItem().getId() + " " + component.getInventoryItem().getModel().getName());
+//            var iifv = inventoryItemsFieldValuesRepository.findByInventoryItemId(component.getInventoryItem().getId());
+//            // loop through the list of fields and print the values
+//            for (var field : iifv) {
+//                System.out.println("     field " + field.getFieldValue().getId() + " " + field.getFieldValue().getField().getId() + " " + field.getFieldValue().getValueData().getId());
+//            }
+//        }
+
+        /*
+
+        clean all connections for the parent item and then add again
+
+            check current components
+                compare with new components
+
+            inventoryItems
+                - change grade
+            inventoryItemsFieldsValues
+                - update for main item and components
+                - update if new field values were created
+            inventoryItemsComponents
+                - if removed, remove parent
+                - if added, add parent
+
+         */
     }
 }

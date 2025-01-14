@@ -10,7 +10,7 @@ public record InventoryItemSaveInspectionAreaRequestDTO(
         Long areaId,
         Long modelId,
         Long mpnId,
-        String serialNumber,
+        Long inventoryItemId,
         Boolean needsMpn,
         Boolean needsSerialNumber,
         List<InventoryItemSaveInspectionFieldsRequestDTO> fields

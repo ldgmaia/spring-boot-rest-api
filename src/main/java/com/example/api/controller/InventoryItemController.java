@@ -13,6 +13,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -53,29 +54,20 @@ public class InventoryItemController {
             var newInventoryItems = inventoryItemService.register(data);
             return ResponseEntity.ok(newInventoryItems);
         } catch (Exception e) {
-            throw new RuntimeException(e); // change this to show a meaningful message
+            throw new RuntimeException(e);
         }
     }
 
     @Transactional
-    @PostMapping("/inspection/save/asd")
+    @Modifying
+    @PostMapping("/inspection/save")
     public ResponseEntity saveInspection(@RequestBody @Valid InventoryItemSaveInspectionRequestDTO data) {
-
-//        var inventory = inventoryService.register(data);
-//        var uri = uriBuilder.path("/inventory/{id}")
-//                .buildAndExpand(inventory.id())
-//                .toUri();
-//        return ResponseEntity.created(uri).body(inventory);
-//        System.out.println("data " + data);
-//        return ResponseEntity.ok("OK");
-
-        return ResponseEntity.ok(data);
-//        try {
-//            var newInventoryItems = inventoryItemService.register(data);
-//            return ResponseEntity.ok(newInventoryItems);
-//        } catch (Exception e) {
-//            throw new RuntimeException(e); // change this to show a meaningful message
-//        }
+        try {
+            inventoryItemService.saveInspection(data);
+            return ResponseEntity.ok("ok");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @GetMapping
@@ -86,15 +78,15 @@ public class InventoryItemController {
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<InventoryItemInfoDTO> listById(@PathVariable Long id) {
+    public ResponseEntity listById(@PathVariable Long id) {
         try {
             var inventoryItem = inventoryItemService.listById(id);
-            if (inventoryItem != null) {
-                return ResponseEntity.ok(inventoryItem);
-            }
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.ok(inventoryItem);
+
         } catch (Exception e) {
-            throw new RuntimeException(e);
+//            throw new RuntimeException(e);
+            Map<String, String> jsonResponse = Map.of("message", "Item not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(jsonResponse);
         }
     }
 

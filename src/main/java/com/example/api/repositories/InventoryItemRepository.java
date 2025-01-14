@@ -57,6 +57,17 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, Lo
             """)
     InventoryItem findComponentModelIdBySectionAreaId(Long inventoryItemId, Long sectionAreaId);
 
+//    @Query("""
+//            SELECT ii2
+//            FROM InventoryItem ii
+//            JOIN ii.inventoryItemComponents iic
+//            JOIN iic.inventoryItem ii2
+//            WHERE ii.id = :inventoryItemId
+//              AND ii2.sectionArea.id = :sectionAreaId
+//            """)
+//    List<InventoryItem> findComponentsBySectionAreaId(Long inventoryItemId, Long sectionAreaId);
+
+
     @Query("""
             SELECT fv.valueData
             FROM InventoryItem ii
