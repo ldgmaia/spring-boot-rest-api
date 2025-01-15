@@ -3,9 +3,7 @@ package com.example.api.domain.inventoryitems;
 import com.example.api.domain.ValidationException;
 import com.example.api.domain.fieldsvalues.FieldValue;
 import com.example.api.domain.fieldsvalues.FieldValueRegisterDTO;
-import com.example.api.domain.inventoryitems.inspection.InventoryItemInspectedItemInfoDTO;
-import com.example.api.domain.inventoryitems.inspection.InventoryItemInspectionInfoDTO;
-import com.example.api.domain.inventoryitems.inspection.InventoryItemSaveInspectionRequestDTO;
+import com.example.api.domain.inventoryitems.inspection.*;
 import com.example.api.domain.inventoryitems.validations.InventoryValidator;
 import com.example.api.domain.inventoryitemsfieldsvalues.InventoryItemsFieldsValues;
 import com.example.api.domain.inventoryitemsfieldsvalues.InventoryItemsFieldsValuesRegisterDTO;
@@ -18,10 +16,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class InventoryItemService {
@@ -244,144 +240,67 @@ public class InventoryItemService {
     }
 
     public void saveInspection(@Valid InventoryItemSaveInspectionRequestDTO data) {
+
+        // Combine all main fields into one
+        List<InventoryItemSaveInspectionFieldsRequestDTO> mainItemFieldsCombined = new ArrayList<>();
+        mainItemFieldsCombined.addAll(data.mainItemSpecs());
+        mainItemFieldsCombined.addAll(data.mainItemFunctional());
+        mainItemFieldsCombined.addAll(data.mainItemCosmetic());
+
+        // Combine all components into one
+        List<InventoryItemSaveInspectionAreaRequestDTO> componentsCombined = new ArrayList<>();
+        componentsCombined.addAll(data.specs());
+        componentsCombined.addAll(data.functional());
+        componentsCombined.addAll(data.cosmetic());
+
+        // Group by areaId
+        Map<Long, InventoryItemSaveInspectionAreaRequestDTO> groupedByArea = componentsCombined.stream()
+                .collect(Collectors.toMap(
+                        InventoryItemSaveInspectionAreaRequestDTO::areaId,
+                        dto -> dto,
+                        (existing, incoming) -> {
+                            // Merge fields and other properties
+                            List<InventoryItemSaveInspectionFieldsRequestDTO> mergedFields = new ArrayList<>();
+                            if (existing.fields() != null) mergedFields.addAll(existing.fields());
+                            if (incoming.fields() != null) mergedFields.addAll(incoming.fields());
+
+                            return new InventoryItemSaveInspectionAreaRequestDTO(
+                                    existing.present() != null ? existing.present() : incoming.present(),
+                                    existing.section() != null ? existing.section() : incoming.section(),
+                                    existing.area() != null ? existing.area() : incoming.area(),
+                                    existing.areaId(),
+                                    existing.modelId() != null ? existing.modelId() : incoming.modelId(),
+                                    existing.mpnId() != null ? existing.mpnId() : incoming.mpnId(),
+                                    existing.inventoryItemId() != null ? existing.inventoryItemId() : incoming.inventoryItemId(),
+                                    existing.needsMpn() != null ? existing.needsMpn() : incoming.needsMpn(),
+                                    existing.needsSerialNumber() != null ? existing.needsSerialNumber() : incoming.needsSerialNumber(),
+                                    mergedFields
+                            );
+                        }
+                ));
+
+        // Return the grouped and merged results as a list
+//        return new ArrayList<>(groupedByArea.values());
+//        System.out.println("mainItemFieldsCombined " + mainItemFieldsCombined);
+
         // Removing all fields values from the main item and its components
-//        List<Long> allInventoryItemIds = new ArrayList<>();
-        List<Long> componentInventoryItemIds = new ArrayList<>();
-
-//        allInventoryItemIds.add(data.parentInventoryItemId());
-
-        var inventoryItem = inventoryItemRepository.getReferenceById(data.parentInventoryItemId());
-
-//        var components = inventoryItemComponentRepository.findByParentInventoryItemId(data.parentInventoryItemId());
-//        for (var component : components) {
-//            allInventoryItemIds.add(component.getInventoryItem().getId());
-//        }
-
         inventoryItemsFieldValuesRepository.deleteByInventoryItemId(data.parentInventoryItemId());
         inventoryItemComponentRepository.updateInventoryItemsPresenceToFalse(data.parentInventoryItemId());
         inventoryItemComponentRepository.removeParentItemOfComponents(data.parentInventoryItemId());
 
-        for (var component : data.specs()) {
-            componentInventoryItemIds.add(component.inventoryItemId());
-        }
-        for (var component : data.functional()) {
-            componentInventoryItemIds.add(component.inventoryItemId());
-        }
-        for (var component : data.cosmetic()) {
-            componentInventoryItemIds.add(component.inventoryItemId());
+        List<Long> componentInventoryItemIds = new ArrayList<>();
+        for (InventoryItemSaveInspectionAreaRequestDTO area : groupedByArea.values()) {
+            componentInventoryItemIds.add(area.inventoryItemId());
         }
         inventoryItemsFieldValuesRepository.deleteByInventoryItemIdIn(componentInventoryItemIds);
 
         // add the parent for the new components
-        for (var component : data.specs()) {
+        for (var component : groupedByArea.values()) {
             if (component.present()) {
                 var ii = inventoryItemRepository.getReferenceById(component.inventoryItemId());
                 ii.setModel(modelRepository.getReferenceById(component.modelId()));
                 ii.setSectionArea(sectionAreaRepository.getReferenceById(component.areaId()));
-                ii.setPresent(true);
-                if (component.mpnId() != null) {
-                    ii.setMpn(mpnRepository.getReferenceById(component.mpnId()));
-                } else {
-                    ii.setMpn(null);
-                }
-                inventoryItemRepository.save(ii);
-
-                if (component.fields() != null) {
-                    for (var field : component.fields()) {
-                        var specField = fieldRepository.getReferenceById(field.fieldId());
-
-                        Value valueData;
-
-                        // Case 1: Both valueData and valueDataId are null
-                        if (field.valueDataId() == null && (field.valueData() == null || field.valueData().isEmpty())) {
-                            throw new ValidationException("Value is required for " + field);
-                        }
-
-                        // Case 2: valueDataId exists
-                        if (field.valueDataId() != null) {
-                            valueData = valueRepository.getReferenceById(field.valueDataId());
-                        } else {
-                            // Case 3: valueData provided, valueDataId must be null
-                            if (valueRepository.existsByValueData(field.valueData())) {
-                                valueData = valueRepository.findByValueData(field.valueData());
-                            } else {
-                                valueData = valueRepository.save(new Value(new ValueRegisterDTO(field.valueData())));
-                            }
-                        }
-
-                        // check if field value already exists
-                        FieldValue fieldValue;
-                        if (fieldValueRepository.existsByValuesDataIdAndFieldsId(valueData.getId(), specField.getId())) {
-                            fieldValue = fieldValueRepository.findByFieldIdAndValueDataId(specField.getId(), valueData.getId());
-                        } else {
-                            var newFieldvalue = new FieldValue(new FieldValueRegisterDTO(valueData, (double) 0, specField));
-                            fieldValue = fieldValueRepository.save(newFieldvalue);
-                        }
-
-                        var inventoryItemsFieldsValues = new InventoryItemsFieldsValues(new InventoryItemsFieldsValuesRegisterDTO(fieldValue, ii));
-                        inventoryItemsFieldValuesRepository.save(inventoryItemsFieldsValues);
-                    }
-                }
-            }
-        }
-
-        for (var component : data.functional()) {
-            if (component.present()) {
-                var ii = inventoryItemRepository.getReferenceById(component.inventoryItemId());
-                ii.setModel(modelRepository.getReferenceById(component.modelId()));
-                ii.setSectionArea(sectionAreaRepository.getReferenceById(component.areaId()));
-                ii.setPresent(true);
-                if (component.mpnId() != null) {
-                    ii.setMpn(mpnRepository.getReferenceById(component.mpnId()));
-                } else {
-                    ii.setMpn(null);
-                }
-                inventoryItemRepository.save(ii);
-
-                if (component.fields() != null) {
-                    for (var field : component.fields()) {
-                        var specField = fieldRepository.getReferenceById(field.fieldId());
-
-                        Value valueData;
-
-                        // Case 1: Both valueData and valueDataId are null
-                        if (field.valueDataId() == null && (field.valueData() == null || field.valueData().isEmpty())) {
-                            throw new ValidationException("Value is required for " + field);
-                        }
-
-                        // Case 2: valueDataId exists
-                        if (field.valueDataId() != null) {
-                            valueData = valueRepository.getReferenceById(field.valueDataId());
-                        } else {
-                            // Case 3: valueData provided, valueDataId must be null
-                            if (valueRepository.existsByValueData(field.valueData())) {
-                                valueData = valueRepository.findByValueData(field.valueData());
-                            } else {
-                                valueData = valueRepository.save(new Value(new ValueRegisterDTO(field.valueData())));
-                            }
-                        }
-
-                        // check if field value already exists
-                        FieldValue fieldValue;
-                        if (fieldValueRepository.existsByValuesDataIdAndFieldsId(valueData.getId(), specField.getId())) {
-                            fieldValue = fieldValueRepository.findByFieldIdAndValueDataId(specField.getId(), valueData.getId());
-                        } else {
-                            var newFieldvalue = new FieldValue(new FieldValueRegisterDTO(valueData, (double) 0, specField));
-                            fieldValue = fieldValueRepository.save(newFieldvalue);
-                        }
-
-                        var inventoryItemsFieldsValues = new InventoryItemsFieldsValues(new InventoryItemsFieldsValuesRegisterDTO(fieldValue, ii));
-                        inventoryItemsFieldValuesRepository.save(inventoryItemsFieldsValues);
-                    }
-                }
-            }
-        }
-
-        for (var component : data.cosmetic()) {
-            if (component.present()) {
-                var ii = inventoryItemRepository.getReferenceById(component.inventoryItemId());
-                ii.setModel(modelRepository.getReferenceById(component.modelId()));
-                ii.setSectionArea(sectionAreaRepository.getReferenceById(component.areaId()));
+                ii.setItemStatus(itemStatusRepository.getReferenceById(3L)); // in use
                 ii.setPresent(true);
                 if (component.mpnId() != null) {
                     ii.setMpn(mpnRepository.getReferenceById(component.mpnId()));
@@ -430,7 +349,9 @@ public class InventoryItemService {
         }
         inventoryItemComponentRepository.addParentItemToComponents(data.parentInventoryItemId(), componentInventoryItemIds);
 
-        for (var field : data.mainItemSpecs()) {
+        var inventoryItem = inventoryItemRepository.getReferenceById(data.parentInventoryItemId());
+
+        for (var field : mainItemFieldsCombined) {
             var specField = fieldRepository.getReferenceById(field.fieldId());
 
             Value valueData;
@@ -464,77 +385,7 @@ public class InventoryItemService {
             var inventoryItemsFieldsValues = new InventoryItemsFieldsValues(new InventoryItemsFieldsValuesRegisterDTO(fieldValue, inventoryItem));
             inventoryItemsFieldValuesRepository.save(inventoryItemsFieldsValues);
         }
-
-        for (var field : data.mainItemFunctional()) {
-            var specField = fieldRepository.getReferenceById(field.fieldId());
-
-            Value valueData;
-
-            // Case 1: Both valueData and valueDataId are null
-            if (field.valueDataId() == null && (field.valueData() == null || field.valueData().isEmpty())) {
-                throw new ValidationException("Value is required for " + field);
-            }
-
-            // Case 2: valueDataId exists
-            if (field.valueDataId() != null) {
-                valueData = valueRepository.getReferenceById(field.valueDataId());
-            } else {
-                // Case 3: valueData provided, valueDataId must be null
-                if (valueRepository.existsByValueData(field.valueData())) {
-                    valueData = valueRepository.findByValueData(field.valueData());
-                } else {
-                    valueData = valueRepository.save(new Value(new ValueRegisterDTO(field.valueData())));
-                }
-            }
-
-            // check if field value already exists
-            FieldValue fieldValue;
-            if (fieldValueRepository.existsByValuesDataIdAndFieldsId(valueData.getId(), specField.getId())) {
-                fieldValue = fieldValueRepository.findByFieldIdAndValueDataId(specField.getId(), valueData.getId());
-            } else {
-                var newFieldvalue = new FieldValue(new FieldValueRegisterDTO(valueData, (double) 0, specField));
-                fieldValue = fieldValueRepository.save(newFieldvalue);
-            }
-
-            var inventoryItemsFieldsValues = new InventoryItemsFieldsValues(new InventoryItemsFieldsValuesRegisterDTO(fieldValue, inventoryItem));
-            inventoryItemsFieldValuesRepository.save(inventoryItemsFieldsValues);
-        }
-
-        for (var field : data.mainItemCosmetic()) {
-            var specField = fieldRepository.getReferenceById(field.fieldId());
-
-            Value valueData;
-
-            // Case 1: Both valueData and valueDataId are null
-            if (field.valueDataId() == null && (field.valueData() == null || field.valueData().isEmpty())) {
-                throw new ValidationException("Value is required for " + field);
-            }
-
-            // Case 2: valueDataId exists
-            if (field.valueDataId() != null) {
-                valueData = valueRepository.getReferenceById(field.valueDataId());
-            } else {
-                // Case 3: valueData provided, valueDataId must be null
-                if (valueRepository.existsByValueData(field.valueData())) {
-                    valueData = valueRepository.findByValueData(field.valueData());
-                } else {
-                    valueData = valueRepository.save(new Value(new ValueRegisterDTO(field.valueData())));
-                }
-            }
-
-            // check if field value already exists
-            FieldValue fieldValue;
-            if (fieldValueRepository.existsByValuesDataIdAndFieldsId(valueData.getId(), specField.getId())) {
-                fieldValue = fieldValueRepository.findByFieldIdAndValueDataId(specField.getId(), valueData.getId());
-            } else {
-                var newFieldvalue = new FieldValue(new FieldValueRegisterDTO(valueData, (double) 0, specField));
-                fieldValue = fieldValueRepository.save(newFieldvalue);
-            }
-
-            var inventoryItemsFieldsValues = new InventoryItemsFieldsValues(new InventoryItemsFieldsValuesRegisterDTO(fieldValue, inventoryItem));
-            inventoryItemsFieldValuesRepository.save(inventoryItemsFieldsValues);
-        }
-
+    }
 
 //        System.out.println("data " + data);
 //        var parentInventoryItem = inventoryItemRepository.getReferenceById(data.parentInventoryItemId());
@@ -571,5 +422,5 @@ public class InventoryItemService {
                 - if added, add parent
 
          */
-    }
+//    }
 }

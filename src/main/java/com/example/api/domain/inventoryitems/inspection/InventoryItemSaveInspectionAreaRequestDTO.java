@@ -3,7 +3,6 @@ package com.example.api.domain.inventoryitems.inspection;
 import java.util.List;
 
 public record InventoryItemSaveInspectionAreaRequestDTO(
-
         Boolean present,
         String section,
         String area,
@@ -14,6 +13,5 @@ public record InventoryItemSaveInspectionAreaRequestDTO(
         Boolean needsMpn,
         Boolean needsSerialNumber,
         List<InventoryItemSaveInspectionFieldsRequestDTO> fields
-
 ) {
 }
