@@ -207,7 +207,7 @@ public class InventoryItemService {
     }
 
     public List<InventoryItemsByReceivingItemDTO> getInventoryItemsByReceivingItemId(Long receivingItemId, String type, Long statusId) {
-        return inventoryItemRepository.findByReceivingItemId(receivingItemId, type, statusId);
+        return inventoryItemRepository.findByReceivingItemId(receivingItemId, type);
     }
 
     public List<InventoryItemsByLocationDTO> getInventoryItemsByLocationId(Long locationId, String type, Long statusId, Long mainItemInventoryId, Long areaId) {

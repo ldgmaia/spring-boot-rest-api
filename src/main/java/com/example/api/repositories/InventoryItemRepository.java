@@ -37,13 +37,11 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, Lo
             JOIN ii.location l
             WHERE ii.receivingItem.id = :receivingItemId
             AND ii.type = :type
-            AND ii.itemStatus.id = :statusId
             ORDER BY ii.createdAt DESC
             """)
     List<InventoryItemsByReceivingItemDTO> findByReceivingItemId(
             @Param("receivingItemId") Long receivingItemId,
-            @Param("type") String type,
-            @Param("statusId") Long statusId);
+            @Param("type") String type);
 
     InventoryItem findBySerialNumber(String serialNumber);
 
