@@ -13,6 +13,7 @@ public record ReceivingItemInfoDTO(
         String description,
         Long quantityToReceive,
         Long quantityAlreadyReceived,
+        Long quantityAssessed,
         Long quantityAdded,
         Long receivingId,
         String createdBy,
@@ -29,6 +30,7 @@ public record ReceivingItemInfoDTO(
                 receivingItem.getDescription(),
                 receivingItem.getQuantityToReceive(),
                 receivingItem.getQuantityAlreadyReceived(),
+                inventoryItemRepository.countByReceivingItemIdAndTypeAndItemStatusIdNot(receivingItem.getId(), "Main", 1L),
                 inventoryItemRepository.countByReceivingItemIdAndType(receivingItem.getId(), "Main"),  // Fetch quantityAdded
                 receivingItem.getReceiving().getId(),
                 receivingItem.getCreatedBy().getUsername(),
@@ -47,6 +49,7 @@ public record ReceivingItemInfoDTO(
                 receivingItem.getDescription(),
                 receivingItem.getQuantityToReceive(),
                 receivingItem.getQuantityAlreadyReceived(),
+                null,
                 null,
                 receivingItem.getReceiving().getId(),
                 receivingItem.getCreatedBy().getUsername(),

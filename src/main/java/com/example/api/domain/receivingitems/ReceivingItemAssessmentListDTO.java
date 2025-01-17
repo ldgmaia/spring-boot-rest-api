@@ -13,6 +13,7 @@ public record ReceivingItemAssessmentListDTO(
         String status,
         Long quantityOrdered,
         Long quantityAlreadyReceived,
+        Long quantityAssessed,
         Long quantityAdded,
         String supplierName,
         LocalDateTime createdAt) {
@@ -24,6 +25,7 @@ public record ReceivingItemAssessmentListDTO(
             String status,
             Long quantityOrdered,
             Long quantityAlreadyReceived,
+            Long quantityAssessed,
             Long quantityAdded,
             String supplierName,
             LocalDateTime createdAt) {
@@ -34,6 +36,7 @@ public record ReceivingItemAssessmentListDTO(
         this.status = status;
         this.quantityOrdered = quantityOrdered;
         this.quantityAlreadyReceived = quantityAlreadyReceived;
+        this.quantityAssessed = quantityAssessed;
         this.quantityAdded = quantityAdded;
         this.supplierName = supplierName;
         this.createdAt = createdAt;
@@ -56,6 +59,7 @@ public record ReceivingItemAssessmentListDTO(
                 receivingItem.getStatus(),
                 receivingItem.getPurchaseOrderItem() != null ? receivingItem.getPurchaseOrderItem().getQuantityOrdered() : null,
                 receivingItem.getQuantityAlreadyReceived(),
+                inventoryItemRepository.countByReceivingItemIdAndTypeAndItemStatusIdNot(receivingItem.getId(), "Main", 1L),
                 inventoryItemRepository.countByReceivingItemIdAndType(receivingItem.getId(), "Main"),  // Fetch quantityAdded
                 receivingItem.getReceiving().getSupplier().getName(),
                 receivingItem.getCreatedAt()

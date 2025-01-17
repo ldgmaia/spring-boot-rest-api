@@ -46,7 +46,7 @@ public class ReceivingItemController {
 //        Page<ReceivingItemAssessmentListDTO> receivingsByStatus =
 
 
-        return ResponseEntity.ok(receivingItemRepository.findByReceiving_TypeAndStatusInAndQuantityAlreadyReceivedGreaterThanOrderByUpdatedAtDesc(ReceivingType.PO, status, 0L, pagination).stream().map(ri -> {
+        return ResponseEntity.ok(receivingItemRepository.findByReceivingTypeAndStatusInAndQuantityAlreadyReceivedGreaterThanOrderByUpdatedAtDesc(ReceivingType.PO, status, 0L, pagination).stream().map(ri -> {
             return new ReceivingItemAssessmentListDTO(ri, inventoryItemRepository);
         }).toList());
     }

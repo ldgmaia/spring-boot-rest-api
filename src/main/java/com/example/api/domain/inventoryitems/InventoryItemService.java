@@ -141,9 +141,7 @@ public class InventoryItemService {
 
                     inventoryItemRepository.save(inventory);
                     receivingItemRepository.getReferenceById(receivingItem.getId()).setQuantityAlreadyReceived(receivingItemRepository.getReferenceById(receivingItem.getId()).getQuantityAlreadyReceived() + 1);
-
-
-                    receivingItemRepository.getReferenceById(receivingItem.getId()).setStatus("Pending Assessment"); // this line works properly
+                    receivingItemRepository.getReferenceById(receivingItem.getId()).setStatus("Pending Assessment");
 
                     inventoryItems.add(new InventoryItemResponseDTO(inventory));
                 }

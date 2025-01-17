@@ -25,6 +25,8 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, Lo
 
     Long countByReceivingItemIdAndTypeAndItemStatusIdNotIn(@NotNull Long receivingItemId, @NotNull String type, @NotNull List<Long> statusIds);
 
+    Long countByReceivingItemIdAndTypeAndItemStatusIdNot(Long receivingItemId, String type, Long itemStatusId);
+
     @Query("""
             SELECT new com.example.api.domain.inventoryitems.InventoryItemsByReceivingItemDTO(
                 ii, m.name, m2.name, ic.name, is2.name, l.name

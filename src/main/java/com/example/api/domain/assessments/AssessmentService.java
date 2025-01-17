@@ -65,6 +65,9 @@ public class AssessmentService {
     @Autowired
     private ItemConditionRepository itemConditionRepository;
 
+    @Autowired
+    private ReceivingItemRepository receivingItemRepository;
+
     public void createAssessment(AssessmentRequestDTO data) {
 
         var parentInventoryItem = inventoryItemRepository.getReferenceById(data.parentInventoryItemId());
@@ -180,7 +183,22 @@ public class AssessmentService {
             parentInventoryItem.getReceivingItem().setStatus("Pending Assessment");
         }
 
-        parentInventoryItem.setItemStatus(itemStatusRepository.getReferenceById(2L)); // In Stock
+        // 2 means 'In Stock'
+        // 3 means 'In Use'
+        parentInventoryItem.setItemStatus(itemStatusRepository.getReferenceById(2L));
+
+        // set the Receiving status accordingly
+        var totalAssessed = inventoryItemRepository.countByReceivingItemIdAndTypeAndItemStatusIdNot(parentInventoryItem.getReceivingItem().getId(), "Main", 1L);
+        var totalAlreadyReceived = receivingItemRepository.getReferenceById(parentInventoryItem.getReceivingItem().getId()).getQuantityAlreadyReceived();
+        var totalAdded = inventoryItemRepository.countByReceivingItemIdAndType(parentInventoryItem.getReceivingItem().getId(), "Main");
+
+        if (totalAlreadyReceived.equals(totalAssessed)) {
+            receivingItemRepository.getReferenceById(parentInventoryItem.getReceivingItem().getId()).setStatus("Assessment Complete");
+        }
+
+        if (totalAdded > totalAssessed) {
+            receivingItemRepository.getReferenceById(parentInventoryItem.getReceivingItem().getId()).setStatus("Pending Assessment");
+        }
     }
 
     private void processComponentAssessmentFields(List<AssessmentRequestFieldsDTO> fields, InventoryItem inventoryItem, Assessment assessment) {

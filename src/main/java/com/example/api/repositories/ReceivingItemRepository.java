@@ -34,20 +34,20 @@ public interface ReceivingItemRepository extends JpaRepository<ReceivingItem, Lo
             """)
     List<ReceivingItem> findByPurchaseOrderItemId(@Param("purchaseOrderItemId") Long purchaseOrderItemId);
 
-    Page<ReceivingItem> findByReceiving_TypeAndStatusInAndQuantityAlreadyReceivedGreaterThanOrderByUpdatedAtDesc(ReceivingType type, String[] statuses, Long quantityAlreadyReceived, Pageable pageable);
+    Page<ReceivingItem> findByReceivingTypeAndStatusInAndQuantityAlreadyReceivedGreaterThanOrderByUpdatedAtDesc(ReceivingType type, String[] statuses, Long quantityAlreadyReceived, Pageable pageable);
 
-    List<ReceivingItem> findByReceiving_TypeAndQuantityAlreadyReceivedGreaterThanAndStatusInOrderByCreatedAtDesc(ReceivingType type, Long quantityAlreadyReceived, String[] statuses);
+    List<ReceivingItem> findByReceivingTypeAndQuantityAlreadyReceivedGreaterThanAndStatusInOrderByCreatedAtDesc(ReceivingType type, Long quantityAlreadyReceived, String[] statuses);
 
-    List<ReceivingItem> findByReceiving_TypeAndPurchaseOrderItem_PurchaseOrder_PoNumberAndStatusInOrderByCreatedAtDesc(ReceivingType type, String poNumber, String[] statuses);
+    List<ReceivingItem> findByReceivingTypeAndPurchaseOrderItemPurchaseOrderPoNumberAndStatusInOrderByCreatedAtDesc(ReceivingType type, String poNumber, String[] statuses);
 
-    List<ReceivingItem> findByInventoryItems_SerialNumberAndReceiving_TypeOrderByCreatedAtDesc(String serialNumber, ReceivingType receivingType);
+    List<ReceivingItem> findByInventoryItemsSerialNumberAndReceivingTypeOrderByCreatedAtDesc(String serialNumber, ReceivingType receivingType);
 
-    List<ReceivingItem> findByReceiving_TypeAndReceiving_IdAndStatusInOrderByCreatedAtDesc(ReceivingType type, Long id, String[] statuses);
+    List<ReceivingItem> findByReceivingTypeAndReceivingIdAndStatusInOrderByCreatedAtDesc(ReceivingType type, Long id, String[] statuses);
 
-    List<ReceivingItem> findByReceiving_TypeAndStatusInAndDescriptionContainingOrderByCreatedAtDesc(ReceivingType type, String[] statuses, String description);
+    List<ReceivingItem> findByReceivingTypeAndStatusInAndDescriptionContainingOrderByCreatedAtDesc(ReceivingType type, String[] statuses, String description);
 
-    List<ReceivingItem> findByReceiving_TypeAndStatusInAndReceiving_TrackingLadingOrderByCreatedAtDesc(ReceivingType type, String[] statuses, String trackingLading);
+    List<ReceivingItem> findByReceivingTypeAndStatusInAndReceivingTrackingLadingOrderByCreatedAtDesc(ReceivingType type, String[] statuses, String trackingLading);
 
-    List<ReceivingItem> findByReceiving_TypeAndStatusInAndReceiving_Supplier_IdOrderByCreatedAtDesc(ReceivingType type, String[] statuses, Long id);
+    List<ReceivingItem> findByReceivingTypeAndStatusInAndReceivingSupplierIdOrderByCreatedAtDesc(ReceivingType type, String[] statuses, Long id);
 
 }
