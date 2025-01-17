@@ -15,7 +15,6 @@ public record InventoryItemInfoDTO(
         MPNInfoDTO mpn,
         ItemConditionInfoDTO itemCondition,
         ItemStatusInfoDTO itemStatus,
-//        ReceivingItemInfoDTO receivingItem,
         UserInfoDTO createdBy,
         UserInfoDTO inspectedBy,
         LocationInfoDTO location,
@@ -25,7 +24,8 @@ public record InventoryItemInfoDTO(
         String cosmeticGrade,
         String companyGrade,
         String functionalGrade,
-        LocalDateTime lastInspectedAt
+        LocalDateTime lastInspectedAt,
+        Long receivingItemId
 ) {
     public InventoryItemInfoDTO(InventoryItem inventoryItem) {
         this(
@@ -34,7 +34,6 @@ public record InventoryItemInfoDTO(
                 inventoryItem.getMpn() == null ? null : new MPNInfoDTO(inventoryItem.getMpn()),
                 new ItemConditionInfoDTO(inventoryItem.getItemCondition()),
                 new ItemStatusInfoDTO(inventoryItem.getItemStatus()),
-//                new ReceivingItemInfoDTO(inventoryItem.getReceivingItem()),
                 new UserInfoDTO(inventoryItem.getCreatedBy()),
                 inventoryItem.getInspectedBy() == null ? null : new UserInfoDTO(inventoryItem.getInspectedBy()),
                 new LocationInfoDTO(inventoryItem.getLocation()),
@@ -44,7 +43,8 @@ public record InventoryItemInfoDTO(
                 inventoryItem.getCosmeticGrade(),
                 inventoryItem.getCompanyGrade(),
                 inventoryItem.getFunctionalGrade(),
-                inventoryItem.getLastInspectedAt()
+                inventoryItem.getLastInspectedAt(),
+                inventoryItem.getReceivingItem() == null ? null : inventoryItem.getReceivingItem().getId()
         );
     }
 }

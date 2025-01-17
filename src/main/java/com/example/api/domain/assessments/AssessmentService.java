@@ -67,8 +67,13 @@ public class AssessmentService {
 
     public void createAssessment(AssessmentRequestDTO data) {
 
+        var parentInventoryItem = inventoryItemRepository.getReferenceById(data.parentInventoryItemId());
+
+        if (parentInventoryItem.getItemStatus().getId() != 1L) {
+            throw new ValidationException("Item is already in inventory");
+        }
+
         var all = groupFieldsByAreaId(data);
-        var parentInventoryItem = inventoryItemRepository.getReferenceById(all.parentInventoryItemId());
 
         Assessment parentAssessment = new Assessment(new AssessmentRegisterDTO(
                 "Item",

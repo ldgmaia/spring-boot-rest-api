@@ -30,8 +30,12 @@ public class AssessmentController {
     @PostMapping
     @Transactional
     public ResponseEntity createAssessment(@RequestBody @Valid AssessmentRequestDTO data) {
-        assessmentService.createAssessment(data);
-        return ResponseEntity.ok("OK");
+        try {
+            assessmentService.createAssessment(data);
+            return ResponseEntity.ok("ok");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
 //    @PostMapping("/save/draft")
