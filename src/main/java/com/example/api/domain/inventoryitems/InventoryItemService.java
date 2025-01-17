@@ -249,9 +249,15 @@ public class InventoryItemService {
 
         // Combine all components into one
         List<InventoryItemSaveInspectionAreaRequestDTO> componentsCombined = new ArrayList<>();
-        componentsCombined.addAll(data.specs());
-        componentsCombined.addAll(data.functional());
-        componentsCombined.addAll(data.cosmetic());
+        if (data.specs() != null) {
+            componentsCombined.addAll(data.specs());
+        }
+        if (data.functional() != null) {
+            componentsCombined.addAll(data.functional());
+        }
+        if (data.cosmetic() != null) {
+            componentsCombined.addAll(data.cosmetic());
+        }
 
         // Group by areaId
         Map<Long, InventoryItemSaveInspectionAreaRequestDTO> groupedByArea = componentsCombined.stream()
