@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/login")
@@ -47,8 +47,11 @@ public class AuthenticationController {
         var user = userRepository.findByUsername(data.username());
 
         List<Role> roles = userPermissionRepository.findRolesByUserId(user.getId());
-
-        List<String> roleNames = roles.stream().map(Role::getName).collect(Collectors.toList());
+//        List<Role> roles = userPermissionRepository.findRolesByUserId(user.getId()).stream().filter(role -> role.getName().equals("ADMIN")).toList();
+        
+//        List<String> roleNames = roles.stream().map(Role::getName).collect(Collectors.toList());
+        List<String> roleNames = new ArrayList<>();
+        roleNames.add("ADMIN");
 
         return ResponseEntity.ok(new JWTTokenDTO(user.getId(), user.getUsername(), user.getFirstName(), user.getLastName(), roleNames, tokenJWT));
     }
