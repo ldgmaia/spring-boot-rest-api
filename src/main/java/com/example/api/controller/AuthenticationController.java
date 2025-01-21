@@ -48,7 +48,7 @@ public class AuthenticationController {
 
         List<Role> roles = userPermissionRepository.findRolesByUserId(user.getId());
 //        List<Role> roles = userPermissionRepository.findRolesByUserId(user.getId()).stream().filter(role -> role.getName().equals("ADMIN")).toList();
-        
+
 //        List<String> roleNames = roles.stream().map(Role::getName).collect(Collectors.toList());
         List<String> roleNames = new ArrayList<>();
         roleNames.add("ADMIN");
