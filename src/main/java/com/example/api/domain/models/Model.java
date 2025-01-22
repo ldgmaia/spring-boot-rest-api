@@ -6,6 +6,8 @@ import com.example.api.domain.sections.Section;
 import com.example.api.domain.users.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,9 +16,10 @@ import java.util.List;
 @Entity(name = "Model")
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @EqualsAndHashCode(of = "id")
+@EntityListeners(AuditingEntityListener.class)
 public class Model {
 
     @Id
@@ -38,6 +41,7 @@ public class Model {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
+    @CreatedBy()
     private User createdBy;
 
     @OneToMany(mappedBy = "model", orphanRemoval = true)
@@ -54,7 +58,6 @@ public class Model {
         this.needsMpn = data.needsMpn();
         this.category = data.category();
         this.enabled = true;
-        this.createdBy = currentUser;
     }
 
     public void deactivate() {

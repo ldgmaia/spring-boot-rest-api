@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS users (
 
     PRIMARY KEY (id),
     UNIQUE (username),
-    INDEX idx_username (username)
+    INDEX (username)
 );
 
 CREATE TABLE IF NOT EXISTS roles (
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS roles (
 
     PRIMARY KEY (id),
     UNIQUE (name),
-    INDEX idx_name (name)
+    INDEX (name)
 );
 
 CREATE TABLE IF NOT EXISTS users_roles (
@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS permissions (
 
     PRIMARY KEY (id),
     UNIQUE (route),
-    INDEX idx_route (route)
+    INDEX (route)
 );
 
 CREATE TABLE IF NOT EXISTS permissions_roles (
@@ -60,6 +60,6 @@ CREATE TABLE IF NOT EXISTS permissions_roles (
     PRIMARY KEY (id),
 	FOREIGN KEY (permission_id) REFERENCES permissions (id) ON DELETE CASCADE ON UPDATE CASCADE,
 	FOREIGN KEY (role_id) REFERENCES roles (id) ON DELETE CASCADE ON UPDATE CASCADE,
-	UNIQUE uc_role_id_permission_id (role_id, permission_id),
-	INDEX idx_role_id_permission_id (role_id, permission_id)
+	UNIQUE (role_id, permission_id),
+	INDEX (role_id, permission_id)
 );

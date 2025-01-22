@@ -1,14 +1,13 @@
 package com.example.api.controller;
 
-import com.example.api.domain.ValidationException;
-import com.example.api.domain.users.User;
 import com.example.api.domain.users.UserInfoDTO;
 import com.example.api.domain.users.UserRegisterDTO;
-import com.example.api.repositories.UserRepository;
+import com.example.api.domain.users.UserService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,21 +21,21 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class UserController {
 
     @Autowired
-    private UserRepository repository;
+    private UserService userService;
 
     @PostMapping
     @Transactional
+    @Modifying
     public ResponseEntity register(@RequestBody @Valid UserRegisterDTO data, UriComponentsBuilder uriBuilder) {
+        var newUser = userService.register(data);
+        var uri = uriBuilder.path("/users/{id}").buildAndExpand(newUser.getId()).toUri();
 
-        if (repository.findByUsername(data.username()) != null) {
-            throw new ValidationException("User already registered");
-        }
-
-        var user = new User(data);
-        repository.save(user);
-
-        var uri = uriBuilder.path("/users/{id}").buildAndExpand(user.getId()).toUri();
-
-        return ResponseEntity.created(uri).body(new UserInfoDTO(user));
+        return ResponseEntity.created(uri).body(new UserInfoDTO(newUser));
     }
+
+//    @PutMapping("/deactivate/{userId}")
+//    public ResponseEntity<Void> deactivateUser(@PathVariable Long userId) {
+//        userService.deactivateUser(userId);
+//        return ResponseEntity.noContent().build();
+//    }
 }
