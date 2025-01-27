@@ -241,9 +241,18 @@ public class InventoryItemService {
 
         // Combine all main fields into one
         List<InventoryItemSaveInspectionFieldsRequestDTO> mainItemFieldsCombined = new ArrayList<>();
-        mainItemFieldsCombined.addAll(data.mainItemSpecs());
-        mainItemFieldsCombined.addAll(data.mainItemFunctional());
-        mainItemFieldsCombined.addAll(data.mainItemCosmetic());
+
+        if (data.mainItemSpecs() != null) {
+            mainItemFieldsCombined.addAll(data.mainItemSpecs());
+        }
+
+        if (data.mainItemFunctional() != null) {
+            mainItemFieldsCombined.addAll(data.mainItemFunctional());
+        }
+
+        if (data.mainItemCosmetic() != null) {
+            mainItemFieldsCombined.addAll(data.mainItemCosmetic());
+        }
 
         // Combine all components into one
         List<InventoryItemSaveInspectionAreaRequestDTO> componentsCombined = new ArrayList<>();
