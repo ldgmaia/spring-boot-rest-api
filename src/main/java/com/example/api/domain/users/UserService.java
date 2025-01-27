@@ -30,11 +30,9 @@ public class UserService {
         }
 
         var user = new User(data);
-
         var storageLocation = storageLocationRepository.findByName("Technicians");
 
         var storageLevel = new StorageLevel(user.getUsername(), storageLocation);
-        System.out.println("level " + storageLevel.getCreatedBy());
         storageLevelRepository.save(storageLevel);
 
         user.setStorageLevel(storageLevel);
