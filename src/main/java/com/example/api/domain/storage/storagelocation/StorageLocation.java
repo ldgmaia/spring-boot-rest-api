@@ -1,6 +1,5 @@
 package com.example.api.domain.storage.storagelocation;
 
-import com.example.api.domain.receivingitems.ReceivingItem;
 import com.example.api.domain.storage.storagearea.StorageArea;
 import com.example.api.domain.storage.storagelevel.StorageLevel;
 import com.example.api.domain.users.User;
@@ -45,15 +44,22 @@ public class StorageLocation {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "storage_area_id")
-    private StorageArea area;
+    private StorageArea storageArea;
 
-    @OneToMany(mappedBy = "location", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "storageLocation", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<StorageLevel> levels = new ArrayList<>();
 
     public StorageLocation(StorageLocationRequestDTO data, StorageArea area) {
         this.name = data.name();
         this.description = data.description();
-        this.area = area;
+        this.storageArea = area;
+        this.enabled = true;
+    }
+
+    public StorageLocation(StorageLocationUpdateDTO data, StorageArea area) {
+        this.name = data.name();
+        this.description = data.description();
+        this.storageArea = area;
         this.enabled = true;
     }
 }

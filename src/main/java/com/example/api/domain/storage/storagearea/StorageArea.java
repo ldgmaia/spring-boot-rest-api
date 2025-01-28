@@ -46,7 +46,7 @@ public class StorageArea {
     @JoinColumn(name = "storage_zone_id")
     private StorageZone storageZone;
 
-    @OneToMany(mappedBy = "area", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "storageArea", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<StorageLocation> locations = new ArrayList<>();
 
     public StorageArea(StorageAreaRequestDTO data, StorageZone zone) {

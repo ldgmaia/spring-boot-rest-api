@@ -49,7 +49,7 @@ public class StorageService {
                 storageLocationRepository.save(locationEntity);
 
                 location.levels().forEach(level -> {
-                    StorageLevel levelEntity = new StorageLevel(level, locationEntity);
+                    StorageLevel levelEntity = new StorageLevel(level.name(), locationEntity);
                     storageLevelRepository.save(levelEntity);
                 });
             });
@@ -92,16 +92,103 @@ public class StorageService {
                 }
                 // Create new area
                 area = new StorageArea(areaDTO, storageZone);
+                storageAreaRepository.save(area);
             }
 
-            storageAreaRepository.save(area);
+            // Handle locations within the area
+            Map<Long, StorageLocation> existingLocationsMap = storageLocationRepository.findAllByStorageAreaId(area.getId()).stream()
+                    .collect(Collectors.toMap(StorageLocation::getId, location -> location));
+
+            Map<Long, StorageLocation> newLocationsMap = new HashMap<>();
+
+            areaDTO.locations().forEach(locationDTO -> {
+                StorageLocation location;
+
+                if (locationDTO.id() != null) {
+                    // Update existing location
+                    location = existingLocationsMap.get(locationDTO.id());
+                    if (location == null) {
+                        throw new RuntimeException("Location not found with ID: " + locationDTO.id());
+                    }
+                    location.setName(locationDTO.name());
+                    location.setDescription(locationDTO.description());
+                } else {
+                    // Persist the area before creating new locations
+                    if (area.getId() == null) {
+                        storageAreaRepository.save(area);
+                    }
+
+                    // Check for duplicates by name within the same area
+                    Optional<StorageLocation> existingLocationOpt = storageLocationRepository.findByStorageAreaIdAndName(area.getId(), locationDTO.name());
+                    if (existingLocationOpt.isPresent()) {
+                        throw new UniqueConstraintViolationException(
+                                MessageFormat.format("Duplicate location \"{0}\" in area \"{1}\"", locationDTO.name(), area.getName()));
+                    }
+                    // Create and associate new location
+                    location = new StorageLocation(locationDTO, area);
+                    storageLocationRepository.save(location);
+                }
+
+                // Handle levels within the location
+                Map<Long, StorageLevel> existingLevelsMap = storageLevelRepository.findAllByStorageLocationId(location.getId()).stream()
+                        .collect(Collectors.toMap(StorageLevel::getId, level -> level));
+
+                Map<Long, StorageLevel> newLevelsMap = new HashMap<>();
+
+                locationDTO.levels().forEach(levelDTO -> {
+                    StorageLevel level;
+
+                    if (levelDTO.id() != null) {
+                        // Update existing level
+                        level = existingLevelsMap.get(levelDTO.id());
+                        if (level == null) {
+                            throw new RuntimeException("Level not found with ID: " + levelDTO.id());
+                        }
+                        level.setName(levelDTO.name());
+                    } else {
+                        // Persist the location before creating new levels
+                        if (location.getId() == null) {
+                            storageLocationRepository.save(location);
+                        }
+
+                        // Check for duplicates by name within the same location
+                        Optional<StorageLevel> existingLevelOpt = storageLevelRepository.findByStorageLocationIdAndName(location.getId(), levelDTO.name());
+                        if (existingLevelOpt.isPresent()) {
+                            throw new UniqueConstraintViolationException(
+                                    MessageFormat.format("Duplicate level \"{0}\" in location \"{1}\"", levelDTO.name(), location.getName()));
+                        }
+                        // Create and associate new level
+                        level = new StorageLevel(levelDTO.name(), location);
+                        storageLevelRepository.save(level);
+                    }
+
+                    newLevelsMap.put(level.getId(), level);
+                });
+
+                // Remove levels no longer present in the update for this location
+                for (Long id : existingLevelsMap.keySet()) {
+                    if (!newLevelsMap.containsKey(id)) {
+                        System.out.println("id " + id);
+                        storageLevelRepository.deleteById(id);
+                    }
+                }
+
+                newLocationsMap.put(location.getId(), location);
+            });
+
+            // Remove locations no longer present in the update for this area
+            for (Long id : existingLocationsMap.keySet()) {
+                if (!newLocationsMap.containsKey(id)) {
+                    storageLocationRepository.deleteById(id);
+                }
+            }
+
             newAreasMap.put(area.getId(), area);
         });
 
         // Remove areas no longer present in the update
         for (Long id : existingAreasMap.keySet()) {
             if (!newAreasMap.containsKey(id)) {
-                System.out.println("deleting area " + id);
                 storageAreaRepository.deleteById(id);
             }
         }

@@ -42,7 +42,7 @@ public class StorageZone {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "storageZone", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "storageZone", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<StorageArea> areas = new ArrayList<>();
 
     public StorageZone(StorageRequestDTO data) {

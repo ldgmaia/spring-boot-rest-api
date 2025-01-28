@@ -29,7 +29,7 @@ public class StorageLevel {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "storage_location_id")
-    private StorageLocation location;
+    private StorageLocation storageLocation;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
@@ -45,6 +45,6 @@ public class StorageLevel {
     public StorageLevel(String level, StorageLocation location) {
         this.name = level;
         this.enabled = true;
-        this.location = location;
+        this.storageLocation = location;
     }
 }
