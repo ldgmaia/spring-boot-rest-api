@@ -1,8 +1,8 @@
 services:
-  newrbms-backend-prod:
+  newrbms-backend-alpha:
     build:
       context: .
-    container_name: newrbms-backend-prod
+    container_name: newrbms-backend-alpha
     ports:
       - 8091:8091
     volumes:
