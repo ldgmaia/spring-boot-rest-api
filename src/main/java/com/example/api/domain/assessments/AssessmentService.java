@@ -7,6 +7,7 @@ import com.example.api.domain.fieldsvalues.FieldValue;
 import com.example.api.domain.fieldsvalues.FieldValueRegisterDTO;
 import com.example.api.domain.inventoryitems.InventoryItem;
 import com.example.api.domain.inventoryitems.InventoryItemRegisterDTO;
+import com.example.api.domain.inventoryitems.InventoryItemService;
 import com.example.api.domain.inventoryitemscomponents.InventoryItemComponentRegisterDTO;
 import com.example.api.domain.inventoryitemscomponents.InventoryItemComponents;
 import com.example.api.domain.inventoryitemsfieldsvalues.InventoryItemsFieldsValues;
@@ -68,6 +69,9 @@ public class AssessmentService {
     @Autowired
     private ReceivingItemRepository receivingItemRepository;
 
+    @Autowired
+    private InventoryItemService inventoryItemService;
+
     public void createAssessment(AssessmentRequestDTO data) {
 
         var parentInventoryItem = inventoryItemRepository.getReferenceById(data.parentInventoryItemId());
@@ -119,10 +123,12 @@ public class AssessmentService {
                         !component.pulled(), // if component was pulled, it should not be present in the inventory items
                         area,
                         component.serialNumber(),
-                        "RBID TBD",
+                        "temp",
                         "Component",
                         BigDecimal.ZERO
                 ));
+                inventoryItemRepository.save(inventoryItem);
+                inventoryItem.setRbid(inventoryItemService.generateRBID(inventoryItem));
                 inventoryItemRepository.save(inventoryItem);
                 inventoryItemComponentRepository.save(new InventoryItemComponents(new InventoryItemComponentRegisterDTO(component.pulled() ? null : parentInventoryItem, inventoryItem)));
             } else {

@@ -134,12 +134,15 @@ public class InventoryItemService {
                             null,
                             null,
                             String.valueOf(uniqueIdentifier), // Serial number - must be given an appropriate value later
-                            String.valueOf(uniqueIdentifier), // The RBID will be generated following a formula. This random number is just temporary
+                            String.valueOf(uniqueIdentifier), // This is a temporal value to be replaces with the method generateRBID
                             typeValue,
                             receivingItem.getAdditionalItem() ? BigDecimal.valueOf(0L) : poiUnitPrice
                     ));
 
                     inventoryItemRepository.save(inventory);
+                    inventory.setRbid(generateRBID(inventory));
+                    inventoryItemRepository.save(inventory);
+
                     receivingItemRepository.getReferenceById(receivingItem.getId()).setQuantityAlreadyReceived(receivingItemRepository.getReferenceById(receivingItem.getId()).getQuantityAlreadyReceived() + 1);
                     receivingItemRepository.getReferenceById(receivingItem.getId()).setStatus("Pending Assessment");
 
@@ -182,6 +185,8 @@ public class InventoryItemService {
 
             // Save the inventory to generate the ID
             inventoryItemRepository.save(inventory);
+            String rbid = generateRBID(inventory);//to generate with partNumber
+            inventory.setRbid(rbid);
             receivingItemRepository.getReferenceById(receivingItem.getId()).setStatus("Pending Assessment");
 
             inventoryItems.add(new InventoryItemResponseDTO(inventory));
@@ -398,6 +403,18 @@ public class InventoryItemService {
             var inventoryItemsFieldsValues = new InventoryItemsFieldsValues(new InventoryItemsFieldsValuesRegisterDTO(fieldValue, inventoryItem));
             inventoryItemsFieldValuesRepository.save(inventoryItemsFieldsValues);
         }
+    }
+
+    public String generateRBID(InventoryItem inventoryItem) {
+        // Fetch required data
+        String partNumber = inventoryItem.getMpn() != null ? inventoryItem.getMpn().getName() : "";
+        String model = inventoryItem.getModel().getName(); // Assuming Model has a 'name' field
+        String category = inventoryItem.getCategory().getName(); // Assuming Category has a 'name' field
+        String po = inventoryItem.getReceivingItem().getPurchaseOrderItem().getPurchaseOrder().getPoNumber(); // Assuming PurchaseOrder has a 'poNumber' field
+        Long inventoryItemsId = inventoryItem.getId();
+
+        // Build the RBID
+        return String.format("%s+%s+%s+%s+%d", partNumber, model, category, po, inventoryItemsId);
     }
 
 //        System.out.println("data " + data);
