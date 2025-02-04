@@ -9,13 +9,6 @@ import java.util.List;
 
 public interface FieldValueRepository extends JpaRepository<FieldValue, Long> {
 
-
-//    FieldValue findById(Long fieldValueId);
-
-//    Boolean existsByName(String name);
-
-//    Boolean existsByValuesDataIdAndFieldsId(Long valueDataId, Long fieldId);
-
     @Query(value = """
             SELECT EXISTS (
                 SELECT 1
@@ -31,7 +24,7 @@ public interface FieldValueRepository extends JpaRepository<FieldValue, Long> {
     }
 
     @Query(value = """
-                SELECT NEW com.example.api.domain.values.ValueInfoDTO(vd.id, vd.valueData, vd.enabled)
+                SELECT NEW com.example.api.domain.values.ValueInfoDTO(vd.id, vd.valueData, vd.enabled, fv.score)
                 FROM Value vd
                 JOIN FieldValue fv ON vd.id = fv.valueData.id
                 WHERE fv.field.id = :fieldId
