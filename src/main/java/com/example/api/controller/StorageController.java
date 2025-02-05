@@ -3,6 +3,9 @@ package com.example.api.controller;
 import com.example.api.domain.storage.StorageRequestDTO;
 import com.example.api.domain.storage.StorageService;
 import com.example.api.domain.storage.StorageUpdateDTO;
+import com.example.api.domain.storage.storagearea.StorageAreaMoveDTO;
+import com.example.api.domain.storage.storagelevel.StorageLevelMoveDTO;
+import com.example.api.domain.storage.storagelocation.StorageLocationMoveDTO;
 import com.example.api.domain.storage.storagezone.StorageZoneInfoDTO;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.transaction.Transactional;
@@ -45,8 +48,24 @@ public class StorageController {
         return ResponseEntity.ok("OK");
     }
 
-//    @GetMapping("/{id}")
-//    public ResponseEntity<StorageLevelLocationDisplayDTO> getLocationById(@PathVariable Long id) {
-//        return ResponseEntity.ok(storageService.getLocationDisplayById(id));
-//    }
+    @Transactional
+    @PutMapping("/move-level")
+    public ResponseEntity<Void> moveStorageLevel(@RequestBody StorageLevelMoveDTO request) {
+        storageService.moveStorageLevel(request);
+        return ResponseEntity.ok().build();
+    }
+
+    @Transactional
+    @PutMapping("/move-location")
+    public ResponseEntity<Void> moveStorageLocation(@RequestBody StorageLocationMoveDTO request) {
+        storageService.moveStorageLocation(request);
+        return ResponseEntity.ok().build();
+    }
+
+    @Transactional
+    @PutMapping("/move-area")
+    public ResponseEntity<Void> moveStorageArea(@RequestBody StorageAreaMoveDTO request) {
+        storageService.moveStorageArea(request);
+        return ResponseEntity.ok().build();
+    }
 }
