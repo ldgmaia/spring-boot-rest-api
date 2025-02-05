@@ -86,7 +86,13 @@ public class MPNService {
                 if (fieldValueRepository.existsByValuesDataIdAndFieldsId(valueData.getId(), field.getId())) {
                     fieldValue = fieldValueRepository.findByFieldIdAndValueDataId(field.getId(), valueData.getId());
                 } else {
-                    var newFieldvalue = new FieldValue(new FieldValueRegisterDTO(valueData, (double) 0, field));
+                    Double score = null;
+                    if (field.getFieldType().name().equals("COSMETIC")) {
+                        score = 9.0;
+                    } else if (field.getFieldType().name().equals("FUNCTIONAL")) {
+                        score = 5.0;
+                    }
+                    var newFieldvalue = new FieldValue(new FieldValueRegisterDTO(valueData, score, field));
                     fieldValue = fieldValueRepository.save(newFieldvalue);
                 }
 
@@ -151,7 +157,13 @@ public class MPNService {
                             // Check if field value already exists
                             FieldValue fieldValue = fieldValueRepository.findByFieldIdAndValueDataId(field.getId(), valueData.getId());
                             if (fieldValue == null) {
-                                fieldValue = fieldValueRepository.save(new FieldValue(new FieldValueRegisterDTO(valueData, 0.0, field)));
+                                Double score = null;
+                                if (field.getFieldType().name().equals("COSMETIC")) {
+                                    score = 9.0;
+                                } else if (field.getFieldType().name().equals("FUNCTIONAL")) {
+                                    score = 5.0;
+                                }
+                                fieldValue = fieldValueRepository.save(new FieldValue(new FieldValueRegisterDTO(valueData, score, field)));
                             }
                             return fieldValue.getId();
                         }

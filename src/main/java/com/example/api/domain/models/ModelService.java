@@ -89,7 +89,14 @@ public class ModelService {
                             var mfvData = fieldValueRepository.findByFieldIdAndValueDataId(mfv.fieldId(), valueData.getId());
                             if (mfvData == null) {
                                 // Create and save new FieldValue object if it doesn't exist
-                                var newFieldValue = new FieldValue(new FieldValueRegisterDTO(valueData, null, fieldRepository.getReferenceById(mfv.fieldId())));
+                                var field = fieldRepository.getReferenceById(mfv.fieldId());
+                                Double score = null;
+                                if (field.getFieldType().name().equals("COSMETIC")) {
+                                    score = 9.0;
+                                } else if (field.getFieldType().name().equals("FUNCTIONAL")) {
+                                    score = 5.0;
+                                }
+                                var newFieldValue = new FieldValue(new FieldValueRegisterDTO(valueData, score, field));
                                 mfvData = fieldValueRepository.save(newFieldValue);
                             }
                             var modelFieldValue = new ModelFieldsValues(new ModelFieldValueRegisterDTO(mfvData, model));
@@ -199,7 +206,14 @@ public class ModelService {
                             var mfvData = fieldValueRepository.findByFieldIdAndValueDataId(mfv.fieldId(), valueData.getId());
                             if (mfvData == null) {
                                 // Create and save new FieldValue object if it doesn't exist
-                                var newFieldValue = new FieldValue(new FieldValueRegisterDTO(valueData, null, fieldRepository.getReferenceById(mfv.fieldId())));
+                                var field = fieldRepository.getReferenceById(mfv.fieldId());
+                                Double score = null;
+                                if (field.getFieldType().name().equals("COSMETIC")) {
+                                    score = 9.0;
+                                } else if (field.getFieldType().name().equals("FUNCTIONAL")) {
+                                    score = 5.0;
+                                }
+                                var newFieldValue = new FieldValue(new FieldValueRegisterDTO(valueData, score, field));
                                 mfvData = fieldValueRepository.save(newFieldValue);
                             }
 
@@ -216,7 +230,14 @@ public class ModelService {
                             var mfvData = fieldValueRepository.findByFieldIdAndValueDataId(mfv.fieldId(), valueData.getId());
                             if (mfvData == null) {
                                 // Create and save new FieldValue object if it doesn't exist
-                                var newFieldValue = new FieldValue(new FieldValueRegisterDTO(valueData, null, fieldRepository.getReferenceById(mfv.fieldId())));
+                                var field = fieldRepository.getReferenceById(mfv.fieldId());
+                                Double score = null;
+                                if (field.getFieldType().name().equals("COSMETIC")) {
+                                    score = 9.0;
+                                } else if (field.getFieldType().name().equals("FUNCTIONAL")) {
+                                    score = 5.0;
+                                }
+                                var newFieldValue = new FieldValue(new FieldValueRegisterDTO(valueData, score, field));
                                 mfvData = fieldValueRepository.save(newFieldValue);
                             }
 

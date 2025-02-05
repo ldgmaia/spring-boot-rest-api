@@ -241,7 +241,13 @@ public class AssessmentService {
             if (fieldValueRepository.existsByValuesDataIdAndFieldsId(valueData.getId(), specField.getId())) {
                 fieldValue = fieldValueRepository.findByFieldIdAndValueDataId(specField.getId(), valueData.getId());
             } else {
-                var newFieldvalue = new FieldValue(new FieldValueRegisterDTO(valueData, (double) 0, specField));
+                Double score = null;
+                if (specField.getFieldType().name().equals("COSMETIC")) {
+                    score = 9.0;
+                } else if (specField.getFieldType().name().equals("FUNCTIONAL")) {
+                    score = 5.0;
+                }
+                var newFieldvalue = new FieldValue(new FieldValueRegisterDTO(valueData, score, specField));
                 fieldValue = fieldValueRepository.save(newFieldvalue);
             }
 
@@ -286,7 +292,13 @@ public class AssessmentService {
                 if (fieldValueRepository.existsByValuesDataIdAndFieldsId(valueData.getId(), specField.getId())) {
                     fieldValue = fieldValueRepository.findByFieldIdAndValueDataId(specField.getId(), valueData.getId());
                 } else {
-                    var newFieldvalue = new FieldValue(new FieldValueRegisterDTO(valueData, (double) 0, specField));
+                    Double score = null;
+                    if (specField.getFieldType().name().equals("COSMETIC")) {
+                        score = 9.0;
+                    } else if (specField.getFieldType().name().equals("FUNCTIONAL")) {
+                        score = 5.0;
+                    }
+                    var newFieldvalue = new FieldValue(new FieldValueRegisterDTO(valueData, score, specField));
                     fieldValue = fieldValueRepository.save(newFieldvalue);
                 }
 

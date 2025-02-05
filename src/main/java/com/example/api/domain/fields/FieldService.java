@@ -52,8 +52,17 @@ public class FieldService {
 
         // If field DataType is BOOLEAN, it should create the fieldValue records for true and false automatically with the pre-existing valueData IDs.
         if (data.dataType() == DataType.BOOLEAN) {
-            fieldValueRepository.save(new FieldValue(new FieldValueRegisterDTO(valueRepository.findByValueData("true"), null, field)));
-            fieldValueRepository.save(new FieldValue(new FieldValueRegisterDTO(valueRepository.findByValueData("false"), null, field)));
+            Double minScore = null;
+            Double maxScore = null;
+            if (field.getFieldType().name().equals("COSMETIC")) {
+                maxScore = 1.0;
+                minScore = 9.0;
+            } else if (field.getFieldType().name().equals("FUNCTIONAL")) {
+                maxScore = 5.0;
+                minScore = 0.0;
+            }
+            fieldValueRepository.save(new FieldValue(new FieldValueRegisterDTO(valueRepository.findByValueData("true"), maxScore, field)));
+            fieldValueRepository.save(new FieldValue(new FieldValueRegisterDTO(valueRepository.findByValueData("false"), minScore, field)));
         }
         return new FieldInfoDTO(field);
     }
