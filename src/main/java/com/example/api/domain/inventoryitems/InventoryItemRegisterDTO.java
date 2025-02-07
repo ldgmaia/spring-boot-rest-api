@@ -26,6 +26,7 @@ public record InventoryItemRegisterDTO(
         String serialNumber,
         String rbid,
         String type,
-        BigDecimal cost
+        BigDecimal cost,
+        String companyGrade
 ) {
 }

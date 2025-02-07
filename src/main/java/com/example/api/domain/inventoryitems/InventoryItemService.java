@@ -108,6 +108,20 @@ public class InventoryItemService {
 
         List<InventoryItemResponseDTO> inventoryItems = new ArrayList<>();
 
+        String companygrade = null;
+        Long conditionId = data.itemConditionId();
+
+        if (data.itemConditionId() == 1L) { // NEW
+            companygrade = "N";
+        } else {
+            if (Objects.equals(data.post(), "FAILED")) {
+                companygrade = "FA";
+                conditionId = 5L; // DOA
+            } else {
+                companygrade = "TBI";
+            }
+        }
+
         if (data.byQuantity()) {
             if (data.quantity() <= 0 || data.quantity() > quantityRemainingToAdd) {
                 throw new ValidationException(
@@ -126,7 +140,7 @@ public class InventoryItemService {
                             categoryRepository.getReferenceById(data.categoryId()),
                             modelRepository.getReferenceById(data.modelId()),
                             data.mpnId() != null ? mpnRepository.getReferenceById(data.mpnId()) : null,
-                            itemConditionRepository.getReferenceById(data.itemConditionId()),
+                            itemConditionRepository.getReferenceById(conditionId),
                             itemStatusRepository.getReferenceById(1L),
                             receivingItemRepository.getReferenceById(data.receivingItemId()),
                             location, // this needs to be fixed when we have locations done
@@ -136,7 +150,8 @@ public class InventoryItemService {
                             String.valueOf(uniqueIdentifier), // Serial number - must be given an appropriate value later
                             String.valueOf(uniqueIdentifier), // This is a temporal value to be replaces with the method generateRBID
                             typeValue,
-                            receivingItem.getAdditionalItem() ? BigDecimal.valueOf(0L) : poiUnitPrice
+                            receivingItem.getAdditionalItem() ? BigDecimal.valueOf(0L) : poiUnitPrice,
+                            companygrade
                     ));
 
                     inventoryItemRepository.save(inventory);
@@ -170,7 +185,7 @@ public class InventoryItemService {
                     categoryRepository.getReferenceById(data.categoryId()),
                     modelRepository.getReferenceById(data.modelId()),
                     data.mpnId() != null ? mpnRepository.getReferenceById(data.mpnId()) : null,
-                    itemConditionRepository.getReferenceById(data.itemConditionId()),
+                    itemConditionRepository.getReferenceById(conditionId),
                     itemStatusRepository.getReferenceById(1L),
                     receivingItemRepository.getReferenceById(data.receivingItemId()),
                     location, // this needs to be fixed when we have locations done
@@ -180,7 +195,8 @@ public class InventoryItemService {
                     data.serialNumber(), // Serial number
                     String.valueOf(uniqueIdentifier), // The RBID will be generated following a formula. This random nunmber is just temporary
                     typeValue,
-                    receivingItem.getAdditionalItem() ? BigDecimal.valueOf(0L) : poiUnitPrice
+                    receivingItem.getAdditionalItem() ? BigDecimal.valueOf(0L) : poiUnitPrice,
+                    companygrade
             ));
 
             // Save the inventory to generate the ID

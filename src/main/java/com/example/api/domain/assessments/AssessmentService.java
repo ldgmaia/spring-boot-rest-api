@@ -132,7 +132,8 @@ public class AssessmentService {
                         component.serialNumber(),
                         "temp",
                         "Component",
-                        BigDecimal.ZERO
+                        BigDecimal.ZERO,
+                        null
                 ));
                 inventoryItemRepository.save(inventoryItem);
                 inventoryItem.setRbid(inventoryItemService.generateRBID(inventoryItem));
@@ -236,19 +237,46 @@ public class AssessmentService {
         var minimumFunctionalNonCriticalGrade = Optional.ofNullable(minimumGrades.get("functional_non_critical"))
                 .orElseThrow(() -> new NoSuchElementException("functional_non_critical not found"));
 
-
+        // Calculates the grades of the main item
         var mainItemInventoryItem = inventoryItemRepository.getReferenceById(inventoryItem.getId());
-        var minFunctionalScoreMainItem = inventoryItemsFieldValuesRepository.findMinScoreOfInventoryItem(inventoryItem.getId(), FieldType.FUNCTIONAL);
-        var minCosmeticScoreMainItem = inventoryItemsFieldValuesRepository.findMinScoreOfInventoryItem(inventoryItem.getId(), FieldType.COSMETIC);
-        if (minFunctionalScoreMainItem != null) {
-            mainItemInventoryItem.setFunctionalGrade(minFunctionalScoreMainItem.toString());
-        }
-        if (minCosmeticScoreMainItem != null) {
-            mainItemInventoryItem.setCosmeticGrade(minCosmeticScoreMainItem.toString());
-        }
+        var lowestMainItemFunctionalScore = inventoryItemsFieldValuesRepository.findMinScoreOfInventoryItem(mainItemInventoryItem.getId(), FieldType.FUNCTIONAL);
+        var lowestMainItemCosmeticScore = inventoryItemsFieldValuesRepository.findMinScoreOfInventoryItem(mainItemInventoryItem.getId(), FieldType.COSMETIC);
+
+
+//        var mainItemFunctionalGrading = Optional.ofNullable(gradingRepository.findByTypeAndScore("functional", lowestMainItemFunctionalScore))
+//                .map(Gradings::getGrade)
+//                .orElse("NA");
+//
+//        var mainItemCosmeticGrading = Optional.ofNullable(gradingRepository.findByTypeAndScore("cosmetic", lowestMainItemCosmeticScore))
+//                .map(Gradings::getGrade)
+//                .orElse("NA");
+
+//        // Determine company grade
+//        String mainItemCompanyGrade;
+//        if ("FA".equals(mainItemFunctionalGrading)) {
+//            mainItemCompanyGrade = "FA";
+//        } else {
+//            mainItemCompanyGrade = Optional.ofNullable(gradingRepository.findByTypeAndScore("cosmetic", lowestMainItemCosmeticScore))
+//                    .map(Gradings::getCompany_grade)
+//                    .orElse("NA");
+//        }
+
+//        mainItemInventoryItem.setFunctionalGrade(mainItemFunctionalGrading);
+//        mainItemInventoryItem.setCosmeticGrade(mainItemCosmeticGrading);
+//        mainItemInventoryItem.setCompanyGrade(mainItemCompanyGrade);
+
+//        var minFunctionalScoreMainItem = inventoryItemsFieldValuesRepository.findMinScoreOfInventoryItem(inventoryItem.getId(), FieldType.FUNCTIONAL);
+//        var minCosmeticScoreMainItem = inventoryItemsFieldValuesRepository.findMinScoreOfInventoryItem(inventoryItem.getId(), FieldType.COSMETIC);
+//        if (minFunctionalScoreMainItem != null) {
+//            mainItemInventoryItem.setFunctionalGrade(minFunctionalScoreMainItem.toString());
+//        }
+//        if (minCosmeticScoreMainItem != null) {
+//            mainItemInventoryItem.setCosmeticGrade(minCosmeticScoreMainItem.toString());
+//        }
 
         var mainItemComponentsInventoryItems = inventoryItemComponentRepository.findByParentInventoryItemId(inventoryItem.getId());
 
+        // Calculates the grades of the components
         mainItemComponentsInventoryItems.forEach(item -> {
             Long functionalGrade = 0L;
             Long cosmeticGrade = 0L;

@@ -124,5 +124,6 @@ public class InventoryItem {
         this.location = inventory.location();
         this.type = inventory.type();
         this.cost = inventory.cost();
+        this.companyGrade = inventory.companyGrade();
     }
 }
