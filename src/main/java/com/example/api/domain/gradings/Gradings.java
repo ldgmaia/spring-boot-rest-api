@@ -6,8 +6,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
-
 @Table(name = "gradings")
 @Entity(name = "Grading")
 @Getter
@@ -21,7 +19,7 @@ public class Gradings {
     private Long id;
 
     private String type;
-    private BigDecimal key_param;
+    private Long score;
     private String grade;
     private String company_grade;
 }

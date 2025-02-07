@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS admin_settings (
 CREATE TABLE IF NOT EXISTS gradings (
     id                      BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     type                    VARCHAR(255) NOT NULL,
-    score                   DECIMAL(10, 2)  NOT NULL,
+    score                   BIGINT  NOT NULL,
     grade                   VARCHAR(255) NOT NULL,
     company_grade           VARCHAR(255),
     created_at              TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,

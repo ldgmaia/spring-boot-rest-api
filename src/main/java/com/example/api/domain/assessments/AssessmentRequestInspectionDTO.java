@@ -8,6 +8,7 @@ public record AssessmentRequestInspectionDTO(
         Long modelId,
         Long mpnId,
         Boolean pulled,
+        Boolean isCritical,
         String serialNumber,
         List<AssessmentRequestFieldsDTO> fields
 ) {
@@ -17,6 +18,7 @@ public record AssessmentRequestInspectionDTO(
             Long modelId,
             Long mpnId,
             Boolean pulled,
+            Boolean isCritical,
             String serialNumber,
             List<AssessmentRequestFieldsDTO> fields
     ) {
@@ -25,6 +27,7 @@ public record AssessmentRequestInspectionDTO(
         this.modelId = modelId;
         this.mpnId = mpnId;
         this.pulled = pulled != null ? pulled : false;
+        this.isCritical = isCritical != null ? isCritical : false;
         this.serialNumber = serialNumber;
         this.fields = fields != null ? fields : List.of();
     }

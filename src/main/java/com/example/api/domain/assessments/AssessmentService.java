@@ -1,10 +1,13 @@
 package com.example.api.domain.assessments;
 
 import com.example.api.domain.ValidationException;
+import com.example.api.domain.adminsettings.AdminSettings;
 import com.example.api.domain.assessmentfieldsvalues.AssessmentFieldsValues;
 import com.example.api.domain.assessmentfieldsvalues.AssessmentFieldsValuesRegisterDTO;
+import com.example.api.domain.fields.FieldType;
 import com.example.api.domain.fieldsvalues.FieldValue;
 import com.example.api.domain.fieldsvalues.FieldValueRegisterDTO;
+import com.example.api.domain.gradings.Gradings;
 import com.example.api.domain.inventoryitems.InventoryItem;
 import com.example.api.domain.inventoryitems.InventoryItemRegisterDTO;
 import com.example.api.domain.inventoryitems.InventoryItemService;
@@ -19,16 +22,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class AssessmentService {
 
     @Autowired
     private AssessmentRepository assessmentRepository;
+
+    @Autowired
+    private GradingRepository gradingRepository;
+
+    @Autowired
+    private AdminSettingRepository adminSettingRepository;
 
     @Autowired
     private InventoryItemRepository inventoryItemRepository;
@@ -205,6 +212,94 @@ public class AssessmentService {
         if (totalAdded > totalAssessed) {
             receivingItemRepository.getReferenceById(parentInventoryItem.getReceivingItem().getId()).setStatus("Pending Assessment");
         }
+
+        // Calculate grades of main item and its components
+        calculateGrade(parentAssessment.getInventoryItem());
+
+    }
+
+    private void calculateGrade(InventoryItem inventoryItem) {
+
+        var minimumGrades = adminSettingRepository.findByService("minimum_grading")
+                .stream()
+                .collect(Collectors.toMap(AdminSettings::getKey_param, s -> Long.valueOf(s.getValue_param())));
+
+        var minimumCosmeticCriticalGrade = Optional.ofNullable(minimumGrades.get("cosmetic_critical"))
+                .orElseThrow(() -> new NoSuchElementException("cosmetic_critical not found"));
+
+        var minimumCosmeticNonCriticalGrade = Optional.ofNullable(minimumGrades.get("cosmetic_non_critical"))
+                .orElseThrow(() -> new NoSuchElementException("cosmetic_non_critical not found"));
+
+        var minimumFunctionalCriticalGrade = Optional.ofNullable(minimumGrades.get("functional_critical"))
+                .orElseThrow(() -> new NoSuchElementException("functional_critical not found"));
+
+        var minimumFunctionalNonCriticalGrade = Optional.ofNullable(minimumGrades.get("functional_non_critical"))
+                .orElseThrow(() -> new NoSuchElementException("functional_non_critical not found"));
+
+
+        var mainItemInventoryItem = inventoryItemRepository.getReferenceById(inventoryItem.getId());
+        var minFunctionalScoreMainItem = inventoryItemsFieldValuesRepository.findMinScoreOfInventoryItem(inventoryItem.getId(), FieldType.FUNCTIONAL);
+        var minCosmeticScoreMainItem = inventoryItemsFieldValuesRepository.findMinScoreOfInventoryItem(inventoryItem.getId(), FieldType.COSMETIC);
+        if (minFunctionalScoreMainItem != null) {
+            mainItemInventoryItem.setFunctionalGrade(minFunctionalScoreMainItem.toString());
+        }
+        if (minCosmeticScoreMainItem != null) {
+            mainItemInventoryItem.setCosmeticGrade(minCosmeticScoreMainItem.toString());
+        }
+
+        var mainItemComponentsInventoryItems = inventoryItemComponentRepository.findByParentInventoryItemId(inventoryItem.getId());
+
+        mainItemComponentsInventoryItems.forEach(item -> {
+            Long functionalGrade = 0L;
+            Long cosmeticGrade = 0L;
+
+            var lowestFunctionalScore = inventoryItemsFieldValuesRepository.findMinScoreOfInventoryItem(item.getInventoryItem().getId(), FieldType.FUNCTIONAL);
+            var lowestCosmeticScore = inventoryItemsFieldValuesRepository.findMinScoreOfInventoryItem(item.getInventoryItem().getId(), FieldType.COSMETIC);
+
+            // TODO
+            // Check minimum value in the admin settings table
+            // calculate company grade based on the rules
+            // what to do when there is no functional or cosmetic grade
+
+            Boolean isCritical = item.getInventoryItem().getSectionArea().getIsCritical();
+
+            if (lowestFunctionalScore == null) {
+                functionalGrade = null;
+            } else {
+                var minFunctionalGrade = isCritical ? minimumFunctionalCriticalGrade : minimumFunctionalNonCriticalGrade;
+                functionalGrade = lowestFunctionalScore < minFunctionalGrade ? minFunctionalGrade : lowestFunctionalScore;
+            }
+
+            if (lowestCosmeticScore == null) {
+                cosmeticGrade = null;
+            } else {
+                var minCosmeticGrade = isCritical ? minimumCosmeticCriticalGrade : minimumCosmeticNonCriticalGrade;
+                cosmeticGrade = lowestCosmeticScore < minCosmeticGrade ? minCosmeticGrade : lowestCosmeticScore;
+            }
+
+            var functionalGrading = Optional.ofNullable(gradingRepository.findByTypeAndScore("functional", functionalGrade))
+                    .map(Gradings::getGrade)
+                    .orElse("NA");
+
+            var cosmeticGrading = Optional.ofNullable(gradingRepository.findByTypeAndScore("cosmetic", cosmeticGrade))
+                    .map(Gradings::getGrade)
+                    .orElse("NA");
+
+            // Determine company grade
+            String companyGrade;
+            if ("FA".equals(functionalGrading)) {
+                companyGrade = "FA";
+            } else {
+                companyGrade = Optional.ofNullable(gradingRepository.findByTypeAndScore("cosmetic", cosmeticGrade))
+                        .map(Gradings::getCompany_grade)
+                        .orElse("NA");
+            }
+
+            var componentInventoryItem = item.getInventoryItem();
+            componentInventoryItem.setFunctionalGrade(functionalGrading);
+            componentInventoryItem.setCosmeticGrade(cosmeticGrading);
+            componentInventoryItem.setCompanyGrade(companyGrade);
+        });
     }
 
     private void processComponentAssessmentFields(List<AssessmentRequestFieldsDTO> fields, InventoryItem inventoryItem, Assessment assessment) {
@@ -260,7 +355,6 @@ public class AssessmentService {
     }
 
     private void processMainItemAssessment(List<AssessmentRequestFieldsDTO> fields, InventoryItem parentInventoryItem, Assessment parentAssessment) {
-
         if (fields != null) {
             fields.forEach(field -> {
                 if (field.fieldId() == null) {
@@ -322,7 +416,7 @@ public class AssessmentService {
         for (AssessmentRequestInspectionDTO spec : combinedSpecs) {
             Long areaId = spec.areaId();
             if (!areaMap.containsKey(areaId)) {
-                AssessmentRequestInspectionDTO component = new AssessmentRequestInspectionDTO(spec.present(), spec.areaId(), spec.modelId(), spec.mpnId(), spec.pulled(), spec.serialNumber(), spec.fields());
+                AssessmentRequestInspectionDTO component = new AssessmentRequestInspectionDTO(spec.present(), spec.areaId(), spec.modelId(), spec.mpnId(), spec.pulled(), spec.isCritical(), spec.serialNumber(), spec.fields());
                 areaMap.put(areaId, component);
             } else {
                 AssessmentRequestInspectionDTO existingComponent = areaMap.get(areaId);

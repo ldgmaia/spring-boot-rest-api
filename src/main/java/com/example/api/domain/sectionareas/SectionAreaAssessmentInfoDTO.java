@@ -8,6 +8,7 @@ public record SectionAreaAssessmentInfoDTO(
         Long id,
         String name,
         Long areaOrder,
+        Boolean isCritical,
         List<ModelAssessmentInfoDTO> models
 ) {
     public SectionAreaAssessmentInfoDTO(SectionArea sectionArea) {
@@ -15,6 +16,7 @@ public record SectionAreaAssessmentInfoDTO(
                 sectionArea.getId(),
                 sectionArea.getName(),
                 sectionArea.getAreaOrder(),
+                sectionArea.getIsCritical(),
                 sectionArea.getSectionAreaModels().stream().map(sectionAreaModel -> new ModelAssessmentInfoDTO(sectionAreaModel.getModel())).toList()
         );
     }
