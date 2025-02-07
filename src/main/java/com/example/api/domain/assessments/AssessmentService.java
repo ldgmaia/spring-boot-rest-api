@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Service
@@ -239,40 +240,12 @@ public class AssessmentService {
 
         // Calculates the grades of the main item
         var mainItemInventoryItem = inventoryItemRepository.getReferenceById(inventoryItem.getId());
-        var lowestMainItemFunctionalScore = inventoryItemsFieldValuesRepository.findMinScoreOfInventoryItem(mainItemInventoryItem.getId(), FieldType.FUNCTIONAL);
-        var lowestMainItemCosmeticScore = inventoryItemsFieldValuesRepository.findMinScoreOfInventoryItem(mainItemInventoryItem.getId(), FieldType.COSMETIC);
-
-
-//        var mainItemFunctionalGrading = Optional.ofNullable(gradingRepository.findByTypeAndScore("functional", lowestMainItemFunctionalScore))
-//                .map(Gradings::getGrade)
-//                .orElse("NA");
-//
-//        var mainItemCosmeticGrading = Optional.ofNullable(gradingRepository.findByTypeAndScore("cosmetic", lowestMainItemCosmeticScore))
-//                .map(Gradings::getGrade)
-//                .orElse("NA");
-
-//        // Determine company grade
-//        String mainItemCompanyGrade;
-//        if ("FA".equals(mainItemFunctionalGrading)) {
-//            mainItemCompanyGrade = "FA";
-//        } else {
-//            mainItemCompanyGrade = Optional.ofNullable(gradingRepository.findByTypeAndScore("cosmetic", lowestMainItemCosmeticScore))
-//                    .map(Gradings::getCompany_grade)
-//                    .orElse("NA");
-//        }
-
-//        mainItemInventoryItem.setFunctionalGrade(mainItemFunctionalGrading);
-//        mainItemInventoryItem.setCosmeticGrade(mainItemCosmeticGrading);
-//        mainItemInventoryItem.setCompanyGrade(mainItemCompanyGrade);
-
-//        var minFunctionalScoreMainItem = inventoryItemsFieldValuesRepository.findMinScoreOfInventoryItem(inventoryItem.getId(), FieldType.FUNCTIONAL);
-//        var minCosmeticScoreMainItem = inventoryItemsFieldValuesRepository.findMinScoreOfInventoryItem(inventoryItem.getId(), FieldType.COSMETIC);
-//        if (minFunctionalScoreMainItem != null) {
-//            mainItemInventoryItem.setFunctionalGrade(minFunctionalScoreMainItem.toString());
-//        }
-//        if (minCosmeticScoreMainItem != null) {
-//            mainItemInventoryItem.setCosmeticGrade(minCosmeticScoreMainItem.toString());
-//        }
+        AtomicReference<Long> lowestMainItemFunctionalScore = new AtomicReference<>(
+                inventoryItemsFieldValuesRepository.findMinScoreOfInventoryItem(mainItemInventoryItem.getId(), FieldType.FUNCTIONAL)
+        );
+        AtomicReference<Long> lowestMainItemCosmeticScore = new AtomicReference<>(
+                inventoryItemsFieldValuesRepository.findMinScoreOfInventoryItem(mainItemInventoryItem.getId(), FieldType.COSMETIC)
+        );
 
         var mainItemComponentsInventoryItems = inventoryItemComponentRepository.findByParentInventoryItemId(inventoryItem.getId());
 
@@ -284,10 +257,13 @@ public class AssessmentService {
             var lowestFunctionalScore = inventoryItemsFieldValuesRepository.findMinScoreOfInventoryItem(item.getInventoryItem().getId(), FieldType.FUNCTIONAL);
             var lowestCosmeticScore = inventoryItemsFieldValuesRepository.findMinScoreOfInventoryItem(item.getInventoryItem().getId(), FieldType.COSMETIC);
 
-            // TODO
-            // Check minimum value in the admin settings table
-            // calculate company grade based on the rules
-            // what to do when there is no functional or cosmetic grade
+            if (lowestFunctionalScore != null && lowestFunctionalScore < lowestMainItemFunctionalScore.get()) {
+                lowestMainItemFunctionalScore.set(lowestFunctionalScore);
+            }
+
+            if (lowestCosmeticScore != null && lowestCosmeticScore < lowestMainItemCosmeticScore.get()) {
+                lowestMainItemCosmeticScore.set(lowestCosmeticScore);
+            }
 
             Boolean isCritical = item.getInventoryItem().getSectionArea().getIsCritical();
 
@@ -328,6 +304,16 @@ public class AssessmentService {
             componentInventoryItem.setCosmeticGrade(cosmeticGrading);
             componentInventoryItem.setCompanyGrade(companyGrade);
         });
+        // Determine company grade for main item
+        String mainItemCompanyGrade;
+        if (lowestMainItemFunctionalScore.get() == 0L) {
+            mainItemCompanyGrade = "FA";
+        } else {
+            mainItemCompanyGrade = Optional.ofNullable(gradingRepository.findByTypeAndScore("cosmetic", lowestMainItemCosmeticScore.get()))
+                    .map(Gradings::getCompany_grade)
+                    .orElse("NA");
+        }
+        mainItemInventoryItem.setCompanyGrade(mainItemCompanyGrade);
     }
 
     private void processComponentAssessmentFields(List<AssessmentRequestFieldsDTO> fields, InventoryItem inventoryItem, Assessment assessment) {
