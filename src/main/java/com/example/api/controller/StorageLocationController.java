@@ -18,9 +18,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/storage")
+@RequestMapping("/storage-location")
 @SecurityRequirement(name = "bearer-key")
-public class StorageController {
+public class StorageLocationController {
 
     @Autowired
     private StorageService storageService;
