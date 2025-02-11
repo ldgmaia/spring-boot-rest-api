@@ -300,6 +300,10 @@ public class AssessmentService {
             }
 
             var componentInventoryItem = item.getInventoryItem();
+            
+            if ("NA".equals(cosmeticGrading)) {
+                companyGrade = "U";
+            }
             componentInventoryItem.setFunctionalGrade(functionalGrading);
             componentInventoryItem.setCosmeticGrade(cosmeticGrading);
             componentInventoryItem.setCompanyGrade(companyGrade);
