@@ -2,10 +2,12 @@ package com.example.api.repositories;
 
 import com.example.api.domain.storage.storagelevel.StorageLevel;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
+@Repository
 public interface StorageLevelRepository extends JpaRepository<StorageLevel, Long> {
     List<StorageLevel> findAllByStorageLocationId(Long id);
 

@@ -46,12 +46,12 @@ public class FieldValueController {
 //    @PutMapping
 //    @Transactional
 //    public ResponseEntity update(@RequestBody @Valid FieldUpdateDTO data) {
-////        var field = fieldRepository.getReferenceById(data.id());
+
+    /// /        var field = fieldRepository.getReferenceById(data.id());
 //        var field = fieldService.updateInfo(data);
 //
 //        return ResponseEntity.ok(field);
 //    }
-
     @DeleteMapping("/{id}")
     @Transactional
     public ResponseEntity delete(@PathVariable Long id) { // route is /doctors/1, for example

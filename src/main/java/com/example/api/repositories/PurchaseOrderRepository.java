@@ -5,9 +5,11 @@ import com.example.api.domain.purchaseorders.PurchaseOrderListDTO;
 import com.example.api.domain.suppliers.SupplierInfoDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository
 public interface PurchaseOrderRepository extends JpaRepository<PurchaseOrder, Long> {
 
     @Query("""

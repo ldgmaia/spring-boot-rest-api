@@ -4,9 +4,11 @@ import com.example.api.domain.mpnfieldsvalues.MPNFieldValueInfoDTO;
 import com.example.api.domain.mpnfieldsvalues.MPNFieldsValues;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository
 public interface MPNFieldValueRepository extends JpaRepository<MPNFieldsValues, Long> {
     List<MPNFieldsValues> findAllByMpnId(Long mpnId);
 

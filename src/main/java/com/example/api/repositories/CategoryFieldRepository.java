@@ -4,9 +4,11 @@ import com.example.api.domain.categoryfields.CategoryFields;
 import com.example.api.domain.categoryfields.CategoryFieldsInfoDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository
 public interface CategoryFieldRepository extends JpaRepository<CategoryFields, Long> {
 
     List<CategoryFields> findAllByEnabledTrueAndCategoryId(Long categoryId);

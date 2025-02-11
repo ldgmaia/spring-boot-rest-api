@@ -4,10 +4,12 @@ import com.example.api.domain.sectionareas.SectionArea;
 import com.example.api.domain.sectionareas.SectionAreaInfoDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
+@Repository
 public interface SectionAreaRepository extends JpaRepository<SectionArea, Long> {
 
     @Query(value = """

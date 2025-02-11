@@ -16,6 +16,5 @@ public record CategoryFieldsRegisterDTO(
 
         Boolean printOnLabel,
         Boolean isMandatory
-
 ) {
 }
