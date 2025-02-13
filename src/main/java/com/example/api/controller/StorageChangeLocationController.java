@@ -1,5 +1,6 @@
 package com.example.api.controller;
 
+import com.example.api.domain.locations.changelocation.ChangeLocationRequestDTO;
 import com.example.api.domain.locations.changelocation.ChangeLocationService;
 import com.example.api.domain.locations.changelocation.usergroups.LocationUserGroupInfoDTO;
 import com.example.api.domain.locations.changelocation.usergroups.LocationUserGroupRequestDTO;
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/location")
+@RequestMapping("/storage-location")
 @SecurityRequirement(name = "bearer-key")
 public class StorageChangeLocationController {
 
@@ -63,5 +64,14 @@ public class StorageChangeLocationController {
         var usersInUserGroup = locationMainService.getAllUserGroupPermissionsByGroupId(id);
         return ResponseEntity.ok(usersInUserGroup);
     }
+
+    @PutMapping("/change-location")
+    public ResponseEntity changeLocation(@RequestBody @Valid ChangeLocationRequestDTO data) {
+
+        locationMainService.changeLocation(data);
+
+        return ResponseEntity.ok(data);
+    }
+
 
 }

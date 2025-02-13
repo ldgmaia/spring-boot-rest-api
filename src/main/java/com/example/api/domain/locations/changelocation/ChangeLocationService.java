@@ -12,7 +12,9 @@ import com.example.api.domain.locations.changelocation.usergroupsusers.LocationU
 import com.example.api.domain.storage.storagearea.StorageArea;
 import com.example.api.domain.users.User;
 import com.example.api.repositories.*;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -90,4 +92,10 @@ public class ChangeLocationService {
         return locationUserGroupPermissionRepository.findById(groupId).stream().map(LocationUserGroupPermissionInfoDTO::new).toList();
     }
 
+    public void changeLocation(@Valid ChangeLocationRequestDTO data) {
+        System.out.println("data " + data);
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        var currentUser = userRepository.findByUsername(username);
+        System.out.println("currentUser " + currentUser.getUsername() + " - " + currentUser.getId());
+    }
 }
