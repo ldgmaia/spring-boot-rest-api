@@ -7,11 +7,6 @@ VALUES
     ('REFURBISHED', 1),
     ('DOA', 1);
 
-INSERT INTO locations
-    (name, created_by)
-VALUES
-    ('UserLocation', 1);
-
 INSERT INTO item_statuses
     (name, created_by)
 VALUES

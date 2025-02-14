@@ -1,16 +1,3 @@
-CREATE TABLE IF NOT EXISTS locations
-(
-    id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    name            VARCHAR(255) NOT NULL,
-    created_by      BIGINT UNSIGNED NOT NULL,
-    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
-
-    PRIMARY KEY (id),
-    INDEX (created_by),
-    FOREIGN KEY (created_by) REFERENCES users (id)
-);
-
 CREATE TABLE IF NOT EXISTS item_conditions
 (
     id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -47,7 +34,6 @@ CREATE TABLE IF NOT EXISTS inventory_items
     mpn_id              BIGINT UNSIGNED,
     created_by          BIGINT UNSIGNED NOT NULL,
     receiving_items_id  BIGINT UNSIGNED NOT NULL,
-    location_id         BIGINT UNSIGNED NOT NULL,
     post                VARCHAR(255)    NOT NULL,
     serial_number       VARCHAR(255),
     company_grade       VARCHAR(255),
@@ -74,7 +60,6 @@ CREATE TABLE IF NOT EXISTS inventory_items
     INDEX (section_area_id),
     INDEX (created_by),
     INDEX (receiving_items_id),
-    INDEX (location_id),
     INDEX (inspected_by),
     INDEX (rbid),
     INDEX (serial_number),
@@ -86,8 +71,7 @@ CREATE TABLE IF NOT EXISTS inventory_items
     FOREIGN KEY (item_statuses_id)      REFERENCES item_statuses (id),
     FOREIGN KEY (section_area_id)       REFERENCES section_areas (id),
     FOREIGN KEY (created_by)            REFERENCES users (id),
-    FOREIGN KEY (receiving_items_id)    REFERENCES receiving_items (id),
-    FOREIGN KEY (location_id)           REFERENCES locations (id)
+    FOREIGN KEY (receiving_items_id)    REFERENCES receiving_items (id)
 );
 
 CREATE TABLE IF NOT EXISTS inventory_items_fields_values (

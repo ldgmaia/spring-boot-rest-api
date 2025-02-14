@@ -31,14 +31,14 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, Lo
 
     @Query("""
             SELECT new com.example.api.domain.inventoryitems.InventoryItemsByReceivingItemDTO(
-                ii, m.name, m2.name, ic.name, is2.name, l.name
+                ii, m.name, m2.name, ic.name, is2.name, sl.name
             )
             FROM InventoryItem ii
             LEFT JOIN ii.mpn m
             JOIN ii.model m2
             JOIN ii.itemCondition ic
             JOIN ii.itemStatus is2
-            JOIN ii.location l
+            JOIN ii.storageLevel sl
             WHERE ii.receivingItem.id = :receivingItemId
             AND ii.type = :type
             ORDER BY ii.createdAt DESC
@@ -96,7 +96,7 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, Lo
     @Query("""
             SELECT ii
             FROM InventoryItem ii
-            WHERE ii.location.id = :locationId
+            WHERE ii.storageLevel.id = :storageLevelId
               AND ii.type = :type
               AND ii.itemStatus.id = :itemStatusId
             and ii.model.id in (
@@ -109,8 +109,8 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, Lo
             	and sa.id = :sectionAreaId
             )
             """)
-    List<InventoryItem> findByLocationIdAndTypeAndItemStatusId(
-            @Param("locationId") Long locationId,
+    List<InventoryItem> findBystorageLevelIdAndTypeAndItemStatusId(
+            @Param("storageLevelId") Long storageLevelId,
             @Param("type") String type,
             @Param("itemStatusId") Long itemStatusId,
             @Param("inventoryItemId") Long inventoryItemId,

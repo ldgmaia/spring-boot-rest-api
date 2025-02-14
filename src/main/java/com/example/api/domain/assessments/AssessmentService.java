@@ -126,7 +126,7 @@ public class AssessmentService {
                         parentInventoryItem.getItemCondition(),
                         component.pulled() ? itemStatusRepository.getReferenceById(1L) : itemStatusRepository.getReferenceById(3L),
                         parentInventoryItem.getReceivingItem(),
-                        parentInventoryItem.getLocation(),
+                        parentInventoryItem.getStorageLevel(),
                         "NA",
                         !component.pulled(), // if component was pulled, it should not be present in the inventory items
                         area,
@@ -300,7 +300,7 @@ public class AssessmentService {
             }
 
             var componentInventoryItem = item.getInventoryItem();
-            
+
             if ("NA".equals(cosmeticGrading)) {
                 companyGrade = "U";
             }

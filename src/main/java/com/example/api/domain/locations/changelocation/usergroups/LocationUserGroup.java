@@ -1,5 +1,6 @@
 package com.example.api.domain.locations.changelocation.usergroups;
 
+import com.example.api.domain.locations.changelocation.usergroupsusers.LocationUserGroupUser;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -7,6 +8,8 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Table(name = "location_user_groups")
 @Entity(name = "LocationUserGroup")
@@ -27,14 +30,17 @@ public class LocationUserGroup {
 
     private String description;
 
+    @OneToMany(mappedBy = "locationUserGroup", cascade = CascadeType.ALL)
+    private List<LocationUserGroupUser> users = new ArrayList<>();
+
     @CreatedDate
     private LocalDateTime createdAt;
 
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    public LocationUserGroup(String name, String description) {
-        this.name = name;
-        this.description = description;
+    public LocationUserGroup(LocationUserGroupRegisterDTO data) {
+        this.name = data.name();
+        this.description = data.description();
     }
 }

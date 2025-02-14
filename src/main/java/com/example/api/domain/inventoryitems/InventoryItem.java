@@ -5,11 +5,11 @@ import com.example.api.domain.inventoryitemscomponents.InventoryItemComponents;
 import com.example.api.domain.inventoryitemsfieldsvalues.InventoryItemsFieldsValues;
 import com.example.api.domain.itemcondition.ItemCondition;
 import com.example.api.domain.itemstatus.ItemStatus;
-import com.example.api.domain.locations.Location;
 import com.example.api.domain.models.Model;
 import com.example.api.domain.mpns.MPN;
 import com.example.api.domain.receivingitems.ReceivingItem;
 import com.example.api.domain.sectionareas.SectionArea;
+import com.example.api.domain.storage.storagelevel.StorageLevel;
 import com.example.api.domain.users.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -97,8 +97,8 @@ public class InventoryItem {
     private LocalDateTime lastInspectedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "location_id")
-    private Location location;
+    @JoinColumn(name = "storage_level_id")
+    private StorageLevel storageLevel;
 
     private String type;
     private BigDecimal cost;
@@ -121,7 +121,7 @@ public class InventoryItem {
         this.sectionArea = inventory.sectionArea();
         this.serialNumber = inventory.serialNumber();
         this.rbid = inventory.rbid();
-        this.location = inventory.location();
+        this.storageLevel = inventory.storageLevel();
         this.type = inventory.type();
         this.cost = inventory.cost();
         this.companyGrade = inventory.companyGrade();

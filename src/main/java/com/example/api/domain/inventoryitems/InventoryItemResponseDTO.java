@@ -29,7 +29,7 @@ public record InventoryItemResponseDTO(
                 inventoryItem.getModel().getName(),
                 inventoryItem.getItemCondition().getName(),
                 inventoryItem.getItemStatus().getName(),
-                inventoryItem.getLocation().getName()
+                inventoryItem.getStorageLevel().getName()
         );
     }
 }

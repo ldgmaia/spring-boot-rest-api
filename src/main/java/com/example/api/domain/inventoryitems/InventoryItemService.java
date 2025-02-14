@@ -41,7 +41,7 @@ public class InventoryItemService {
     private PurchaseOrderItemRepository purchaseOrderItemRepository;
 
     @Autowired
-    private LocationRepository locationRepository;
+    private StorageLevelRepository storageLevelRepository;
 
     @Autowired
     private FieldRepository fieldRepository;
@@ -104,7 +104,7 @@ public class InventoryItemService {
 
         var poiUnitPrice = receivingItem.getAdditionalItem() ? BigDecimal.valueOf(0L) : receivingItem.getPurchaseOrderItem().getId() != null ? purchaseOrderItemRepository.getReferenceById(receivingItem.getPurchaseOrderItem().getId()).getUnitPrice() : BigDecimal.valueOf(0L);//from purchare order item table on column unit cost
 
-        var location = locationRepository.getReferenceById(1L); // change the id for the correct data when we work on Locations
+        var location = storageLevelRepository.getReferenceById(currentUser.getStorageLevel().getId()); // change the id for the correct data when we work on Locations
 
         List<InventoryItemResponseDTO> inventoryItems = new ArrayList<>();
 
@@ -230,7 +230,7 @@ public class InventoryItemService {
     }
 
     public List<InventoryItemsByLocationDTO> getInventoryItemsByLocationId(Long locationId, String type, Long statusId, Long mainItemInventoryId, Long areaId) {
-        var inventoryList = inventoryItemRepository.findByLocationIdAndTypeAndItemStatusId(locationId, type, statusId, mainItemInventoryId, areaId);
+        var inventoryList = inventoryItemRepository.findBystorageLevelIdAndTypeAndItemStatusId(locationId, type, statusId, mainItemInventoryId, areaId);
         return inventoryList.stream().map(InventoryItemsByLocationDTO::new).toList();
     }
 
