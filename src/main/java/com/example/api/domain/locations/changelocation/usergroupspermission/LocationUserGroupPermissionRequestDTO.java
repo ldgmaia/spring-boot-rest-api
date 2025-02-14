@@ -10,9 +10,6 @@ public record LocationUserGroupPermissionRequestDTO(
         Long fromLocationAreaId,
 
         @NotNull
-        Long toLocationAreaId,
-
-        String name,
-        String description
+        Long toLocationAreaId
 ) {
 }

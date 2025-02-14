@@ -36,22 +36,15 @@ public class LocationUserGroupPermission {
     @JoinColumn(name = "to_location_area_id", nullable = false)
     private StorageArea toLocationArea;
 
-//    @Column(nullable = false, unique = true)
-//    private String name;
-//
-//    private String description;
-
     @CreatedDate
     private LocalDateTime createdAt;
 
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    public LocationUserGroupPermission(LocationUserGroup group, StorageArea fromStorageArea, StorageArea toStorageArea, String name, String description) {
-        this.locationUserGroup = group;
-        this.fromLocationArea = fromStorageArea;
-        this.toLocationArea = toStorageArea;
-//        this.name = name;
-//        this.description = description;
+    public LocationUserGroupPermission(LocationUserGroupPermissionRegisterDTO data) {
+        this.locationUserGroup = data.locationUserGroup();
+        this.fromLocationArea = data.fromLocationArea();
+        this.toLocationArea = data.toLocationArea();
     }
 }

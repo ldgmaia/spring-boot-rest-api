@@ -26,7 +26,7 @@ public class LocationUserGroupUser {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id", nullable = false)
-    private LocationUserGroup group;
+    private LocationUserGroup locationUserGroup;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -38,8 +38,8 @@ public class LocationUserGroupUser {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    public LocationUserGroupUser(LocationUserGroup locationUserGroup, User user) {
-        this.group = locationUserGroup;
-        this.user = user;
+    public LocationUserGroupUser(LocationUserGroupUserRegisterDTO data) {
+        this.locationUserGroup = data.locationUserGroup();
+        this.user = data.user();
     }
 }

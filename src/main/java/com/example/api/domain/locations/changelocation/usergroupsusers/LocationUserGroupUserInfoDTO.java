@@ -1,24 +1,14 @@
-package com.example.api.domain.locations.changelocation.usergroupsusers;//package com.example.api.domain.grouptransferpermissions;
+package com.example.api.domain.locations.changelocation.usergroupsusers;
 
-import com.example.api.domain.locations.changelocation.usergroups.LocationUserGroupInfoDTO;
-import com.example.api.domain.users.UserInfoDTO;
-
-import java.time.LocalDateTime;
 
 public record LocationUserGroupUserInfoDTO(
-        Long id,
-        LocationUserGroupInfoDTO locationUserGroupInfo,
-        UserInfoDTO user,
-        LocalDateTime createdAt,
-        LocalDateTime updatedAt
+        Long userId,
+        String userName
 ) {
-    public LocationUserGroupUserInfoDTO(LocationUserGroupUser save) {
+    public LocationUserGroupUserInfoDTO(LocationUserGroupUser entity) {
         this(
-                save.getId(),
-                new LocationUserGroupInfoDTO(save.getGroup()),
-                new UserInfoDTO(save.getUser()),
-                save.getCreatedAt(),
-                save.getUpdatedAt()
+                entity.getUser().getId(),
+                entity.getUser().getUsername()
         );
     }
 }

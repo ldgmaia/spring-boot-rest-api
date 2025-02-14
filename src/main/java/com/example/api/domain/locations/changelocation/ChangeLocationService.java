@@ -1,23 +1,28 @@
 package com.example.api.domain.locations.changelocation;
 
 
+import com.example.api.domain.ValidationException;
 import com.example.api.domain.locations.changelocation.usergroups.LocationUserGroup;
 import com.example.api.domain.locations.changelocation.usergroups.LocationUserGroupInfoDTO;
+import com.example.api.domain.locations.changelocation.usergroups.LocationUserGroupRegisterDTO;
 import com.example.api.domain.locations.changelocation.usergroups.LocationUserGroupRequestDTO;
 import com.example.api.domain.locations.changelocation.usergroupspermission.LocationUserGroupPermission;
 import com.example.api.domain.locations.changelocation.usergroupspermission.LocationUserGroupPermissionInfoDTO;
+import com.example.api.domain.locations.changelocation.usergroupspermission.LocationUserGroupPermissionRegisterDTO;
 import com.example.api.domain.locations.changelocation.usergroupspermission.LocationUserGroupPermissionRequestDTO;
 import com.example.api.domain.locations.changelocation.usergroupsusers.LocationUserGroupUser;
 import com.example.api.domain.locations.changelocation.usergroupsusers.LocationUserGroupUserInfoDTO;
+import com.example.api.domain.locations.changelocation.usergroupsusers.LocationUserGroupUserRegisterDTO;
 import com.example.api.domain.storage.storagearea.StorageArea;
 import com.example.api.domain.users.User;
 import com.example.api.repositories.*;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -25,9 +30,6 @@ public class ChangeLocationService {
 
     @Autowired
     private LocationUserGroupRepository locationUserGroupRepository;
-
-    @Autowired
-    private LocationUserGroupUserRepository locationUserGroupUserRepository;
 
     @Autowired
     private LocationUserGroupPermissionRepository locationUserGroupPermissionRepository;
@@ -38,61 +40,98 @@ public class ChangeLocationService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private LocationUserGroupUserRepository locationUserGroupUserRepository;
+
     public LocationUserGroupInfoDTO createLocationUserGroup(LocationUserGroupRequestDTO data) {
-        LocationUserGroup group = new LocationUserGroup(data.name(), data.description());
-        return new LocationUserGroupInfoDTO(locationUserGroupRepository.save(group));
+
+        List<User> users = userRepository.findAllById(data.users());
+        data.users().forEach(user -> {
+            if (!userRepository.existsById(user)) {
+                throw new ValidationException("One or more users not found.");
+            }
+        });
+
+        // Create and save the user group
+        LocationUserGroup userGroup = new LocationUserGroup(new LocationUserGroupRegisterDTO(data.name(), data.description()));
+        LocationUserGroup savedGroup = locationUserGroupRepository.save(userGroup);
+
+        // Associate users with the group
+        List<LocationUserGroupUser> userAssociations = users.stream().map(user -> new LocationUserGroupUser(new LocationUserGroupUserRegisterDTO(savedGroup, user))).toList();
+        locationUserGroupUserRepository.saveAll(userAssociations);
+        return new LocationUserGroupInfoDTO(savedGroup);
+    }
+
+    public LocationUserGroupInfoDTO updateLocationUserGroup(Long id, LocationUserGroupRequestDTO data) {
+        LocationUserGroup group = locationUserGroupRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User group not found"));
+
+        group.setName(data.name());
+        group.setDescription(data.description());
+
+        // Remove previous user associations before adding new ones
+        locationUserGroupUserRepository.deleteAllByLocationUserGroup(group);
+        locationUserGroupUserRepository.flush();
+
+        List<User> users = userRepository.findAllById(data.users());
+        if (users.size() != data.users().size()) {
+            throw new ValidationException("One or more users not found.");
+        }
+
+        // Associate users with the group
+        List<LocationUserGroupUser> userAssociations = users.stream().map(user -> new LocationUserGroupUser(new LocationUserGroupUserRegisterDTO(group, user))).toList();
+        locationUserGroupUserRepository.saveAll(userAssociations);
+
+        return new LocationUserGroupInfoDTO(group);
+    }
+
+    public void deleteLocationUserGroup(Long id) {
+        LocationUserGroup userGroup = locationUserGroupRepository.findById(id).orElseThrow(() -> new ValidationException("User group not found."));
+        userGroup.setUsers(new ArrayList<>());
+        locationUserGroupRepository.save(userGroup);
+        locationUserGroupRepository.delete(userGroup);
     }
 
     public List<LocationUserGroupInfoDTO> getAllLocationUserGroups() {
-        return locationUserGroupRepository.findAll().stream().map(LocationUserGroupInfoDTO::new).toList();
+        return locationUserGroupRepository.findAll().stream()
+                .map(LocationUserGroupInfoDTO::new)
+                .toList();
     }
 
-    // CRUD for Location User Group Users
-    public LocationUserGroupUser addUserToGroup(Long groupId, Long userId) {
-
-        LocationUserGroup locationUserGroup = locationUserGroupRepository.findById(groupId).orElseThrow(() -> new RuntimeException("Group not found"));
-
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-
-        // Verificar si el usuario ya está en el grupo
-        if (locationUserGroupUserRepository.existsByGroupIdAndUserId(groupId, userId)) {
-            throw new RuntimeException("User is already in the group");
+    public List<LocationUserGroupUserInfoDTO> getAllUsersByGroup(Long id) {
+        if (!locationUserGroupRepository.existsById(id)) {
+            throw new ValidationException("User group not found");
         }
 
-        // Guardar la relación entre el usuario y el grupo usando un constructor
-        LocationUserGroupUser locationUserGroupUser = new LocationUserGroupUser(locationUserGroup, user);
-
-        locationUserGroupUserRepository.save(locationUserGroupUser);
-        return locationUserGroupUser;
+        return locationUserGroupUserRepository.findByLocationUserGroupId(id).stream()
+                .map(LocationUserGroupUserInfoDTO::new)
+                .toList();
     }
 
-    public List<LocationUserGroupInfoDTO> getAllUsersInGroups() {
-        return locationUserGroupUserRepository.findAll().stream().map(LocationUserGroupInfoDTO::new).toList();
+    public LocationUserGroupPermissionInfoDTO createPermission(LocationUserGroupPermissionRequestDTO request) {
+        // Fetch the user group
+        LocationUserGroup userGroup = locationUserGroupRepository.findById(request.locationUserGroupId()).orElseThrow(() -> new RuntimeException("User group not found"));
+        StorageArea fromLocationArea = storageAreaRepository.findById(request.fromLocationAreaId()).orElseThrow(() -> new RuntimeException("From storageLevel not found"));
+        StorageArea toLocationArea = storageAreaRepository.findById(request.toLocationAreaId()).orElseThrow(() -> new RuntimeException("To storageLevel not found"));
+        LocationUserGroupPermission permission = new LocationUserGroupPermission(new LocationUserGroupPermissionRegisterDTO(userGroup, fromLocationArea, toLocationArea));
+        LocationUserGroupPermission savedPermission = locationUserGroupPermissionRepository.save(permission);
+
+        return new LocationUserGroupPermissionInfoDTO(savedPermission);
     }
 
-    public List<LocationUserGroupUserInfoDTO> getAllUsersByGroupId(Long groupId) {
-        return Collections.singletonList(new LocationUserGroupUserInfoDTO(locationUserGroupUserRepository.getReferenceById(groupId)));
+    public void deletePermission(Long id) {
+        if (!locationUserGroupPermissionRepository.existsById(id)) {
+            throw new ValidationException("Permission not found");
+        }
+        locationUserGroupPermissionRepository.deleteById(id);
     }
 
-    // CRUD for Location User Group Permissions
-    public LocationUserGroupPermissionInfoDTO createPermission(LocationUserGroupPermissionRequestDTO data) {
-        LocationUserGroup group = locationUserGroupRepository.findById(data.locationUserGroupId()).orElseThrow(() -> new RuntimeException("Group not found"));
-        StorageArea fromLocationArea = storageAreaRepository.findById(data.fromLocationAreaId()).orElseThrow(() -> new RuntimeException("From location not found"));
-        StorageArea toLocationArea = storageAreaRepository.findById(data.toLocationAreaId()).orElseThrow(() -> new RuntimeException("To location not found"));
-
-        LocationUserGroupPermission permission = new LocationUserGroupPermission(group, fromLocationArea, toLocationArea, data.name(), data.description());
-        return new LocationUserGroupPermissionInfoDTO(locationUserGroupPermissionRepository.save(permission));
+    public List<LocationUserGroupPermissionInfoDTO> getPermissionsByGroup(Long id) {
+        return locationUserGroupPermissionRepository.findByLocationUserGroupId(id).stream()
+                .map(LocationUserGroupPermissionInfoDTO::new)
+                .toList();
     }
 
-    public List<LocationUserGroupPermissionInfoDTO> getAllGroupPermissions() {
-        return locationUserGroupPermissionRepository.findAll().stream().map(LocationUserGroupPermissionInfoDTO::new).toList();
-    }
-
-    public List<LocationUserGroupPermissionInfoDTO> getAllUserGroupPermissionsByGroupId(Long groupId) {
-        return locationUserGroupPermissionRepository.findById(groupId).stream().map(LocationUserGroupPermissionInfoDTO::new).toList();
-    }
-
-    public void changeLocation(@Valid ChangeLocationRequestDTO data) {
+    public void changeLocation(ChangeLocationRequestDTO data) {
         System.out.println("data " + data);
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         var currentUser = userRepository.findByUsername(username);

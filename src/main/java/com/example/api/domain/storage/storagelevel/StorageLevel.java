@@ -42,9 +42,9 @@ public class StorageLevel {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    public StorageLevel(String level, StorageLocation location) {
+    public StorageLevel(String level, StorageLocation storageLocation) {
         this.name = level;
         this.enabled = true;
-        this.storageLocation = location;
+        this.storageLocation = storageLocation;
     }
 }
