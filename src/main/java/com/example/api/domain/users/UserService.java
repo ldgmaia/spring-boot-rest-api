@@ -16,9 +16,6 @@ public class UserService {
     private UserRepository userRepository;
 
     @Autowired
-    private StorageService storageService;
-
-    @Autowired
     private StorageLevelRepository storageLevelRepository;
 
     @Autowired

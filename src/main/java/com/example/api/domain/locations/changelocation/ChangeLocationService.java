@@ -16,6 +16,7 @@ import com.example.api.domain.locations.changelocation.usergroupsusers.LocationU
 import com.example.api.domain.storage.storagearea.StorageArea;
 import com.example.api.domain.users.User;
 import com.example.api.repositories.*;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -132,9 +133,16 @@ public class ChangeLocationService {
     }
 
     public void changeLocation(ChangeLocationRequestDTO data) {
-        System.out.println("data " + data);
+//        System.out.println("data " + data);
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         var currentUser = userRepository.findByUsername(username);
         System.out.println("currentUser " + currentUser.getUsername() + " - " + currentUser.getId());
+    }
+
+    public Boolean checkPermission(@Valid CheckPermissionRequestDTO data) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        var currentUser = userRepository.findByUsername(username);
+
+        return locationUserGroupPermissionRepository.existsByLocationUserGroupIdAndFromLocationAreaIdAndToLocationAreaId(currentUser.getId(), data.fromLocationAreaId(), data.toLocationAreaId());
     }
 }

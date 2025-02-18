@@ -2,6 +2,7 @@ package com.example.api.controller;
 
 import com.example.api.domain.locations.changelocation.ChangeLocationRequestDTO;
 import com.example.api.domain.locations.changelocation.ChangeLocationService;
+import com.example.api.domain.locations.changelocation.CheckPermissionRequestDTO;
 import com.example.api.domain.locations.changelocation.usergroups.LocationUserGroupInfoDTO;
 import com.example.api.domain.locations.changelocation.usergroups.LocationUserGroupRequestDTO;
 import com.example.api.domain.locations.changelocation.usergroupspermission.LocationUserGroupPermissionInfoDTO;
@@ -136,5 +137,11 @@ public class StorageLocationController {
     public ResponseEntity changeLocation(@RequestBody @Valid ChangeLocationRequestDTO data) {
         changeLocationService.changeLocation(data);
         return ResponseEntity.ok(data);
+    }
+
+    @PutMapping("/check-permission")
+    public ResponseEntity<Boolean> checkPermission(@RequestBody @Valid CheckPermissionRequestDTO data) {
+
+        return ResponseEntity.ok(changeLocationService.checkPermission(data));
     }
 }
