@@ -53,6 +53,9 @@ public class AuthenticationController {
         List<String> roleNames = new ArrayList<>();
         roleNames.add("ADMIN");
 
-        return ResponseEntity.ok(new JWTTokenDTO(user.getId(), user.getUsername(), user.getFirstName(), user.getLastName(), roleNames, tokenJWT));
+        if (user.getStorageLevel() == null) {
+            return ResponseEntity.ok(new JWTTokenDTO(user.getId(), user.getUsername(), user.getFirstName(), user.getLastName(), null, roleNames, tokenJWT));
+        }
+        return ResponseEntity.ok(new JWTTokenDTO(user.getId(), user.getUsername(), user.getFirstName(), user.getLastName(), user.getStorageLevel().getId(), roleNames, tokenJWT));
     }
 }
