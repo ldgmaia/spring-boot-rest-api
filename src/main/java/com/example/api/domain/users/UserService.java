@@ -1,7 +1,6 @@
 package com.example.api.domain.users;
 
 import com.example.api.domain.ValidationException;
-import com.example.api.domain.storage.StorageService;
 import com.example.api.domain.storage.storagelevel.StorageLevel;
 import com.example.api.repositories.StorageLevelRepository;
 import com.example.api.repositories.StorageLocationRepository;
@@ -14,6 +13,9 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+//    @Autowired
+//    private StorageService storageService;
 
     @Autowired
     private StorageLevelRepository storageLevelRepository;

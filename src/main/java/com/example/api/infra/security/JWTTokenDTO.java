@@ -7,8 +7,9 @@ public record JWTTokenDTO(
         String username,
         String firstName,
         String lastName,
-        Long storageLevelId,
+        Long storageLevelid,
         List<String> roles,
         String token
 ) {
+
 }

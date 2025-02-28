@@ -1,0 +1,2 @@
+ALTER TABLE item_statuses
+ADD COLUMN can_transfer BOOLEAN NOT NULL DEFAULT TRUE;

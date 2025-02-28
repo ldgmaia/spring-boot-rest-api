@@ -24,14 +24,12 @@ public class ItemStatus {
     @JoinColumn(name = "created_by")
     private User createdBy;
 
-//    @Column(name = "created_at", nullable = false, updatable = false)
-//    private Timestamp createdAt;
-//
-//    @Column(name = "updated_at", nullable = false)
-//    private Timestamp updatedAt;
+    @Column(name = "can_transfer", nullable = false)
+    private Boolean canTransfer;
 
-    public ItemStatus(String name, User createdBy) {
+    public ItemStatus(String name, User createdBy, Boolean canTransfer) {
         this.name = name;
         this.createdBy = createdBy;
+        this.canTransfer = canTransfer;
     }
 }

@@ -10,5 +10,7 @@ import java.util.List;
 public interface LocationUserGroupPermissionRepository extends JpaRepository<LocationUserGroupPermission, Long> {
     List<LocationUserGroupPermission> findByLocationUserGroupId(Long locationUserGroupId);
 
-    boolean existsByLocationUserGroupIdAndFromLocationAreaIdAndToLocationAreaId(Long userId, Long fromIid, Long toId);
+    Boolean existsByLocationUserGroupIdInAndFromLocationAreaIdAndToLocationAreaId(List<Long> userGroupIds, Long fromLocationAreaId, Long toLocationAreaId);
+
+    Boolean existsByLocationUserGroupIdAndFromLocationAreaIdAndToLocationAreaId(Long userId, Long fromIid, Long toId);
 }

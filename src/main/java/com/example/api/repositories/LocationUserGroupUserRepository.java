@@ -13,4 +13,6 @@ public interface LocationUserGroupUserRepository extends JpaRepository<LocationU
     List<LocationUserGroupUser> findByLocationUserGroupId(Long locationUserGroupId);
 
     void deleteAllByLocationUserGroup(LocationUserGroup locationUserGroup);
+
+    List<LocationUserGroupUser> findByUserId(Long id);
 }

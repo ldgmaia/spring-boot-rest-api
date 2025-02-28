@@ -14,4 +14,6 @@ public interface StorageAreaRepository extends JpaRepository<StorageArea, Long> 
     List<StorageArea> findAllByStorageZoneId(Long storageZoneId);
 
     Optional<StorageArea> findByStorageZoneIdAndName(Long storageZoneId, @NotNull String name);
+
+    StorageArea findByName(String name);
 }

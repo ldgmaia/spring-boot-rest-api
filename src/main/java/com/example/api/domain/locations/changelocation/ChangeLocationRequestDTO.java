@@ -6,7 +6,7 @@ import java.util.List;
 
 public record ChangeLocationRequestDTO(
         @NotNull
-        Long toLocationId,
+        Long toLocationLevelId,
 
         @NotNull
         List<Long> ids
