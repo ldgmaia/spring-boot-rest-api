@@ -2,6 +2,10 @@ package com.example.api.domain.locations.changelocation;
 
 
 import com.example.api.domain.ValidationException;
+import com.example.api.domain.inventoryitems.InventoryItem;
+import com.example.api.domain.itemtransferlog.ItemTransferLog;
+import com.example.api.domain.itemtransferlog.ItemTransferRegisterDTO;
+import com.example.api.domain.itemtransferlog.TransferStatus;
 import com.example.api.domain.locations.changelocation.usergroups.LocationUserGroup;
 import com.example.api.domain.locations.changelocation.usergroups.LocationUserGroupInfoDTO;
 import com.example.api.domain.locations.changelocation.usergroups.LocationUserGroupRegisterDTO;
@@ -14,6 +18,7 @@ import com.example.api.domain.locations.changelocation.usergroupsusers.LocationU
 import com.example.api.domain.locations.changelocation.usergroupsusers.LocationUserGroupUserInfoDTO;
 import com.example.api.domain.locations.changelocation.usergroupsusers.LocationUserGroupUserRegisterDTO;
 import com.example.api.domain.storage.storagearea.StorageArea;
+import com.example.api.domain.storage.storagelevel.StorageLevel;
 import com.example.api.domain.users.User;
 import com.example.api.repositories.*;
 import jakarta.validation.Valid;
@@ -25,6 +30,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class ChangeLocationService {
@@ -43,6 +50,18 @@ public class ChangeLocationService {
 
     @Autowired
     private LocationUserGroupUserRepository locationUserGroupUserRepository;
+
+    @Autowired
+    private InventoryItemRepository inventoryItemRepository;
+
+    @Autowired
+    private StorageLevelRepository storageLevelRepository;
+
+    @Autowired
+    private ItemTransferLogRepository itemTransferLogRepository;
+
+    @Autowired
+    private ItemStatusRepository itemStatusRepository;
 
     public LocationUserGroupInfoDTO createLocationUserGroup(LocationUserGroupRequestDTO data) {
 
@@ -109,7 +128,6 @@ public class ChangeLocationService {
     }
 
     public LocationUserGroupPermissionInfoDTO createPermission(LocationUserGroupPermissionRequestDTO request) {
-        // Fetch the user group
         LocationUserGroup userGroup = locationUserGroupRepository.findById(request.locationUserGroupId()).orElseThrow(() -> new RuntimeException("User group not found"));
         StorageArea fromLocationArea = storageAreaRepository.findById(request.fromLocationAreaId()).orElseThrow(() -> new RuntimeException("From storageLevel not found"));
         StorageArea toLocationArea = storageAreaRepository.findById(request.toLocationAreaId()).orElseThrow(() -> new RuntimeException("To storageLevel not found"));
@@ -132,17 +150,92 @@ public class ChangeLocationService {
                 .toList();
     }
 
-    public void changeLocation(ChangeLocationRequestDTO data) {
-//        System.out.println("data " + data);
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        var currentUser = userRepository.findByUsername(username);
-        System.out.println("currentUser " + currentUser.getUsername() + " - " + currentUser.getId());
-    }
-
     public Boolean checkPermission(@Valid CheckPermissionRequestDTO data) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         var currentUser = userRepository.findByUsername(username);
 
         return locationUserGroupPermissionRepository.existsByLocationUserGroupIdAndFromLocationAreaIdAndToLocationAreaId(currentUser.getId(), data.fromLocationAreaId(), data.toLocationAreaId());
+    }
+
+    public void changeLocation(ChangeLocationRequestDTO data) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        var currentUser = userRepository.findByUsername(username);
+
+        if (data.toLocationLevelId() == null) throw new ValidationException("Destination location ID cannot be empty");
+
+        storageLevelRepository.findById(data.toLocationLevelId()).orElseThrow(() -> new ValidationException("Destination location not found"));
+
+        if (data.ids().isEmpty()) throw new ValidationException("No item IDs provided");
+
+        List<InventoryItem> inventoryItemsToModify = inventoryItemRepository.findAllById(data.ids());
+
+        if (inventoryItemsToModify.isEmpty()) throw new ValidationException("No items found for IDs: " + data.ids());
+        if (inventoryItemsToModify.size() != data.ids().size())
+            throw new ValidationException("One or more items not found for IDs: " + data.ids());
+
+        for (InventoryItem item : inventoryItemsToModify) {
+
+            if (item.getStorageLevel().getId().equals(data.toLocationLevelId())) {
+                throw new ValidationException("Item ID: " + item.getId() + " is already in the destination location");
+            }
+
+            var validStatusList = itemStatusRepository.findByCanTransferTrue();
+
+            validStatusList.stream()
+                    .filter(status -> status.getId().equals(item.getItemStatus().getId()))
+                    .findAny()
+                    .orElseThrow(() -> new ValidationException("Serial number: " + item.getSerialNumber() + " is " + item.getItemStatus().getName() + " and can't be transferred"));
+
+            var fromLocationLevelId = item.getStorageLevel().getId();
+            var toLocationLevelId = data.toLocationLevelId();
+            var fromLocationAreaId = item.getStorageLevel().getStorageLocation().getStorageArea().getId();
+            var toLocationAreaId = storageLevelRepository.findById(data.toLocationLevelId()).get().getStorageLocation().getStorageArea().getId();
+
+//            var toLocationAreaId = Optional.of(data.toLocationLevelId())
+//                    .flatMap(storageLevelRepository::findById)
+//                    .map(storageLevel -> storageLevel.getStorageLocation().getStorageArea().getId())
+//                    .orElse(null);
+
+
+            var myselfLocationAreaId = storageAreaRepository.findByName("myself").getId();
+            var loggedUserLocationLevelId = currentUser.getStorageLevel().getId();
+            var loggedUserLocationGroupIds = locationUserGroupUserRepository.findByUserId(currentUser.getId())
+                    .stream()
+                    .map(locationUserGroupUser -> locationUserGroupUser.getLocationUserGroup().getId())
+                    .collect(Collectors.toList());
+
+            var fromLocationAreaToCheck = Objects.equals(fromLocationLevelId, loggedUserLocationLevelId) ? myselfLocationAreaId : fromLocationAreaId;
+            var toLocationAreaToCheck = Objects.equals(toLocationLevelId, loggedUserLocationLevelId) ? myselfLocationAreaId : toLocationAreaId;
+
+            var fromLocationLevel = item.getStorageLevel();
+            var toLocationLevel = storageLevelRepository.getReferenceById(data.toLocationLevelId());
+
+            Boolean canTransfer = locationUserGroupPermissionRepository.existsByLocationUserGroupIdInAndFromLocationAreaIdAndToLocationAreaId(loggedUserLocationGroupIds, fromLocationAreaToCheck, toLocationAreaToCheck);
+
+            if (!canTransfer) {
+                //throw new ValidationException("You don't have permission to transfer items from/to location");
+
+                var log = new ItemTransferLog(new ItemTransferRegisterDTO(
+                        item,
+                        fromLocationLevel,
+                        toLocationLevel,
+                        TransferStatus.FAILURE,
+                        "No permission to transfer from location " + fromLocationLevel.getName() + " (" + fromLocationLevel.getStorageLocation().getStorageArea().getName() + ")" + " to location " + toLocationLevel.getName() + " (" + toLocationLevel.getStorageLocation().getStorageArea().getName() + ")"
+                ));
+                itemTransferLogRepository.save(log);
+                throw new ValidationException("User: " + currentUser.getUsername() + ". You don't have permission to transfer items from " + storageAreaRepository.findById(fromLocationAreaToCheck).get().getName() + " to " + storageAreaRepository.findById(toLocationAreaToCheck).get().getName() + " location");
+            }
+
+            StorageLevel newStorageLevel = storageLevelRepository.findById(data.toLocationLevelId())
+                    .orElseThrow(() -> new ValidationException("Storage level not found for ID: " + data.toLocationLevelId()));
+
+            item.setStorageLevel(newStorageLevel);
+
+            inventoryItemRepository.save(item);
+            System.out.println("Item " + item.getId() + " moved to location " + newStorageLevel.getId());
+            var log = new ItemTransferLog(new ItemTransferRegisterDTO(item, fromLocationLevel, toLocationLevel, TransferStatus.SUCCESS, "SUCCESS - Location Changed"));
+            System.out.println("ItemTransferLog: " + log);
+            itemTransferLogRepository.save(log);
+        }
     }
 }
