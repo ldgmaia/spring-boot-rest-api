@@ -15,11 +15,3 @@ ADD FOREIGN KEY (storage_level_id)
 REFERENCES storage_levels(id)
 ON DELETE SET NULL
 ON UPDATE SET NULL;
-
-
---ALTER TABLE users
---ADD CONSTRAINT fk_storage_level
---FOREIGN KEY (storage_level_id)
---REFERENCES storage_levels(id)
---ON DELETE CASCADE
---ON UPDATE CASCADE;

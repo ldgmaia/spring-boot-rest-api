@@ -1,17 +1,19 @@
 CREATE TABLE roles (
 	id BIGINT unsigned NOT NULL AUTO_INCREMENT,
-	name VARCHAR(100) UNIQUE NOT NULL,
+	name VARCHAR(100)  NOT NULL,
 
+    UNIQUE (name),
 	PRIMARY KEY (id)
 );
 
 CREATE TABLE permissions (
 	id BIGINT unsigned NOT NULL AUTO_INCREMENT,
-	route VARCHAR(100) UNIQUE NOT NULL,
+	route VARCHAR(100) NOT NULL,
 	description VARCHAR(100) NOT NULL,
 	role_id BIGINT unsigned NOT NULL,
 
 	PRIMARY KEY (id),
+	UNIQUE (route),
 	CONSTRAINT fk_permissions_roles FOREIGN KEY (role_id) REFERENCES roles (id)
 );
 

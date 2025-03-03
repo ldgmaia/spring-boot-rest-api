@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS location_user_groups (
     id                  BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    name                VARCHAR(255) NOT NULL UNIQUE,
+    name                VARCHAR(255) NOT NULL,
     description         VARCHAR(255),
     created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,

@@ -1,0 +1,18 @@
+--INSERT INTO location_user_groups (name,description)
+--VALUES
+--	 ('Warehouse',''),
+--	 ('Tech',''),
+--	 ('FBA','');
+--
+--INSERT INTO location_user_group_users (group_id,user_id)
+--VALUES
+--	 (1,1),
+--	 (1,2),
+--	 (2,2),
+--	 (2,1);
+--
+--INSERT INTO location_user_group_permissions (location_user_groups_id,from_location_area_id,to_location_area_id)
+--VALUES
+--	 (2,1,2),
+--	 (2,2,1),
+--	 (2,1,3);
