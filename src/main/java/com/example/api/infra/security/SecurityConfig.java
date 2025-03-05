@@ -22,6 +22,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -33,11 +34,11 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource myWebsiteConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("*"));
+        configuration.setAllowedOrigins(List.of("*"));
 //        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
 //        configuration.setAllowedMethods(Arrays.asList("*"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowedHeaders(List.of("*"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
@@ -67,7 +68,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(req -> {
                     req.requestMatchers(HttpMethod.POST, "/login").permitAll(); // exclude the /login route from requiring the authentication token
 //                    req.requestMatchers(HttpMethod.POST, "/login", "/users").permitAll(); // exclude the /login route from requiring the authentication token
-                    req.requestMatchers(HttpMethod.GET, "/files/view/**").permitAll();
+                    req.requestMatchers(HttpMethod.GET, "/files/view/**", "/qbo/callback", "/qbo/webhook").permitAll();
 //                    req.requestMatchers(HttpMethod.POST, "/users").hasRole("ADMIN"); // only admin users can register new users
                     req.requestMatchers("/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**").permitAll(); // exclude the /users route from requiring the authentication token
                     req.anyRequest().authenticated(); // any other request, needs to be authenticated
