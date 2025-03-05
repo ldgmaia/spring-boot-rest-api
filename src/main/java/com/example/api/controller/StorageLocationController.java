@@ -60,6 +60,12 @@ public class StorageLocationController {
         return ResponseEntity.ok(zones);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<StorageZoneInfoDTO> getStorage(@PathVariable Long id) {
+        StorageZoneInfoDTO zone = storageService.getZoneInfo(id);
+        return ResponseEntity.ok(zone);
+    }
+
     @Transactional
     @PutMapping("/move-area")
     public ResponseEntity<Void> moveStorageArea(@RequestBody StorageAreaMoveDTO request) {

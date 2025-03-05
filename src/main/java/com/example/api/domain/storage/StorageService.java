@@ -199,12 +199,16 @@ public class StorageService {
         return new StorageZoneInfoDTO(storageZone);
     }
 
-    // Method to get all zones and map them to DTOs
     public List<StorageZoneInfoDTO> getAllZonesInfo() {
         List<StorageZone> zones = storageZoneRepository.findAll();
         return zones.stream()
                 .map(StorageZoneInfoDTO::new)
                 .toList();
+    }
+
+    public StorageZoneInfoDTO getZoneInfo(Long id) {
+        StorageZone zone = storageZoneRepository.getReferenceById(id);
+        return new StorageZoneInfoDTO(zone);
     }
 
     public void moveStorageLevel(StorageLevelMoveDTO request) {

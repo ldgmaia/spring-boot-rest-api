@@ -1,0 +1,19 @@
+name: CI
+on:
+  push:
+    branches: [ alpha ]
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git pull, run Migrations and restart services
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cd /home/deploy/documents/projects/rbms-backend-alpha
+            sh update_alpha.sh

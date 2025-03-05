@@ -1,4 +1,4 @@
-name: CI-BETA
+name: CI
 on:
   push:
     branches: [ beta ]
@@ -7,7 +7,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
       - name: Git pull, run Migrations and restart services
         uses: appleboy/ssh-action@master
         with:
