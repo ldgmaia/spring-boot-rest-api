@@ -232,9 +232,7 @@ public class ChangeLocationService {
             item.setStorageLevel(newStorageLevel);
 
             inventoryItemRepository.save(item);
-            System.out.println("Item " + item.getId() + " moved to location " + newStorageLevel.getId());
             var log = new ItemTransferLog(new ItemTransferRegisterDTO(item, fromLocationLevel, toLocationLevel, TransferStatus.SUCCESS, "SUCCESS - Location Changed"));
-            System.out.println("ItemTransferLog: " + log);
             itemTransferLogRepository.save(log);
         }
     }

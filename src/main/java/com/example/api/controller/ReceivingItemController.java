@@ -34,18 +34,11 @@ public class ReceivingItemController {
     @GetMapping("/{id}")
     public ResponseEntity<ReceivingItemInfoDTO> detail(@PathVariable Long id) {
         var receivingItem = receivingItemService.show(id);
-
         return ResponseEntity.ok(receivingItem);
     }
 
     @GetMapping
     public ResponseEntity listReceivingsByStatus(@RequestParam(required = false, defaultValue = "Pending assessment") String[] status, @PageableDefault(size = 100, page = 0, sort = {"createdAt"}) Pageable pagination) {
-//        Arrays.stream(status).forEach(System.out::println);
-//        System.out.println("status 1 -> " + status[0]);
-//        System.out.println("status 2 -> " + status[1]);
-//        Page<ReceivingItemAssessmentListDTO> receivingsByStatus =
-
-
         return ResponseEntity.ok(receivingItemRepository.findByReceivingTypeAndStatusInAndQuantityAlreadyReceivedGreaterThanOrderByUpdatedAtDesc(ReceivingType.PO, status, 0L, pagination).stream().map(ri -> {
             return new ReceivingItemAssessmentListDTO(ri, inventoryItemRepository);
         }).toList());

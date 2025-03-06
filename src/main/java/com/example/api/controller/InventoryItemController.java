@@ -47,7 +47,6 @@ public class InventoryItemController {
 //                .buildAndExpand(inventory.id())
 //                .toUri();
 //        return ResponseEntity.created(uri).body(inventory);
-//        System.out.println("data " + data);
 //        return ResponseEntity.ok("OK");
 
         try {

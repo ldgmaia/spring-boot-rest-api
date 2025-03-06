@@ -171,7 +171,6 @@ public class StorageService {
                 // Remove levels no longer present in the update for this location
                 for (Long id : existingLevelsMap.keySet()) {
                     if (!newLevelsMap.containsKey(id)) {
-                        System.out.println("id " + id);
                         storageLevelRepository.deleteById(id);
                     }
                 }

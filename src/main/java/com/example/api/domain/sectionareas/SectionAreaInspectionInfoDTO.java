@@ -36,32 +36,6 @@ public record SectionAreaInspectionInfoDTO(
         );
     }
 
-//    private static Long getCurrentModelId(InventoryItemRepository repository, Long inventoryItemId, Long sectionAreaId) {
-//        List<InventoryItem> components = repository.findComponentsBySectionAreaId(inventoryItemId, sectionAreaId);
-//
-//        if (components.isEmpty()) {
-//            System.out.println("No results found.");
-//            return null;
-//        }
-//
-//        components.forEach(comp -> {
-////            System.out.println(comp.getSerialNumber());
-////            System.out.println(comp.getModel().getName());
-//            System.out.println(inventoryItemId);
-//            System.out.println(comp.getSectionArea().getId());
-//            System.out.println(comp.getId());
-//        });
-//
-//        System.out.println("Number of results: " + components.size());
-
-    /// /        components.forEach(component -> System.out.println("Component ID: " + component.getId() + ", Model ID: " + component.getModel().getId() + ", section size: " + component.getModel().getSections().size()));
-//
-//        if (components.size() > 1) {
-//            throw new RuntimeException("Query returned multiple results when one was expected.");
-//        }
-//
-//        return components.get(0).getModel().getId();
-//    }
     private static Long getCurrentModelId(InventoryItemRepository repository, Long inventoryItemId, Long sectionAreaId) {
         return Optional.ofNullable(repository.findComponentModelIdBySectionAreaId(inventoryItemId, sectionAreaId))
                 .map(component -> component.getModel().getId())

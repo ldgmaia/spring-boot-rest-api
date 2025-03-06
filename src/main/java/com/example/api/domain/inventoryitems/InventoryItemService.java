@@ -313,10 +313,6 @@ public class InventoryItemService {
                         }
                 ));
 
-        // Return the grouped and merged results as a list
-//        return new ArrayList<>(groupedByArea.values());
-//        System.out.println("mainItemFieldsCombined " + mainItemFieldsCombined);
-
         // Removing all fields values from the main item and its components
         inventoryItemsFieldValuesRepository.deleteByInventoryItemId(data.parentInventoryItemId());
         inventoryItemComponentRepository.updateInventoryItemsPresenceToFalse(data.parentInventoryItemId());
@@ -444,41 +440,4 @@ public class InventoryItemService {
         // Build the RBID
         return String.format("%s+%s+%s+%s+%d", partNumber, model, category, po, inventoryItemsId);
     }
-
-//        System.out.println("data " + data);
-//        var parentInventoryItem = inventoryItemRepository.getReferenceById(data.parentInventoryItemId());
-//        var iifv2 = inventoryItemsFieldValuesRepository.findByInventoryItemId(data.parentInventoryItemId());
-//        // loop through the list of fields and print the values
-//        for (var field : iifv2) {
-//            System.out.println("Main item field " + field.getInventoryItem().getId() + " " + field.getFieldValue().getId() + " " + field.getFieldValue().getField().getId() + " " + field.getFieldValue().getValueData().getId());
-//        }
-//
-//        var components = inventoryItemComponentRepository.findByParentInventoryItemId(data.parentInventoryItemId());
-//        for (var component : components) {
-//            System.out.println("field " + component.getInventoryItem().getId() + " " + component.getInventoryItem().getId() + " " + component.getInventoryItem().getModel().getName());
-//            var iifv = inventoryItemsFieldValuesRepository.findByInventoryItemId(component.getInventoryItem().getId());
-//            // loop through the list of fields and print the values
-//            for (var field : iifv) {
-//                System.out.println("     field " + field.getFieldValue().getId() + " " + field.getFieldValue().getField().getId() + " " + field.getFieldValue().getValueData().getId());
-//            }
-//        }
-
-        /*
-
-        clean all connections for the parent item and then add again
-
-            check current components
-                compare with new components
-
-            inventoryItems
-                - change grade
-            inventoryItemsFieldsValues
-                - update for main item and components
-                - update if new field values were created
-            inventoryItemsComponents
-                - if removed, remove parent
-                - if added, add parent
-
-         */
-//    }
 }

@@ -32,7 +32,6 @@ public class PurchaseOrder {
     @JoinColumn(name = "suppliers_id")
     private Supplier supplier;
 
-    //    private String receivingStatus;
     private String watchingPo;
     private LocalDateTime lastReceivedAt;
 
@@ -45,7 +44,6 @@ public class PurchaseOrder {
         this.qboCreatedAt = data.qboCreatedAt();
         this.qboUpdatedAt = data.qboUpdatedAt();
         this.supplier = data.supplier();
-//        this.receivingStatus = data.receivingStatus();
         this.watchingPo = data.watchingPo();
     }
 }
