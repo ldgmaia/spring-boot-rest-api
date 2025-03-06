@@ -1,6 +1,8 @@
 package com.example.api.infra.exception;
 
 import com.example.api.domain.ValidationException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -9,11 +11,14 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.HttpClientErrorException;
 
+import java.io.IOException;
 import java.util.Map;
 
 @RestControllerAdvice
 public class ErrorHandler {
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity handleError404() {
@@ -34,6 +39,31 @@ public class ErrorHandler {
 //        return ResponseEntity.badRequest().body(exception.getMessage());
     }
 
+    @ExceptionHandler(HttpClientErrorException.class)
+    public ResponseEntity<Map<String, String>> handleBusinessRuleError(HttpClientErrorException exception) {
+        String defaultMessage = "An error occurred while processing your request.";
+        try {
+            // Extract the response body
+            String responseBody = exception.getResponseBodyAsString();
+            JsonNode root = objectMapper.readTree(responseBody);
+
+            // Navigate to the specific error message
+            JsonNode faultNode = root.path("Fault").path("Error");
+            if (faultNode.isArray() && faultNode.size() > 0) {
+                JsonNode firstError = faultNode.get(0);
+                String message = firstError.path("Message").asText();
+                String detail = firstError.path("Detail").asText();
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(Map.of("message", message, "detail", detail));
+            }
+        } catch (IOException e) {
+            // Log the error and return a generic message
+            e.printStackTrace();
+        }
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", defaultMessage));
+    }
+
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity handleDataIntegrityViolationException(DataIntegrityViolationException exception) {
         String friendlyMessage = getFriendlyMessage(exception);
@@ -47,12 +77,6 @@ public class ErrorHandler {
     public ResponseEntity handleUniqueConstraintViolationException(UniqueConstraintViolationException exception) {
         Map<String, String> jsonResponse = Map.of("message", exception.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(jsonResponse);
-    }
-
-    private record ErrorDataValidation(String field, String message) {
-        public ErrorDataValidation(FieldError error) {
-            this(error.getField(), error.getDefaultMessage());
-        }
     }
 
     private String getFriendlyMessage(DataIntegrityViolationException exception) {
@@ -69,6 +93,12 @@ public class ErrorHandler {
         }
         // Add more checks for other common data integrity violations if needed
         return "A data integrity violation occurred. Please check your input and try again.";
+    }
+
+    private record ErrorDataValidation(String field, String message) {
+        public ErrorDataValidation(FieldError error) {
+            this(error.getField(), error.getDefaultMessage());
+        }
     }
 
 }

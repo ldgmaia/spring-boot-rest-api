@@ -33,4 +33,9 @@ public class QBOController {
     public ResponseEntity getAuthUri() {
         return ResponseEntity.ok(qboService.getAuthUri());
     }
+
+    @GetMapping("/get-purchase-order-by-id/{purchaseOrderId}")
+    public ResponseEntity getCompanyInfo(@PathVariable Long purchaseOrderId) {
+        return ResponseEntity.ok(qboService.getPurchaseOrderInfo(purchaseOrderId));
+    }
 }

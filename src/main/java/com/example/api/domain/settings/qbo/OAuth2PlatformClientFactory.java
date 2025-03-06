@@ -25,21 +25,28 @@ public class OAuth2PlatformClientFactory {
     @Autowired
     private AdminSettingRepository adminSettingRepository;
 
-
-    //    @Autowired
-//    org.springframework.core.env.Environment env;
     @Value("${QBO_CLIENT_ID}")
     private String qboClientId;
     @Value("${QBO_SECRET}")
     private String qboSecret;
+    @Value("${QBO_SANDBOX_CLIENT_ID}")
+    private String qboSandboxClientId;
+    @Value("${QBO_SANDBOX_SECRET}")
+    private String qboSandboxSecret;
+
+    @Value("${API_ENV}")
+    private String env;
+
 
     @PostConstruct
     public void init() {
-        //initialize the config
-        oauth2Config = new OAuth2Config.OAuth2ConfigBuilder(qboClientId, qboSecret) //set client id, secret
+        String clientId = "prod".equalsIgnoreCase(env) ? qboClientId : qboSandboxClientId;
+        String clientSecret = "prod".equalsIgnoreCase(env) ? qboSecret : qboSandboxSecret;
+
+        oauth2Config = new OAuth2Config.OAuth2ConfigBuilder(clientId, clientSecret) //set client id, secret
                 .callDiscoveryAPI(Environment.SANDBOX) // call discovery API to populate urls
                 .buildConfig();
-        //build the client
+
         client = new OAuth2PlatformClient(oauth2Config);
     }
 
@@ -52,11 +59,12 @@ public class OAuth2PlatformClientFactory {
     }
 
     public String getPropertyValue(String proppertyName) {
-        List<AdminSettings> qboSettings = adminSettingRepository.findByService("QuickBooks");
+        String serviceSettingsName = "prod".equalsIgnoreCase(env) ? "QuickBooks" : "QuickBooksSandbox";
+        List<AdminSettings> qboSettings = adminSettingRepository.findByService(serviceSettingsName);
 
         // Convert list to a map (key: settingKey, value: settingValue)
         Map<String, String> qboSettingsMap = qboSettings.stream()
                 .collect(Collectors.toMap(AdminSettings::getKey_param, AdminSettings::getValue_param));
-        return qboSettingsMap.get("redirect_uri");
+        return qboSettingsMap.get(proppertyName);
     }
 }
