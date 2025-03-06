@@ -1,5 +1,7 @@
 package com.example.api.controller;
 
+import com.example.api.domain.purchaseorders.PurchaseOrderResponseDTO;
+import com.example.api.domain.purchaseorders.VendorResponseDTO;
 import com.example.api.domain.settings.qbo.QboCallbackRequestDTO;
 import com.example.api.domain.settings.qbo.QboService;
 import com.example.api.domain.settings.qbo.QboWebhookRequestDTO;
@@ -36,6 +38,16 @@ public class QBOController {
 
     @GetMapping("/get-purchase-order-by-id/{purchaseOrderId}")
     public ResponseEntity getCompanyInfo(@PathVariable Long purchaseOrderId) {
-        return ResponseEntity.ok(qboService.getPurchaseOrderInfo(purchaseOrderId));
+        String urlModule = "/purchaseorder/" + purchaseOrderId;
+        return ResponseEntity.ok(qboService.fetchFromQbo(urlModule, PurchaseOrderResponseDTO.class));
+//        return ResponseEntity.ok(qboService.getPurchaseOrderInfo(purchaseOrderId));
+    }
+
+    @GetMapping("/get-purchase-order-vendor-by-id/{vendorId}")
+    public ResponseEntity getVendorInfo(@PathVariable Long vendorId) {
+        String urlModule = "/vendor/" + vendorId;
+//        return ResponseEntity.ok(urlModule);
+        return ResponseEntity.ok(qboService.fetchFromQbo(urlModule, VendorResponseDTO.class));
+//        return ResponseEntity.ok(qboService.getPurchaseOrderInfo(purchaseOrderId));
     }
 }

@@ -31,12 +31,11 @@ public class QboService {
     private static final String failureMsg = "Failed";
     @Autowired
     OAuth2PlatformClientFactory factory;
+    String urlModule = "/purchaseorder/" + 322;
     @Autowired
     private AdminSettingRepository adminSettingRepository;
-
     @Value("${API_ENV}")
     private String env;
-
     String serviceSettingsName = "prod".equalsIgnoreCase(env) ? "QuickBooks" : "QuickBooksSandbox";
 
     public RedirectView getAuthUri() {
@@ -100,6 +99,67 @@ public class QboService {
 
         } catch (OAuthException e) {
             throw new RuntimeException("Exception calling connectToQuickbooks " + e);
+        }
+    }
+
+    public <T> T fetchFromQbo(String urlModule, Class<T> responseType) {
+        System.out.println("URL Module: " + urlModule);
+        List<AdminSettings> qboSettings = adminSettingRepository.findByService(serviceSettingsName);
+
+        // Convert list to a map (key: settingKey, value: settingValue)
+        Map<String, String> qboSettingsMap = qboSettings.stream()
+                .collect(Collectors.toMap(AdminSettings::getKey_param, AdminSettings::getValue_param));
+
+        if (qboSettingsMap.get("realmId") == null) {
+            throw new RuntimeException("No realm ID.  QBO calls only work if the accounting scope was passed!");
+//            return new JSONObject().put("response", "No realm ID.  QBO calls only work if the accounting scope was passed!").toString();
+        }
+
+        String accessToken = qboSettingsMap.get("accessToken");
+        String refreshToken = qboSettingsMap.get("refreshToken");
+        String minorVersion = qboSettingsMap.get("minorVersion");
+        String realmId = qboSettingsMap.get("realmId");
+
+        String url = factory.getPropertyValue("qboUrl") + "/v3/company/" + realmId;
+
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "Bearer " + accessToken);
+            headers.set("Accept", "application/json");
+
+            System.out.println("URL: " + url + urlModule + "?minorversion=" + minorVersion);
+
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+            ResponseEntity<T> purchaseOrder = restTemplate.exchange(url + urlModule + "?minorversion=" + minorVersion, HttpMethod.GET, entity, responseType);
+//            ResponseEntity<String> response = restTemplate.exchange(url + "/query?query=select * from PurchaseOrder where Id = '322'&minorversion=" + minorVersion, HttpMethod.GET, entity, String.class);
+            return purchaseOrder.getBody();
+        }
+        /*
+         * Handle 401 status code -
+         * If a 401 response is received, refresh tokens should be used to get a new access token,
+         * and the API call should be tried again.
+         */ catch (HttpClientErrorException e) {
+            OAuth2PlatformClient client = factory.getOAuth2PlatformClient();
+            try {
+                BearerTokenResponse bearerToken = client.refreshToken(refreshToken);
+
+                RestTemplate restTemplate = new RestTemplate();
+                HttpHeaders headers = new HttpHeaders();
+                headers.set("Authorization", "Bearer " + bearerToken.getAccessToken());
+                headers.set("Accept", "application/json");
+
+                HttpEntity<String> entity = new HttpEntity<>(headers);
+                ResponseEntity<T> purchaseOrder = restTemplate.exchange(url + urlModule + "?minorversion=" + minorVersion, HttpMethod.GET, entity, responseType);
+
+                return purchaseOrder.getBody();
+
+            } catch (OAuthException e1) {
+                throw new RuntimeException("Error while calling refreshToken :: " + failureMsg + " - " + e1.getMessage());
+//                return new JSONObject().put("response", failureMsg).toString();
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error while calling executeQuery :: " + e.getMessage());
         }
     }
 
