@@ -103,7 +103,6 @@ public class QboService {
     }
 
     public <T> T fetchFromQbo(String urlModule, Class<T> responseType) {
-        System.out.println("URL Module: " + urlModule);
         List<AdminSettings> qboSettings = adminSettingRepository.findByService(serviceSettingsName);
 
         // Convert list to a map (key: settingKey, value: settingValue)
@@ -112,7 +111,6 @@ public class QboService {
 
         if (qboSettingsMap.get("realmId") == null) {
             throw new RuntimeException("No realm ID.  QBO calls only work if the accounting scope was passed!");
-//            return new JSONObject().put("response", "No realm ID.  QBO calls only work if the accounting scope was passed!").toString();
         }
 
         String accessToken = qboSettingsMap.get("accessToken");
@@ -126,13 +124,14 @@ public class QboService {
             RestTemplate restTemplate = new RestTemplate();
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", "Bearer " + accessToken);
-            headers.set("Accept", "application/json");
-
-            System.out.println("URL: " + url + urlModule + "?minorversion=" + minorVersion);
+            if (urlModule.contains("/pdf")) {
+                headers.set("Accept", "application/pdf");
+            } else {
+                headers.set("Accept", "application/json");
+            }
 
             HttpEntity<String> entity = new HttpEntity<>(headers);
             ResponseEntity<T> purchaseOrder = restTemplate.exchange(url + urlModule + "?minorversion=" + minorVersion, HttpMethod.GET, entity, responseType);
-//            ResponseEntity<String> response = restTemplate.exchange(url + "/query?query=select * from PurchaseOrder where Id = '322'&minorversion=" + minorVersion, HttpMethod.GET, entity, String.class);
             return purchaseOrder.getBody();
         }
         /*
@@ -147,7 +146,11 @@ public class QboService {
                 RestTemplate restTemplate = new RestTemplate();
                 HttpHeaders headers = new HttpHeaders();
                 headers.set("Authorization", "Bearer " + bearerToken.getAccessToken());
-                headers.set("Accept", "application/json");
+                if (urlModule.contains("/pdf")) {
+                    headers.set("Accept", "application/pdf");
+                } else {
+                    headers.set("Accept", "application/json");
+                }
 
                 HttpEntity<String> entity = new HttpEntity<>(headers);
                 ResponseEntity<T> purchaseOrder = restTemplate.exchange(url + urlModule + "?minorversion=" + minorVersion, HttpMethod.GET, entity, responseType);
@@ -156,7 +159,6 @@ public class QboService {
 
             } catch (OAuthException e1) {
                 throw new RuntimeException("Error while calling refreshToken :: " + failureMsg + " - " + e1.getMessage());
-//                return new JSONObject().put("response", failureMsg).toString();
             }
         } catch (Exception e) {
             throw new RuntimeException("Error while calling executeQuery :: " + e.getMessage());

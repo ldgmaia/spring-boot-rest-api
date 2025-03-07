@@ -1,7 +1,6 @@
 package com.example.api.controller;
 
 import com.example.api.domain.purchaseorders.PurchaseOrderResponseDTO;
-import com.example.api.domain.purchaseorders.VendorResponseDTO;
 import com.example.api.domain.settings.qbo.QboCallbackRequestDTO;
 import com.example.api.domain.settings.qbo.QboService;
 import com.example.api.domain.settings.qbo.QboWebhookRequestDTO;
@@ -28,6 +27,7 @@ public class QBOController {
 
     @PostMapping("/webhook")
     public ResponseEntity webhook(@Valid @RequestBody QboWebhookRequestDTO data, @RequestHeader(name = "intuit-signature", required = false) String intuitSignature) {
+        // create the function in the service to manage (create, update, delete) the PO
         return ResponseEntity.ok(intuitSignature);
     }
 
@@ -37,17 +37,20 @@ public class QBOController {
     }
 
     @GetMapping("/get-purchase-order-by-id/{purchaseOrderId}")
-    public ResponseEntity getCompanyInfo(@PathVariable Long purchaseOrderId) {
+    public ResponseEntity getPurchaseOrder(@PathVariable Long purchaseOrderId) {
         String urlModule = "/purchaseorder/" + purchaseOrderId;
         return ResponseEntity.ok(qboService.fetchFromQbo(urlModule, PurchaseOrderResponseDTO.class));
-//        return ResponseEntity.ok(qboService.getPurchaseOrderInfo(purchaseOrderId));
     }
 
-    @GetMapping("/get-purchase-order-vendor-by-id/{vendorId}")
-    public ResponseEntity getVendorInfo(@PathVariable Long vendorId) {
-        String urlModule = "/vendor/" + vendorId;
-//        return ResponseEntity.ok(urlModule);
-        return ResponseEntity.ok(qboService.fetchFromQbo(urlModule, VendorResponseDTO.class));
-//        return ResponseEntity.ok(qboService.getPurchaseOrderInfo(purchaseOrderId));
+    @GetMapping("/get-purchase-order-by-id/{purchaseOrderId}/pdf")
+    public ResponseEntity getPurchaseOrderPdf(@PathVariable Long purchaseOrderId) {
+        String urlModule = "/purchaseorder/" + purchaseOrderId + "/pdf";
+        return ResponseEntity.ok(qboService.fetchFromQbo(urlModule, byte[].class));
     }
+
+//    @GetMapping("/get-purchase-order-vendor-by-id/{vendorId}")
+//    public ResponseEntity getVendor(@PathVariable Long vendorId) {
+//        String urlModule = "/vendor/" + vendorId;
+//        return ResponseEntity.ok(qboService.fetchFromQbo(urlModule, VendorResponseDTO.class));
+//    }
 }
