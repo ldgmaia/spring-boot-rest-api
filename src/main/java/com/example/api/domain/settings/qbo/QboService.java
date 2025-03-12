@@ -28,12 +28,12 @@ import java.util.stream.Collectors;
 @Service
 public class QboService {
 
-    private static final String failureMsg = "Failed";
     @Autowired
     OAuth2PlatformClientFactory factory;
-    String urlModule = "/purchaseorder/" + 322;
+
     @Autowired
     private AdminSettingRepository adminSettingRepository;
+
     @Value("${API_ENV}")
     private String env;
     String serviceSettingsName = "prod".equalsIgnoreCase(env) ? "QuickBooks" : "QuickBooksSandbox";
@@ -110,7 +110,7 @@ public class QboService {
                 .collect(Collectors.toMap(AdminSettings::getKey_param, AdminSettings::getValue_param));
 
         if (qboSettingsMap.get("realmId") == null) {
-            throw new RuntimeException("No realm ID.  QBO calls only work if the accounting scope was passed!");
+            throw new RuntimeException("No realm ID. QBO calls only work if the accounting scope was passed!");
         }
 
         String accessToken = qboSettingsMap.get("accessToken");
@@ -158,7 +158,7 @@ public class QboService {
                 return purchaseOrder.getBody();
 
             } catch (OAuthException e1) {
-                throw new RuntimeException("Error while calling refreshToken :: " + failureMsg + " - " + e1.getMessage());
+                throw new RuntimeException("Error while calling refreshToken :: Failed - " + e1.getMessage());
             }
         } catch (Exception e) {
             throw new RuntimeException("Error while calling executeQuery :: " + e.getMessage());
@@ -216,7 +216,7 @@ public class QboService {
                 return purchaseOrder.getBody();
 
             } catch (OAuthException e1) {
-                throw new RuntimeException("Error while calling refreshToken :: " + failureMsg + " - " + e1.getMessage());
+                throw new RuntimeException("Error while calling refreshToken :: Failed - " + e1.getMessage());
 //                return new JSONObject().put("response", failureMsg).toString();
             }
         } catch (Exception e) {

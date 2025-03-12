@@ -40,10 +40,8 @@ public class CategoryController {
     @Transactional
     public ResponseEntity register(@RequestBody @Valid CategoryRequestDTO data, UriComponentsBuilder uriBuilder) {
 
-
         var category = categoryService.register(data);
         var uri = uriBuilder.path("/category/{id}").buildAndExpand(category.id()).toUri();
-
 
         return ResponseEntity.created(uri).body(category);
     }

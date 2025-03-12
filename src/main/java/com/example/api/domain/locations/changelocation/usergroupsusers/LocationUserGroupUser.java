@@ -41,5 +41,6 @@ public class LocationUserGroupUser {
     public LocationUserGroupUser(LocationUserGroupUserRegisterDTO data) {
         this.locationUserGroup = data.locationUserGroup();
         this.user = data.user();
+        this.locationUserGroup.getUsers().add(this);
     }
 }

@@ -89,17 +89,16 @@ public class StorageLocationController {
 
     @PostMapping("/permission/create-user-group")
     @Transactional
-    public ResponseEntity createLocationUserGroup(@RequestBody @Valid LocationUserGroupRequestDTO data) {
-        changeLocationService.createLocationUserGroup(data);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<LocationUserGroupInfoDTO> createLocationUserGroup(@RequestBody @Valid LocationUserGroupRequestDTO data) {
+        var newGroupInfo = changeLocationService.createLocationUserGroup(data);
+        return ResponseEntity.ok(newGroupInfo);
     }
 
     @PutMapping("/permission/update-user-group/{id}")
     @Transactional
     public ResponseEntity updateLocationUserGroup(@PathVariable Long id, @Valid @RequestBody LocationUserGroupRequestDTO data) {
         changeLocationService.updateLocationUserGroup(id, data);
-
-        return ResponseEntity.ok("OK");
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/permission/delete-user-group/{id}")

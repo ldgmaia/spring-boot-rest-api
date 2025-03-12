@@ -30,7 +30,7 @@ public class LocationUserGroup {
 
     private String description;
 
-    @OneToMany(mappedBy = "locationUserGroup", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "locationUserGroup", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<LocationUserGroupUser> users = new ArrayList<>();
 
     @CreatedDate
