@@ -29,6 +29,7 @@ public class StorageArea {
 
     private String name;
     private Boolean enabled;
+    private Boolean systemManaged;
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -54,6 +55,7 @@ public class StorageArea {
         this.description = data.description();
         this.storageZone = zone;
         this.enabled = true;
+        this.systemManaged = false;
     }
 
     public StorageArea(StorageAreaUpdateDTO data, StorageZone zone) {
@@ -61,5 +63,6 @@ public class StorageArea {
         this.description = data.description();
         this.storageZone = zone;
         this.enabled = true;
+        this.systemManaged = false;
     }
 }

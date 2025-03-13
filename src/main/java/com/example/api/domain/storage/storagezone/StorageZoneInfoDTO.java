@@ -15,7 +15,12 @@ public record StorageZoneInfoDTO(
                 data.getId(),
                 data.getName(),
                 data.getDescription(),
-                data.getAreas() != null ? data.getAreas().stream().map(StorageAreaInfoDTO::new).toList() : null
+                data.getAreas() != null
+                        ? data.getAreas().stream()
+                        .filter(area -> !area.getSystemManaged()) // Filter areas
+                        .map(StorageAreaInfoDTO::new)
+                        .toList()
+                        : null
         );
     }
 }
