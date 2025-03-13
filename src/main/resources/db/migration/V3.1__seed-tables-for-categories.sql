@@ -1,55 +1,109 @@
---INSERT INTO category_groups
---	(name,enabled)
---VALUES
---	('Parts and Accessories',1),
---	('Computing Devices',1);
---
---INSERT INTO categories
---	(name,enabled,needs_post,needs_serial_number,category_group_id)
---VALUES
---	 ('Laptop',1,1,1,2),
---	 ('Hard Drive',1,0,1,1),
---	 ('RAM',1,0,1,1),
---	 ('Keyboard Docking',1,0,1,1),
---	 ('Tablet',1,1,1,2),
---	 ('Battery',1,0,1,1),
---	 ('Camera',1,0,0,1);
---
---INSERT INTO category_components
---	(child_category_id,parent_category_id,enabled)
---	VALUES
---	 (2,1,1),
---	 (3,1,1),
---	 (4,5,1),
---	 (6,1,1),
---	 (6,5,1),
---	 (6,4,1),
---	 (7,1,1),
---	 (7,5,1);
---
---INSERT INTO category_fields
---	(data_level,category_id,fields_id,is_mandatory,order_on_label,print_on_label,enabled)
---VALUES
---	 ('MODEL',6,13,0,NULL,0,1),
---	 ('MPN',6,14,0,NULL,0,1),
---	 ('RBID',6,16,0,NULL,0,1),
---	 ('FUNCTIONAL',6,2,0,NULL,0,1),
---	 ('COSMETIC',6,8,0,NULL,0,1),
---	 ('RBID',7,13,0,NULL,0,1),
---	 ('FUNCTIONAL',2,2,0,NULL,0,1),
---	 ('RBID',2,13,0,NULL,0,1),
---	 ('MPN',2,16,0,NULL,0,1),
---	 ('MODEL',2,14,0,NULL,0,1),
---	 ('COSMETIC',4,8,0,NULL,0,1),
---	 ('FUNCTIONAL',4,2,0,NULL,0,1),
---	 ('MODEL',1,14,0,NULL,0,1),
---	 ('MPN',1,13,0,NULL,0,1),
---	 ('RBID',1,16,0,NULL,0,1),
---	 ('FUNCTIONAL',1,2,0,NULL,0,1),
---	 ('COSMETIC',1,8,0,NULL,0,1),
---	 ('FUNCTIONAL',3,1,0,NULL,0,1),
---	 ('MODEL',5,14,0,NULL,0,1),
---	 ('MPN',5,13,0,NULL,0,1),
---	 ('RBID',5,16,0,NULL,0,1),
---	 ('FUNCTIONAL',5,2,0,NULL,0,1),
---	 ('COSMETIC',5,8,0,NULL,0,1);
+INSERT INTO category_groups (name,enabled)
+VALUES
+	 ('Computing Devices',1),
+	 ('Parts and Accessories',1);
+
+INSERT INTO categories (name,enabled,needs_post,needs_serial_number,category_group_id)
+VALUES
+	 ('2-in-1',1,1,1,1),
+	 ('Laptops',1,1,1,1),
+	 ('Tablets',1,1,1,1),
+	 ('Batteries',1,0,1,2),
+	 ('Camera',1,0,0,2),
+	 ('Cosmetic Parts',1,0,0,2),
+	 ('dGPS Cards',1,0,0,2),
+	 ('Functional Parts',1,0,0,2),
+	 ('Hard Drives',1,0,1,2),
+	 ('Labels',1,0,0,2),
+	 ('Part Keyboards',1,0,0,2),
+	 ('RAMs',1,0,1,2),
+	 ('Screen',1,0,0,2),
+	 ('WLAN Cards',1,0,0,2),
+	 ('WWAN Cards',1,0,0,2);
+
+INSERT INTO category_components (child_category_id,parent_category_id,enabled)
+VALUES
+	 (4,1,1),
+	 (4,2,1),
+	 (4,3,1),
+	 (5,1,1),
+	 (5,2,1),
+	 (5,3,1),
+	 (6,1,1),
+	 (6,2,1),
+	 (6,3,1),
+	 (7,1,1),
+	 (7,2,1),
+	 (7,3,1),
+	 (8,1,1),
+	 (8,2,1),
+	 (8,3,1),
+	 (9,1,1),
+	 (9,2,1),
+	 (9,3,1),
+	 (10,1,1),
+	 (10,2,1),
+	 (10,3,1),
+	 (11,1,1),
+	 (11,2,1),
+	 (12,1,1),
+	 (12,2,1),
+	 (12,3,1),
+	 (13,1,1),
+	 (13,2,1),
+	 (13,3,1),
+	 (14,1,1),
+	 (14,2,1),
+	 (14,3,1),
+	 (15,1,1),
+	 (15,2,1),
+	 (15,3,1);
+
+INSERT INTO category_fields (data_level,category_id,fields_id,is_mandatory,order_on_label,print_on_label,enabled)
+VALUES
+	 ('COSMETIC',2,19,0,NULL,0,1),
+	 ('MODEL',2,9,0,NULL,1,1),
+	 ('MODEL',2,31,0,NULL,1,1),
+	 ('MPN',2,14,0,NULL,1,1),
+	 ('MPN',2,13,0,NULL,1,1),
+	 ('COSMETIC',2,28,0,NULL,0,1),
+	 ('MPN',4,11,0,NULL,1,1),
+	 ('MPN',4,10,0,NULL,1,1),
+	 ('FUNCTIONAL',4,12,1,NULL,1,1),
+	 ('COSMETIC',5,26,0,NULL,0,1),
+	 ('FUNCTIONAL',5,25,1,NULL,1,1),
+	 ('COSMETIC',6,15,0,NULL,0,1),
+	 ('COSMETIC',6,16,0,NULL,0,1),
+	 ('COSMETIC',6,18,0,NULL,0,1),
+	 ('COSMETIC',6,17,0,NULL,0,1),
+	 ('FUNCTIONAL',7,25,1,NULL,1,1),
+	 ('FUNCTIONAL',8,25,0,NULL,0,1),
+	 ('MODEL',9,7,0,NULL,1,1),
+	 ('MPN',9,8,0,NULL,1,1),
+	 ('FUNCTIONAL',9,4,1,NULL,1,1),
+	 ('MPN',9,9,0,NULL,1,1),
+	 ('MPN',9,2,0,NULL,1,1),
+	 ('MPN',9,1,0,NULL,1,1),
+	 ('MPN',9,3,0,NULL,1,1),
+	 ('COSMETIC',10,26,0,NULL,0,1),
+	 ('FUNCTIONAL',11,25,1,NULL,1,1),
+	 ('COSMETIC',11,17,0,NULL,0,1),
+	 ('COSMETIC',11,18,0,NULL,0,1),
+	 ('COSMETIC',11,16,0,NULL,0,1),
+	 ('COSMETIC',11,15,0,NULL,0,1),
+	 ('MPN',12,6,0,NULL,1,1),
+	 ('MPN',12,5,0,NULL,1,1),
+	 ('MPN',12,9,0,NULL,1,1),
+	 ('COSMETIC',13,27,0,NULL,0,1),
+	 ('RBID',13,23,0,NULL,1,1),
+	 ('RBID',13,22,0,NULL,1,1),
+	 ('FUNCTIONAL',13,25,1,NULL,1,1),
+	 ('COSMETIC',13,17,0,NULL,0,1),
+	 ('COSMETIC',13,24,0,NULL,0,1),
+	 ('COSMETIC',13,18,0,NULL,0,1),
+	 ('COSMETIC',13,21,0,NULL,0,1),
+	 ('COSMETIC',13,15,0,NULL,0,1),
+	 ('COSMETIC',13,20,0,NULL,0,1),
+	 ('FUNCTIONAL',14,25,1,NULL,1,1),
+	 ('FUNCTIONAL',15,29,1,NULL,1,1),
+	 ('FUNCTIONAL',15,25,1,NULL,1,1);

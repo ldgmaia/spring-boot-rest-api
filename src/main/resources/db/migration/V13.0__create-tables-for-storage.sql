@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS storage_areas (
     id                              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     name                            VARCHAR(255),
     enabled                         BIT DEFAULT 1 NOT NULL,
+    system_managed                  BIT DEFAULT 1 NOT NULL,
     description                     VARCHAR(255),
     storage_zone_id                 BIGINT UNSIGNED,
     created_by                      BIGINT UNSIGNED NOT NULL,

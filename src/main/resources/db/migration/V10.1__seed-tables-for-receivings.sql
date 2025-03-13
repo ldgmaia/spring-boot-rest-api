@@ -1,7 +1,7 @@
---INSERT INTO carriers
---    (name)
---VALUES
---	('DHL'),
---	('UPS'),
---	('Purolator'),
---	('Canada Post')
+INSERT INTO carriers
+    (name)
+VALUES
+	('DHL'),
+	('UPS'),
+	('Purolator'),
+	('Canada Post')
