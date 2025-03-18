@@ -113,6 +113,10 @@ public class AssessmentService {
         processMainItemAssessment(data.mainItemFunctional(), parentInventoryItem, parentAssessment);
         processMainItemAssessment(data.mainItemCosmetic(), parentInventoryItem, parentAssessment);
 
+        // Flush changes to the database
+        assessmentRepository.flush();
+        inventoryItemsFieldValuesRepository.flush();
+
         all.components().forEach(component -> {
             var area = sectionAreaRepository.findById(component.areaId()).orElse(null);
 
@@ -215,13 +219,16 @@ public class AssessmentService {
             receivingItemRepository.getReferenceById(parentInventoryItem.getReceivingItem().getId()).setStatus("Pending Assessment");
         }
 
+        // Flush changes to the database again
+        inventoryItemRepository.flush();
+        inventoryItemsFieldValuesRepository.flush();
+
         // Calculate grades of main item and its components
         calculateGrade(parentAssessment.getInventoryItem());
-
     }
 
+    //    @Transactional(propagation = Propagation.REQUIRES_NEW)
     private void calculateGrade(InventoryItem inventoryItem) {
-
         var minimumGrades = adminSettingRepository.findByService("minimum_grading")
                 .stream()
                 .collect(Collectors.toMap(AdminSettings::getKey_param, s -> Long.valueOf(s.getValue_param())));
@@ -238,14 +245,31 @@ public class AssessmentService {
         var minimumFunctionalNonCriticalGrade = Optional.ofNullable(minimumGrades.get("functional_non_critical"))
                 .orElseThrow(() -> new NoSuchElementException("functional_non_critical not found"));
 
+        var all = inventoryItemsFieldValuesRepository.findAll();
+
+        AtomicReference<Long> lowestMainItemFunctionalScore = new AtomicReference<>(9L);
+        AtomicReference<Long> lowestMainItemCosmeticScore = new AtomicReference<>(9L);
+
+        // Query the database for scores
+        Long functionalScore = inventoryItemsFieldValuesRepository.findMinScoreOfInventoryItem(inventoryItem.getId(), FieldType.FUNCTIONAL);
+        Long cosmeticScore = inventoryItemsFieldValuesRepository.findMinScoreOfInventoryItem(inventoryItem.getId(), FieldType.COSMETIC);
+
+        if (functionalScore != null) {
+            lowestMainItemFunctionalScore.set(functionalScore);
+        }
+
+        if (cosmeticScore != null) {
+            lowestMainItemCosmeticScore.set(cosmeticScore);
+        }
+
         // Calculates the grades of the main item
         var mainItemInventoryItem = inventoryItemRepository.getReferenceById(inventoryItem.getId());
-        AtomicReference<Long> lowestMainItemFunctionalScore = new AtomicReference<>(
-                inventoryItemsFieldValuesRepository.findMinScoreOfInventoryItem(mainItemInventoryItem.getId(), FieldType.FUNCTIONAL)
-        );
-        AtomicReference<Long> lowestMainItemCosmeticScore = new AtomicReference<>(
-                inventoryItemsFieldValuesRepository.findMinScoreOfInventoryItem(mainItemInventoryItem.getId(), FieldType.COSMETIC)
-        );
+//        AtomicReference<Long> lowestMainItemFunctionalScore = new AtomicReference<>(
+//                inventoryItemsFieldValuesRepository.findMinScoreOfInventoryItem(mainItemInventoryItem.getId(), FieldType.FUNCTIONAL)
+//        );
+//        AtomicReference<Long> lowestMainItemCosmeticScore = new AtomicReference<>(
+//                inventoryItemsFieldValuesRepository.findMinScoreOfInventoryItem(mainItemInventoryItem.getId(), FieldType.COSMETIC)
+//        );
 
         var mainItemComponentsInventoryItems = inventoryItemComponentRepository.findByParentInventoryItemId(inventoryItem.getId());
 
@@ -308,6 +332,7 @@ public class AssessmentService {
             componentInventoryItem.setCosmeticGrade(cosmeticGrading);
             componentInventoryItem.setCompanyGrade(companyGrade);
         });
+
         // Determine company grade for main item
         String mainItemCompanyGrade;
         if (lowestMainItemFunctionalScore.get() == 0L) {
@@ -408,17 +433,19 @@ public class AssessmentService {
                     if (specField.getFieldType().name().equals("COSMETIC")) {
                         score = 9.0;
                     } else if (specField.getFieldType().name().equals("FUNCTIONAL")) {
-                        score = 5.0;
+                        score = 5.0; // Ensure this matches the expected score for functional fields
                     }
                     var newFieldvalue = new FieldValue(new FieldValueRegisterDTO(valueData, score, specField));
                     fieldValue = fieldValueRepository.save(newFieldvalue);
                 }
 
-                var assessmentFieldsValues = new AssessmentFieldsValues(new AssessmentFieldsValuesRegisterDTO(fieldValue, parentAssessment));
-                assessmentFieldValuesRepository.save(assessmentFieldsValues);
-
+                // Save the field value to the inventory item
                 var inventoryItemsFieldsValues = new InventoryItemsFieldsValues(new InventoryItemsFieldsValuesRegisterDTO(fieldValue, parentInventoryItem));
                 inventoryItemsFieldValuesRepository.save(inventoryItemsFieldsValues);
+
+                // Save the field value to the assessment
+                var assessmentFieldsValues = new AssessmentFieldsValues(new AssessmentFieldsValuesRegisterDTO(fieldValue, parentAssessment));
+                assessmentFieldValuesRepository.save(assessmentFieldsValues);
             });
         }
     }
