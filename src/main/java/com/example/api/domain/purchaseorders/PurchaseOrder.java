@@ -1,11 +1,14 @@
 package com.example.api.domain.purchaseorders;
 
+import com.example.api.domain.purchaseorderitems.PurchaseOrderItem;
 import com.example.api.domain.suppliers.Supplier;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Table(name = "purchase_orders")
 @Entity(name = "PurchaseOrder")
@@ -34,6 +37,9 @@ public class PurchaseOrder {
 
     private String watchingPo;
     private LocalDateTime lastReceivedAt;
+
+    @OneToMany(mappedBy = "purchaseOrder", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PurchaseOrderItem> items = new ArrayList<>();
 
     public PurchaseOrder(PurchaseOrderRegisterDTO data) {
         this.status = data.status();

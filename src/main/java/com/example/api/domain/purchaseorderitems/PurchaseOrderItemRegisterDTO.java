@@ -26,4 +26,16 @@ public record PurchaseOrderItemRegisterDTO(
         @NotNull
         PurchaseOrder purchaseOrder
 ) {
+    public PurchaseOrderItemRegisterDTO(PurchaseOrderItem purchaseOrderItem) {
+        this(
+                purchaseOrderItem.getName(),
+                purchaseOrderItem.getDescription(),
+                purchaseOrderItem.getQuantityOrdered(),
+                purchaseOrderItem.getUnitPrice(),
+                purchaseOrderItem.getTotal(),
+                purchaseOrderItem.getQboItemId(),
+                purchaseOrderItem.getQboPurchaseOrderItemId(),
+                purchaseOrderItem.getPurchaseOrder()
+        );
+    }
 }

@@ -22,4 +22,5 @@ public interface PurchaseOrderRepository extends JpaRepository<PurchaseOrder, Lo
 
     List<PurchaseOrderListDTO> findAllByStatusNot(String status);
 
+    PurchaseOrder findByQboId(Long purchaseOrderQboId);
 }

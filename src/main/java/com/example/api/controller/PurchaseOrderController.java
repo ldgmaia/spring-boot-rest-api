@@ -1,12 +1,9 @@
 package com.example.api.controller;
 
 import com.example.api.domain.purchaseorders.PurchaseOrderListDTO;
-import com.example.api.domain.purchaseorders.PurchaseOrderRequestDTO;
 import com.example.api.domain.purchaseorders.PurchaseOrderService;
 import com.example.api.repositories.PurchaseOrderRepository;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,7 +12,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
 @RequestMapping("purchase-orders")
@@ -28,15 +24,15 @@ public class PurchaseOrderController {
     @Autowired
     private PurchaseOrderRepository purchaseOrderRepository;
 
-    @PostMapping
-    @Transactional
-    public ResponseEntity register(@RequestBody @Valid PurchaseOrderRequestDTO data, UriComponentsBuilder uriBuilder) {
-
-        var purchaseOrder = purchaseOrderService.register(data);
-        var uri = uriBuilder.path("/purchase-orders/{id}").buildAndExpand(purchaseOrder.id()).toUri();
-
-        return ResponseEntity.created(uri).body(purchaseOrder);
-    }
+//    @PostMapping
+//    @Transactional
+//    public ResponseEntity register(@RequestBody @Valid PurchaseOrderRequestDTO data, UriComponentsBuilder uriBuilder) {
+//
+//        var purchaseOrder = purchaseOrderService.register(data);
+//        var uri = uriBuilder.path("/purchase-orders/{id}").buildAndExpand(purchaseOrder.id()).toUri();
+//
+//        return ResponseEntity.created(uri).body(purchaseOrder);
+//    }
 
     @GetMapping
     public ResponseEntity<Page<PurchaseOrderListDTO>> list(@PageableDefault(size = 100, page = 0, sort = {"poNumber"}) Pageable pagination, @RequestHeader HttpHeaders headers) {
