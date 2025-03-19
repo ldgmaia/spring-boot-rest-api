@@ -1,12 +1,12 @@
 insert into admin_settings (service, key_param, value_param)
-values 
+values
 	('minimum_grading', 'cosmetic_critical', '0'),
 	('minimum_grading', 'cosmetic_non_critical', '3'),
 	('minimum_grading', 'functional_critical', '0'),
 	('minimum_grading', 'functional_non_critical', '3');
-	
+
 insert into gradings (`type`, score, grade, company_grade)
-values 
+values
 	('functional', 0, 'FA', 'FA'),
 	('functional', 3, 'F3', null),
 	('functional', 4, 'F4', null),
