@@ -16,4 +16,7 @@ public interface ReceivingRepository extends JpaRepository<Receiving, Long> {
             LEFT JOIN FETCH r.pictures
             """)
     Page<Receiving> findAllWithPictures(Pageable pageable);
+
+    boolean existsByTrackingLading(String trackingLading);
+
 }

@@ -1,8 +1,15 @@
 package com.example.api.domain.settings.qbo;
 
 import com.example.api.domain.adminsettings.AdminSettings;
+import com.example.api.domain.purchaseorderitems.PurchaseOrderItem;
+import com.example.api.domain.purchaseorderitems.PurchaseOrderItemRegisterDTO;
+import com.example.api.domain.purchaseorders.PurchaseOrder;
+import com.example.api.domain.purchaseorders.PurchaseOrderRegisterDTO;
 import com.example.api.domain.purchaseorders.PurchaseOrderResponseDTO;
-import com.example.api.repositories.AdminSettingRepository;
+import com.example.api.domain.suppliers.QboVendorResponseDTO;
+import com.example.api.domain.suppliers.Supplier;
+import com.example.api.domain.suppliers.SupplierRegisterDTO;
+import com.example.api.repositories.*;
 import com.intuit.oauth2.client.OAuth2PlatformClient;
 import com.intuit.oauth2.config.OAuth2Config;
 import com.intuit.oauth2.config.Scope;
@@ -20,13 +27,15 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.view.RedirectView;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.math.BigDecimal;
+import java.time.OffsetDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class QboService {
+
+    private static final String failureMsg = "Failed";
 
     @Autowired
     OAuth2PlatformClientFactory factory;
@@ -34,9 +43,118 @@ public class QboService {
     @Autowired
     private AdminSettingRepository adminSettingRepository;
 
+    @Autowired
+    private SupplierRepository supplierRepository;
+
+    @Autowired
+    private PurchaseOrderRepository purchaseOrderRepository;
+
+    @Autowired
+    private PurchaseOrderItemRepository purchaseOrderItemRepository;
+
+    @Autowired
+    private ReceivingRepository receivingRepository;
+
     @Value("${API_ENV}")
     private String env;
+
     String serviceSettingsName = "prod".equalsIgnoreCase(env) ? "QuickBooks" : "QuickBooksSandbox";
+    @Autowired
+    private CategoryRepository categoryRepository;
+
+    public void createPurchaseOrder(PurchaseOrderResponseDTO data) {
+        String vendorId = data.PurchaseOrder().VendorRef().value();
+        QboVendorResponseDTO vendor = fetchFromQbo("/vendor/" + vendorId, QboVendorResponseDTO.class);
+
+        var supplierExists = supplierRepository.existsByQboId(Long.valueOf(vendorId));
+        Supplier supplier;
+        if (!supplierExists) {
+            supplier = new Supplier(new SupplierRegisterDTO(
+                    vendor.Vendor().DisplayName(),
+                    Optional.ofNullable(vendor.Vendor().PrimaryPhone()).map(QboVendorResponseDTO.PrimaryPhone::FreeFormNumber).orElse(""),
+                    Optional.ofNullable(vendor.Vendor().PrimaryEmailAddr()).map(QboVendorResponseDTO.PrimaryEmailAddr::Address).orElse(""),
+                    vendor.Vendor().CompanyName(),
+                    Optional.ofNullable(vendor.Vendor().BillAddr()).map(QboVendorResponseDTO.BillAddr::Line1).orElse(""),
+                    Optional.ofNullable(vendor.Vendor().BillAddr()).map(QboVendorResponseDTO.BillAddr::Line2).orElse(""),
+                    Optional.ofNullable(vendor.Vendor().BillAddr()).map(QboVendorResponseDTO.BillAddr::Line3).orElse(""),
+                    Optional.ofNullable(vendor.Vendor().BillAddr()).map(QboVendorResponseDTO.BillAddr::City).orElse(""),
+                    Optional.ofNullable(vendor.Vendor().BillAddr()).map(QboVendorResponseDTO.BillAddr::CountrySubDivisionCode).orElse(""),
+                    Optional.ofNullable(vendor.Vendor().BillAddr()).map(QboVendorResponseDTO.BillAddr::PostalCode).orElse(""),
+                    Optional.ofNullable(vendor.Vendor().BillAddr()).map(QboVendorResponseDTO.BillAddr::Country).orElse(""),
+                    Long.valueOf(vendorId)
+            ));
+            supplierRepository.save(supplier);
+        } else {
+            supplier = supplierRepository.findByQboId(Long.valueOf(vendorId));
+        }
+
+        var purchaseOrder = new PurchaseOrder(new PurchaseOrderRegisterDTO(
+                data.PurchaseOrder().POStatus(),
+                data.PurchaseOrder().DocNumber(),
+                data.PurchaseOrder().CurrencyRef().value(),
+                BigDecimal.valueOf(data.PurchaseOrder().TotalAmt()),
+                Long.valueOf(data.PurchaseOrder().Id()),
+                OffsetDateTime.parse(data.PurchaseOrder().MetaData().CreateTime()).toLocalDateTime(),
+                OffsetDateTime.parse(data.PurchaseOrder().MetaData().LastUpdatedTime()).toLocalDateTime(),
+                supplier,
+                "watchingPo"
+        ));
+
+        purchaseOrderRepository.save(purchaseOrder);
+
+        data.PurchaseOrder().Line().forEach(poi -> {
+            PurchaseOrderItem purchaseOrderItem = null;
+
+            if (Objects.equals(poi.DetailType(), "ItemBasedExpenseLineDetail")) {
+                purchaseOrderItem = new PurchaseOrderItem(new PurchaseOrderItemRegisterDTO(
+                        poi.ItemBasedExpenseLineDetail().ItemRef().name(),
+                        poi.Description(),
+                        (long) poi.ItemBasedExpenseLineDetail().Qty(),
+                        BigDecimal.valueOf(poi.ItemBasedExpenseLineDetail().UnitPrice()), // Fixed here
+                        BigDecimal.valueOf(poi.Amount()), // Fixed: Convert double to BigDecimal
+                        Long.parseLong(poi.ItemBasedExpenseLineDetail().ItemRef().value()), // Fixed: Convert String to Long
+                        Long.parseLong(poi.ItemBasedExpenseLineDetail().ItemRef().value()), // ✅ FIXED: Convert String to Long
+                        purchaseOrder
+                ));
+            } else if (Objects.equals(poi.DetailType(), "AccountBasedExpenseLineDetail")) {
+                purchaseOrderItem = new PurchaseOrderItem(new PurchaseOrderItemRegisterDTO(
+                        poi.AccountBasedExpenseLineDetail().AccountRef().name(),
+                        poi.Description(),
+                        BigDecimal.ONE.longValue(), // FIXED: Convert BigDecimal to Long
+                        BigDecimal.valueOf(poi.Amount()), // Fixed: Convert double to BigDecimal
+                        BigDecimal.valueOf(poi.Amount()), // Fixed: Convert double to BigDecimal
+                        Long.parseLong(poi.AccountBasedExpenseLineDetail().AccountRef().value()), // Fixed: Convert String to Long
+                        Long.parseLong(poi.AccountBasedExpenseLineDetail().AccountRef().value()), // ✅ FIXED: Convert String to Long
+                        purchaseOrder
+                ));
+            }
+            assert purchaseOrderItem != null;
+            purchaseOrderItemRepository.save(purchaseOrderItem);
+        });
+    }
+
+    public void updatePurchaseOrder(PurchaseOrderResponseDTO data) {
+        boolean exists = receivingRepository.existsByTrackingLading(data.PurchaseOrder().DocNumber());
+        if (!exists) {
+            var purchaseOrder = purchaseOrderRepository.findByQboId(Long.valueOf(data.PurchaseOrder().Id()));
+            if (purchaseOrder == null) {
+                return;
+            }
+            purchaseOrderRepository.delete(purchaseOrder);
+            createPurchaseOrder(data);
+        } else {
+            System.out.println("PO has been received and cannot be updated"); // it should throw an exception
+        }
+    }
+
+    public void deletePurchaseOrder(Long qboPurchaseOrderId) {
+        PurchaseOrder purchaseOrder = purchaseOrderRepository.findByQboId(qboPurchaseOrderId);
+        if (purchaseOrder == null) {
+            return; // it should throw an exception
+        }
+        purchaseOrder.setStatus("Deleted");
+        purchaseOrderRepository.save(purchaseOrder);
+    }
 
     public RedirectView getAuthUri() {
 

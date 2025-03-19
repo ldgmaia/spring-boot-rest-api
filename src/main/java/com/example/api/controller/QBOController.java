@@ -26,9 +26,28 @@ public class QBOController {
     }
 
     @PostMapping("/webhook")
-    public ResponseEntity webhook(@Valid @RequestBody QboWebhookRequestDTO data, @RequestHeader(name = "intuit-signature", required = false) String intuitSignature) {
-        // create the function in the service to manage (create, update, delete) the PO
-        return ResponseEntity.ok(intuitSignature);
+    public void webhook(@Valid @RequestBody QboWebhookRequestDTO data, @RequestHeader(name = "intuit-signature", required = false) String intuitSignature) {
+        Long qboPurchaseOrderId = Long.valueOf(data.eventNotifications().get(0).dataChangeEvent().entities().get(0).id());
+
+        switch (data.eventNotifications().get(0).dataChangeEvent().entities().get(0).operation()) {
+            case "Create": {
+                String urlModule = "/purchaseorder/" + qboPurchaseOrderId;
+                PurchaseOrderResponseDTO po = qboService.fetchFromQbo(urlModule, PurchaseOrderResponseDTO.class);
+                qboService.createPurchaseOrder(po);
+                break;
+            }
+            case "Update": {
+                String urlModule = "/purchaseorder/" + qboPurchaseOrderId;
+                PurchaseOrderResponseDTO po = qboService.fetchFromQbo(urlModule, PurchaseOrderResponseDTO.class);
+                qboService.updatePurchaseOrder(po);
+                break;
+            }
+            case "Delete":
+                qboService.deletePurchaseOrder(qboPurchaseOrderId);
+                break;
+            default:
+                System.out.println("Operation not supported");
+        }
     }
 
     @GetMapping("/get-auth-uri")
@@ -47,10 +66,4 @@ public class QBOController {
         String urlModule = "/purchaseorder/" + purchaseOrderId + "/pdf";
         return ResponseEntity.ok(qboService.fetchFromQbo(urlModule, byte[].class));
     }
-
-//    @GetMapping("/get-purchase-order-vendor-by-id/{vendorId}")
-//    public ResponseEntity getVendor(@PathVariable Long vendorId) {
-//        String urlModule = "/vendor/" + vendorId;
-//        return ResponseEntity.ok(qboService.fetchFromQbo(urlModule, VendorResponseDTO.class));
-//    }
 }
