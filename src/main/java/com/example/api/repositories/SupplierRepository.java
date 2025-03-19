@@ -7,4 +7,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface SupplierRepository extends JpaRepository<Supplier, Long> {
 
+    Supplier findByQboId(long qboId);
+
+    Boolean existsByQboId(Long vendorQboId);
 }

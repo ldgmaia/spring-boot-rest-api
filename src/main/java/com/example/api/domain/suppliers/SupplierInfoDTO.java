@@ -12,7 +12,8 @@ public record SupplierInfoDTO(
         String city,
         String state,
         String postalCode,
-        String country
+        String country,
+        Long qboId
 ) {
 
     public SupplierInfoDTO(Supplier supplier) {
@@ -28,6 +29,7 @@ public record SupplierInfoDTO(
                 supplier.getCity(),
                 supplier.getState(),
                 supplier.getPostalCode(),
-                supplier.getCountry());
+                supplier.getCountry(),
+                supplier.getQboId());
     }
 }

@@ -15,6 +15,7 @@ public record SupplierRegisterDTO(
         String city,
         String state,
         String postalCode,
-        String country
+        String country,
+        Long qboId
 ) {
 }

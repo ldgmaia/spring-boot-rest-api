@@ -29,6 +29,7 @@ public class Supplier {
     private String state;
     private String postalCode;
     private String country;
+    private long qboId;
 
     public Supplier(SupplierRegisterDTO data) {
         this.name = data.name();
@@ -42,5 +43,6 @@ public class Supplier {
         this.state = data.state();
         this.postalCode = data.postalCode();
         this.country = data.country();
+        this.qboId = data.qboId();
     }
 }
