@@ -19,5 +19,4 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     List<CategoryListDTO> findAllByCategoryGroupId(Long categoryGroupId);
 
     Boolean existsByCategoryGroupId(Long categoryGroupId);
-
 }

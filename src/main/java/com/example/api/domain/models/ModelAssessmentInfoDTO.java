@@ -1,5 +1,6 @@
 package com.example.api.domain.models;
 
+import com.example.api.domain.categoryfields.CategoryFields;
 import com.example.api.domain.categoryfields.CategoryFieldsAssessmentInfoDTO;
 import com.example.api.domain.mpns.MPNInfoDTO;
 
@@ -22,7 +23,9 @@ public record ModelAssessmentInfoDTO(
                 model.getNeedsMpn(),
                 !model.getCategory().getParentCategory().isEmpty(),
                 model.getMpns().stream().map(MPNInfoDTO::new).toList(),
-                model.getCategory().getCategoryFields().stream().map(CategoryFieldsAssessmentInfoDTO::new).toList()
+                model.getCategory().getCategoryFields().stream()
+                        .filter(CategoryFields::getEnabled)
+                        .map(CategoryFieldsAssessmentInfoDTO::new).toList()
         );
     }
 }

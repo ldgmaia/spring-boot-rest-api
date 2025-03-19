@@ -33,7 +33,7 @@ public record CategoryFieldsInspectionInfoDTO(
                 categoryField.getField().getDataType(),
                 categoryField.getField().getFieldType(),
                 categoryField.getField().getIsMultiple(),
-                categoryField.getField().getEnabled(),
+                categoryField.getEnabled(),
                 null,
                 null,
                 categoryField.getField().getFieldValues().stream().map(fieldValue -> new ValueInfoDTO(fieldValue.getValueData())).toList()
@@ -51,7 +51,7 @@ public record CategoryFieldsInspectionInfoDTO(
                 categoryField.getField().getDataType(),
                 categoryField.getField().getFieldType(),
                 categoryField.getField().getIsMultiple(),
-                categoryField.getField().getEnabled(),
+                categoryField.getEnabled(),
                 inventoryItemRepository.findComponentFieldValueDataIdByInventoryItemIdAndFieldIdAndCategoryId(inventoryItemId, categoryField.getField().getId(), categoryField.getCategory().getId()) != null ?
                         inventoryItemRepository.findComponentFieldValueDataIdByInventoryItemIdAndFieldIdAndCategoryId(inventoryItemId, categoryField.getField().getId(), categoryField.getCategory().getId()).getId() :
                         null,

@@ -30,7 +30,7 @@ public record CategoryFieldsAssessmentInfoDTO(
                 categoryField.getField().getDataType(),
                 categoryField.getField().getFieldType(),
                 categoryField.getField().getIsMultiple(),
-                categoryField.getField().getEnabled(),
+                categoryField.getEnabled(),
                 categoryField.getField().getFieldValues().stream().map(fieldValue -> new ValueInfoDTO(fieldValue.getValueData())).toList()
         );
     }

@@ -229,6 +229,7 @@ public class CategoryService {
         var categoryId = inventoryItemRepository.findById(inventoryItemId).orElseThrow().getCategory().getId();
         return categoryRepository.findById(categoryId)
                 .map(category -> category.getCategoryFields().stream()
+                        .filter(CategoryFields::getEnabled)
                         .map(CategoryFieldsAssessmentInfoDTO::new)
                         .toList())
                 .orElseThrow(() -> new EntityNotFoundException("Category not found with id: " + categoryId));
@@ -238,6 +239,7 @@ public class CategoryService {
         var categoryId = inventoryItemRepository.findById(inventoryItemId).orElseThrow().getCategory().getId();
         return categoryRepository.findById(categoryId)
                 .map(category -> category.getCategoryFields().stream()
+                        .filter(CategoryFields::getEnabled)
                         .map(cf -> new CategoryFieldsMainItemInspectionInfoDTO(cf, inventoryItemRepository, inventoryItemId))
                         .toList())
                 .orElseThrow(() -> new EntityNotFoundException("Category not found with id: " + categoryId));

@@ -1,5 +1,6 @@
 package com.example.api.domain.models;
 
+import com.example.api.domain.categoryfields.CategoryFields;
 import com.example.api.domain.categoryfields.CategoryFieldsInspectionInfoDTO;
 import com.example.api.domain.mpns.MPNInfoDTO;
 import com.example.api.repositories.InventoryItemRepository;
@@ -25,7 +26,9 @@ public record ModelInspectionInfoDTO(
                 !model.getCategory().getParentCategory().isEmpty(),
                 model.getNeedsMpn() != null ? currentMpnId : null,
                 model.getMpns().stream().map(MPNInfoDTO::new).toList(),
-                model.getCategory().getCategoryFields().stream().map(cf -> new CategoryFieldsInspectionInfoDTO(cf, inventoryItemRepository, inventoryItemId)).toList()
+                model.getCategory().getCategoryFields().stream()
+                        .filter(CategoryFields::getEnabled)
+                        .map(cf -> new CategoryFieldsInspectionInfoDTO(cf, inventoryItemRepository, inventoryItemId)).toList()
         );
     }
 }
