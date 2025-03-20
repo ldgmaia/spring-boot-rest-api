@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS models (
     description VARCHAR(255),
     identifier VARCHAR(255),
     enabled BIT DEFAULT 1 NOT NULL,
-    needs_mpn BIT,
+    needs_mpn BIT DEFAULT 0 NOT NULL,
     status VARCHAR(255),
     approved_by BIGINT UNSIGNED,
     categories_id BIGINT UNSIGNED,

@@ -4,22 +4,23 @@ values
 	('minimum_grading', 'cosmetic_non_critical', '3'),
 	('minimum_grading', 'functional_critical', '0'),
 	('minimum_grading', 'functional_non_critical', '3'),
-    ('QuickBooks', 'redirectUri', ' /api/v1/qbo/callback'),
-	('QuickBooks', 'webhookUri', ' /api/v1/qbo/webhook'),
+    ('QuickBooks', 'redirectUri', '/api/v1/qbo/callback'),
+	('QuickBooks', 'webhookUri', '/api/v1/qbo/webhook'),
 	('QuickBooks', 'webhookVerifier', ' '),
 	('QuickBooks', 'refreshToken', ' '),
 	('QuickBooks', 'accessToken', ' '),
 	('QuickBooks', 'realmId', ' '),
 	('QuickBooks', 'minorVersion', '75'),
 	('QuickBooks', 'qboUrl', 'https://quickbooks.api.intuit.com'),
-    ('QuickBooksSandbox', 'redirectUri', ' /api/v1/qbo/callback'),
-	('QuickBooksSandbox', 'webhookUri', ' /api/v1/qbo/webhook'),
+    ('QuickBooksSandbox', 'redirectUri', '/api/v1/qbo/callback'),
+	('QuickBooksSandbox', 'webhookUri', '/api/v1/qbo/webhook'),
 	('QuickBooksSandbox', 'webhookVerifier', ' '),
 	('QuickBooksSandbox', 'refreshToken', ''),
 	('QuickBooksSandbox', 'accessToken', ' '),
 	('QuickBooksSandbox', 'realmId', ' '),
 	('QuickBooksSandbox', 'minorVersion', '75'),
-	('QuickBooksSandbox', 'qboUrl', 'https://sandbox-quickbooks.api.intuit.com');
+	('QuickBooksSandbox', 'qboUrl', 'https://sandbox-quickbooks.api.intuit.com'),
+	('Purchase Orders', 'receiving status excluded', 'Deleted,Fully Received');
 	
 insert into gradings (`type`, score, grade, company_grade)
 values 
