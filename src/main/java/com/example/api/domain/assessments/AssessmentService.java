@@ -231,7 +231,7 @@ public class AssessmentService {
     private void calculateGrade(InventoryItem inventoryItem) {
         var minimumGrades = adminSettingRepository.findByService("minimum_grading")
                 .stream()
-                .collect(Collectors.toMap(AdminSettings::getKey_param, s -> Long.valueOf(s.getValue_param())));
+                .collect(Collectors.toMap(AdminSettings::getKeyParam, s -> Long.valueOf(s.getValueParam())));
 
         var minimumCosmeticCriticalGrade = Optional.ofNullable(minimumGrades.get("cosmetic_critical"))
                 .orElseThrow(() -> new NoSuchElementException("cosmetic_critical not found"));
@@ -244,8 +244,6 @@ public class AssessmentService {
 
         var minimumFunctionalNonCriticalGrade = Optional.ofNullable(minimumGrades.get("functional_non_critical"))
                 .orElseThrow(() -> new NoSuchElementException("functional_non_critical not found"));
-
-        var all = inventoryItemsFieldValuesRepository.findAll();
 
         AtomicReference<Long> lowestMainItemFunctionalScore = new AtomicReference<>(9L);
         AtomicReference<Long> lowestMainItemCosmeticScore = new AtomicReference<>(9L);

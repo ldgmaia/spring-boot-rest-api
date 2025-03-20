@@ -19,6 +19,6 @@ public class AdminSettings {
     private Long id;
 
     private String service;
-    private String key_param;
-    private String value_param;
+    private String keyParam;
+    private String valueParam;
 }

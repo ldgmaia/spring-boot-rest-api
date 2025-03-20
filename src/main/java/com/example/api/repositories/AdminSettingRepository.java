@@ -15,8 +15,8 @@ public interface AdminSettingRepository extends JpaRepository<AdminSettings, Lon
 
     @Transactional
     @Modifying
-    @Query("update AdminSetting a set a.value_param = ?1 where a.service = ?2 and a.key_param = ?3")
-    void updateValueparamByServiceAndKeyparam(String value_param, String service, String key_param);
+    @Query("update AdminSetting a set a.valueParam = ?1 where a.service = ?2 and a.keyParam = ?3")
+    void updateValueParamByServiceAndKeyParam(String value_param, String service, String key_param);
 
-
+    AdminSettings findByServiceAndKeyParam(String service, String keyParam);
 }

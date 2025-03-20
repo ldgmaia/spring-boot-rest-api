@@ -64,7 +64,7 @@ public class OAuth2PlatformClientFactory {
 
         // Convert list to a map (key: settingKey, value: settingValue)
         Map<String, String> qboSettingsMap = qboSettings.stream()
-                .collect(Collectors.toMap(AdminSettings::getKey_param, AdminSettings::getValue_param));
+                .collect(Collectors.toMap(AdminSettings::getKeyParam, AdminSettings::getValueParam));
         return qboSettingsMap.get(proppertyName);
     }
 }

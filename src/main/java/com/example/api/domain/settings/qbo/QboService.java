@@ -89,7 +89,7 @@ public class QboService {
         }
 
         var purchaseOrder = new PurchaseOrder(new PurchaseOrderRegisterDTO(
-                data.PurchaseOrder().POStatus(),
+                "Pending Receiving",
                 data.PurchaseOrder().DocNumber(),
                 data.PurchaseOrder().CurrencyRef().value(),
                 BigDecimal.valueOf(data.PurchaseOrder().TotalAmt()),
@@ -178,9 +178,9 @@ public class QboService {
 
             BearerTokenResponse bearerTokenResponse = client.retrieveBearerTokens(data.code(), redirectUri);
 
-            adminSettingRepository.updateValueparamByServiceAndKeyparam(bearerTokenResponse.getRefreshToken(), serviceSettingsName, "refreshToken");
-            adminSettingRepository.updateValueparamByServiceAndKeyparam(bearerTokenResponse.getAccessToken(), serviceSettingsName, "accessToken");
-            adminSettingRepository.updateValueparamByServiceAndKeyparam(data.realmId(), serviceSettingsName, "realmId");
+            adminSettingRepository.updateValueParamByServiceAndKeyParam(bearerTokenResponse.getRefreshToken(), serviceSettingsName, "refreshToken");
+            adminSettingRepository.updateValueParamByServiceAndKeyParam(bearerTokenResponse.getAccessToken(), serviceSettingsName, "accessToken");
+            adminSettingRepository.updateValueParamByServiceAndKeyParam(data.realmId(), serviceSettingsName, "realmId");
 
             return """
                     <!DOCTYPE html>
@@ -225,7 +225,7 @@ public class QboService {
 
         // Convert list to a map (key: settingKey, value: settingValue)
         Map<String, String> qboSettingsMap = qboSettings.stream()
-                .collect(Collectors.toMap(AdminSettings::getKey_param, AdminSettings::getValue_param));
+                .collect(Collectors.toMap(AdminSettings::getKeyParam, AdminSettings::getValueParam));
 
         if (qboSettingsMap.get("realmId") == null) {
             throw new RuntimeException("No realm ID. QBO calls only work if the accounting scope was passed!");
@@ -288,7 +288,7 @@ public class QboService {
 
         // Convert list to a map (key: settingKey, value: settingValue)
         Map<String, String> qboSettingsMap = qboSettings.stream()
-                .collect(Collectors.toMap(AdminSettings::getKey_param, AdminSettings::getValue_param));
+                .collect(Collectors.toMap(AdminSettings::getKeyParam, AdminSettings::getValueParam));
 
         if (qboSettingsMap.get("realmId") == null) {
             throw new RuntimeException("No realm ID.  QBO calls only work if the accounting scope was passed!");
