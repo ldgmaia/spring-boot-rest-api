@@ -13,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("purchase-orders")
 @SecurityRequirement(name = "bearer-key")
@@ -72,8 +74,7 @@ public class PurchaseOrderController {
     }
 
     @GetMapping("/list/open-purchase-orders")
-    public ResponseEntity getNonFullyReceivedPurchaseOrders() {
-        var purchaseOrderInfoDTOs = purchaseOrderRepository.findAllByStatusNot("Fully Received");
-        return ResponseEntity.ok(purchaseOrderInfoDTOs);
+    public ResponseEntity<List<PurchaseOrderListDTO>> getOpenPurchaseOrders() {
+        return ResponseEntity.ok(purchaseOrderService.getOpenPurchaseOrders());
     }
 }

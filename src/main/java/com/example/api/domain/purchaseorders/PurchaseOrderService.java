@@ -2,11 +2,14 @@ package com.example.api.domain.purchaseorders;
 
 import com.example.api.domain.ValidationException;
 import com.example.api.domain.purchaseorderitems.PurchaseOrderItemInfoReceivedDTO;
+import com.example.api.repositories.AdminSettingRepository;
 import com.example.api.repositories.PurchaseOrderItemRepository;
 import com.example.api.repositories.PurchaseOrderRepository;
 import com.example.api.repositories.ReceivingItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class PurchaseOrderService {
@@ -19,6 +22,9 @@ public class PurchaseOrderService {
 
     @Autowired
     private ReceivingItemRepository receivingItemRepository;
+
+    @Autowired
+    private AdminSettingRepository adminSettingRepository;
 
 //    public PurchaseOrderInfoDTO register(PurchaseOrderRequestDTO data) {
 //
@@ -98,5 +104,11 @@ public class PurchaseOrderService {
                 .toList();
 
         return new PurchaseOrderInfoReceivedDTO(purchaseOrder, supplier, items);
+    }
+
+    public List<PurchaseOrderListDTO> getOpenPurchaseOrders() {
+        var statuses = adminSettingRepository.findByServiceAndKeyParam("Purchase Orders", "receivingStatusExcluded");
+        List<String> statusesList = List.of(statuses.getValueParam().split(","));
+        return purchaseOrderRepository.findAllByStatusNotIn(statusesList).stream().map(PurchaseOrderListDTO::new).toList();
     }
 }
