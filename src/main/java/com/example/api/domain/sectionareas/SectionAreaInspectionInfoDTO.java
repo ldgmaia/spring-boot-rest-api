@@ -30,7 +30,8 @@ public record SectionAreaInspectionInfoDTO(
                                 sectionAreaModel.getModel(),
                                 getMpnId(inventoryItemRepository, inventoryItemId, sectionArea.getId()),
                                 inventoryItemRepository,
-                                inventoryItemId
+                                inventoryItemId,
+                                sectionArea
                         ))
                         .toList()
         );

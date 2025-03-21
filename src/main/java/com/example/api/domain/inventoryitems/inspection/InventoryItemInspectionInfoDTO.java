@@ -15,7 +15,10 @@ public record InventoryItemInspectionInfoDTO(
         this(
                 inventoryItem.getId(),
                 inventoryItem.getSerialNumber(),
-                inventoryItem.getModel().getSections().stream().sorted((a, b) -> a.getSectionOrder().compareTo(b.getSectionOrder())).map(section -> new SectionInspectionInfoDTO(section, inventoryItem.getId(), inventoryItemRepository)).toList()
+                inventoryItem.getModel().getSections().stream()
+                        .sorted((a, b) -> a.getSectionOrder().compareTo(b.getSectionOrder()))
+                        .map(section -> new SectionInspectionInfoDTO(section, inventoryItem.getId(), inventoryItemRepository))
+                        .toList()
         );
     }
 }

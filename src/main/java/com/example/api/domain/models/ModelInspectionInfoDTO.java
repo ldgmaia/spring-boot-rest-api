@@ -3,6 +3,7 @@ package com.example.api.domain.models;
 import com.example.api.domain.categoryfields.CategoryFields;
 import com.example.api.domain.categoryfields.CategoryFieldsInspectionInfoDTO;
 import com.example.api.domain.mpns.MPNInfoDTO;
+import com.example.api.domain.sectionareas.SectionArea;
 import com.example.api.repositories.InventoryItemRepository;
 
 import java.util.List;
@@ -17,7 +18,7 @@ public record ModelInspectionInfoDTO(
         List<MPNInfoDTO> mpns,
         List<CategoryFieldsInspectionInfoDTO> categoryFields
 ) {
-    public ModelInspectionInfoDTO(Model model, Long currentMpnId, InventoryItemRepository inventoryItemRepository, Long inventoryItemId) {
+    public ModelInspectionInfoDTO(Model model, Long currentMpnId, InventoryItemRepository inventoryItemRepository, Long inventoryItemId, SectionArea sectionArea) {
         this(
                 model.getId(),
                 model.getName(),
@@ -28,7 +29,7 @@ public record ModelInspectionInfoDTO(
                 model.getMpns().stream().map(MPNInfoDTO::new).toList(),
                 model.getCategory().getCategoryFields().stream()
                         .filter(CategoryFields::getEnabled)
-                        .map(cf -> new CategoryFieldsInspectionInfoDTO(cf, inventoryItemRepository, inventoryItemId)).toList()
+                        .map(cf -> new CategoryFieldsInspectionInfoDTO(cf, inventoryItemRepository, inventoryItemId, sectionArea)).toList()
         );
     }
 }

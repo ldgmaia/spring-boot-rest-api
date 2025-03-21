@@ -175,7 +175,6 @@ public class CategoryService {
             remainingField.setEnabled(false);
             categoryFieldRepository.save(remainingField);
         }
-
         return new CategoryInfoDTO(category);
     }
 

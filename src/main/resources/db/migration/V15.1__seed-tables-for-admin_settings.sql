@@ -20,7 +20,7 @@ values
 	('QuickBooksSandbox', 'realmId', ' '),
 	('QuickBooksSandbox', 'minorVersion', '75'),
 	('QuickBooksSandbox', 'qboUrl', 'https://sandbox-quickbooks.api.intuit.com'),
-	('Purchase Orders', 'receiving status excluded', 'Deleted,Fully Received');
+	('Purchase Orders', 'receivingStatusExcluded', 'Deleted,Fully Received');
 	
 insert into gradings (`type`, score, grade, company_grade)
 values 
