@@ -225,21 +225,25 @@ public class CategoryService {
     }
 
     public List<CategoryFieldsAssessmentInfoDTO> getAssessmentMainItemFieldsByinventoryItemId(Long inventoryItemId) {
-        var categoryId = inventoryItemRepository.findById(inventoryItemId).orElseThrow().getCategory().getId();
+        var inventoryItem = inventoryItemRepository.findById(inventoryItemId).orElseThrow();
+        var categoryId = inventoryItem.getCategory().getId();
+        var model = inventoryItem.getModel();
         return categoryRepository.findById(categoryId)
                 .map(category -> category.getCategoryFields().stream()
                         .filter(CategoryFields::getEnabled)
-                        .map(CategoryFieldsAssessmentInfoDTO::new)
+                        .map(cf -> new CategoryFieldsAssessmentInfoDTO(cf, model))
                         .toList())
                 .orElseThrow(() -> new EntityNotFoundException("Category not found with id: " + categoryId));
     }
 
     public List<CategoryFieldsMainItemInspectionInfoDTO> getInspectionMainItemFieldsByinventoryItemId(Long inventoryItemId) {
-        var categoryId = inventoryItemRepository.findById(inventoryItemId).orElseThrow().getCategory().getId();
+        var inventoryItem = inventoryItemRepository.findById(inventoryItemId).orElseThrow();
+        var categoryId = inventoryItem.getCategory().getId();
+        var model = inventoryItem.getModel();
         return categoryRepository.findById(categoryId)
                 .map(category -> category.getCategoryFields().stream()
                         .filter(CategoryFields::getEnabled)
-                        .map(cf -> new CategoryFieldsMainItemInspectionInfoDTO(cf, inventoryItemRepository, inventoryItemId))
+                        .map(cf -> new CategoryFieldsMainItemInspectionInfoDTO(cf, inventoryItemRepository, inventoryItemId, model))
                         .toList())
                 .orElseThrow(() -> new EntityNotFoundException("Category not found with id: " + categoryId));
     }

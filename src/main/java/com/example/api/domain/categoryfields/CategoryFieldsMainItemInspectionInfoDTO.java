@@ -2,6 +2,7 @@ package com.example.api.domain.categoryfields;
 
 import com.example.api.domain.fields.DataType;
 import com.example.api.domain.fields.FieldType;
+import com.example.api.domain.models.Model;
 import com.example.api.domain.values.ValueInfoDTO;
 import com.example.api.repositories.InventoryItemRepository;
 
@@ -20,9 +21,10 @@ public record CategoryFieldsMainItemInspectionInfoDTO(
         Boolean enabled,
         Long currentValueDataId,
         String currentValueData,
-        List<ValueInfoDTO> values
+        List<ValueInfoDTO> values,
+        Boolean modelNeedsMpn
 ) {
-    public CategoryFieldsMainItemInspectionInfoDTO(CategoryFields categoryField, InventoryItemRepository inventoryItemRepository, Long inventoryItemId) {
+    public CategoryFieldsMainItemInspectionInfoDTO(CategoryFields categoryField, InventoryItemRepository inventoryItemRepository, Long inventoryItemId, Model model) {
         this(
                 categoryField.getId(),
                 categoryField.getDataLevel(),
@@ -40,7 +42,8 @@ public record CategoryFieldsMainItemInspectionInfoDTO(
                 inventoryItemRepository.findMainItemFieldValueDataIdByInventoryItemId(inventoryItemId, categoryField.getField().getId()) != null ?
                         inventoryItemRepository.findMainItemFieldValueDataIdByInventoryItemId(inventoryItemId, categoryField.getField().getId()).getValueData() :
                         null,
-                categoryField.getField().getFieldValues().stream().map(fieldValue -> new ValueInfoDTO(fieldValue.getValueData())).toList()
+                categoryField.getField().getFieldValues().stream().map(fieldValue -> new ValueInfoDTO(fieldValue.getValueData())).toList(),
+                model.getNeedsMpn()
         );
     }
 }

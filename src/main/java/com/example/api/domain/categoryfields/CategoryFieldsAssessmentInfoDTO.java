@@ -2,6 +2,7 @@ package com.example.api.domain.categoryfields;
 
 import com.example.api.domain.fields.DataType;
 import com.example.api.domain.fields.FieldType;
+import com.example.api.domain.models.Model;
 import com.example.api.domain.values.ValueInfoDTO;
 
 import java.util.List;
@@ -17,9 +18,10 @@ public record CategoryFieldsAssessmentInfoDTO(
         FieldType fieldType,
         Boolean isMultiple,
         Boolean enabled,
+        Boolean modelNeedsMpn,
         List<ValueInfoDTO> values
 ) {
-    public CategoryFieldsAssessmentInfoDTO(CategoryFields categoryField) {
+    public CategoryFieldsAssessmentInfoDTO(CategoryFields categoryField, Model model) {
         this(
                 categoryField.getId(),
                 categoryField.getDataLevel(),
@@ -31,6 +33,7 @@ public record CategoryFieldsAssessmentInfoDTO(
                 categoryField.getField().getFieldType(),
                 categoryField.getField().getIsMultiple(),
                 categoryField.getEnabled(),
+                model.getNeedsMpn(),
                 categoryField.getField().getFieldValues().stream().map(fieldValue -> new ValueInfoDTO(fieldValue.getValueData())).toList()
         );
     }

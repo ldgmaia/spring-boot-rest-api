@@ -25,7 +25,7 @@ public record ModelAssessmentInfoDTO(
                 model.getMpns().stream().map(MPNInfoDTO::new).toList(),
                 model.getCategory().getCategoryFields().stream()
                         .filter(CategoryFields::getEnabled)
-                        .map(CategoryFieldsAssessmentInfoDTO::new).toList()
+                        .map(cf -> new CategoryFieldsAssessmentInfoDTO(cf, model)).toList()
         );
     }
 }
