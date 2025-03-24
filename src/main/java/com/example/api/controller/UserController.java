@@ -40,4 +40,9 @@ public class UserController {
     public ResponseEntity list() {
         return ResponseEntity.ok(userService.list());
     }
+
+    @GetMapping("/get/{id}")
+    public ResponseEntity getById(@Valid @PathVariable Long id) {
+        return ResponseEntity.ok(userService.getById(id));
+    }
 }

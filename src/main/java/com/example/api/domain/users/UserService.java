@@ -48,6 +48,10 @@ public class UserService {
                 .toList();
     }
 
+    public UserInfoDTO getById(Long id) {
+        return new UserInfoDTO(userRepository.findByIdAndEnabledTrue(id));
+    }
+
 //    public void deactivateUser(Long userId) {
 //        User user = userRepository.findById(userId)
 //                .orElseThrow(() -> new RuntimeException("User not found"));
