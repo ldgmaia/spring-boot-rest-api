@@ -176,7 +176,7 @@ public class ChangeLocationService {
         for (InventoryItem item : inventoryItemsToModify) {
 
             if (item.getStorageLevel().getId().equals(data.toLocationLevelId())) {
-                throw new ValidationException("Item ID: " + item.getId() + " is already in the destination location");
+                throw new ValidationException("Serial number " + item.getSerialNumber() + " is already under location" + item.getStorageLevel().getName());
             }
 
             var validStatusList = itemStatusRepository.findByCanTransferTrue();
