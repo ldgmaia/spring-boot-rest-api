@@ -1,5 +1,6 @@
 package com.example.api.repositories;
 
+import com.example.api.domain.fieldsvalues.FieldValue;
 import com.example.api.domain.inventoryitems.InventoryItem;
 import com.example.api.domain.inventoryitems.InventoryItemsByReceivingItemDTO;
 import com.example.api.domain.sectionareas.SectionArea;
@@ -106,14 +107,14 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, Lo
 
 
     @Query("""
-            SELECT fv.valueData
+            SELECT fv
             FROM InventoryItem ii
             JOIN ii.inventoryItemsFieldsValues iifv
             JOIN iifv.fieldValue fv
             WHERE ii.id = :inventoryItemId
               AND fv.field.id = :fieldId
             """)
-    Value findMainItemFieldValueDataIdByInventoryItemId(Long inventoryItemId, Long fieldId);
+    FieldValue findMainItemFieldValueDataIdByInventoryItemId(Long inventoryItemId, Long fieldId);
 
     @Query("""
             SELECT ii

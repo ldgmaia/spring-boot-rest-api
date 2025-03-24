@@ -37,12 +37,12 @@ public record CategoryFieldsMainItemInspectionInfoDTO(
                 categoryField.getField().getIsMultiple(),
                 categoryField.getEnabled(),
                 inventoryItemRepository.findMainItemFieldValueDataIdByInventoryItemId(inventoryItemId, categoryField.getField().getId()) != null ?
-                        inventoryItemRepository.findMainItemFieldValueDataIdByInventoryItemId(inventoryItemId, categoryField.getField().getId()).getId() :
+                        inventoryItemRepository.findMainItemFieldValueDataIdByInventoryItemId(inventoryItemId, categoryField.getField().getId()).getValueData().getId() :
                         null,
                 inventoryItemRepository.findMainItemFieldValueDataIdByInventoryItemId(inventoryItemId, categoryField.getField().getId()) != null ?
-                        inventoryItemRepository.findMainItemFieldValueDataIdByInventoryItemId(inventoryItemId, categoryField.getField().getId()).getValueData() :
+                        inventoryItemRepository.findMainItemFieldValueDataIdByInventoryItemId(inventoryItemId, categoryField.getField().getId()).getValueData().getValueData() :
                         null,
-                categoryField.getField().getFieldValues().stream().map(fieldValue -> new ValueInfoDTO(fieldValue.getValueData())).toList(),
+                categoryField.getField().getFieldValues().stream().map(fieldValue -> new ValueInfoDTO(fieldValue.getValueData(), fieldValue.getScore())).toList(),
                 model.getNeedsMpn()
         );
     }

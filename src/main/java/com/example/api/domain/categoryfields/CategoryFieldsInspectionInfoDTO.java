@@ -37,7 +37,7 @@ public record CategoryFieldsInspectionInfoDTO(
                 categoryField.getEnabled(),
                 null,
                 null,
-                categoryField.getField().getFieldValues().stream().map(fieldValue -> new ValueInfoDTO(fieldValue.getValueData())).toList()
+                categoryField.getField().getFieldValues().stream().map(fieldValue -> new ValueInfoDTO(fieldValue.getValueData(), fieldValue.getScore())).toList()
         );
     }
 
@@ -59,7 +59,7 @@ public record CategoryFieldsInspectionInfoDTO(
                 inventoryItemRepository.findValuesDataBySectionAreaAndFieldIdOfComponent(inventoryItemId, sectionArea, categoryField.getField().getId()) != null ?
                         inventoryItemRepository.findValuesDataBySectionAreaAndFieldIdOfComponent(inventoryItemId, sectionArea, categoryField.getField().getId()).getValueData() :
                         null,
-                categoryField.getField().getFieldValues().stream().map(fieldValue -> new ValueInfoDTO(fieldValue.getValueData())).toList()
+                categoryField.getField().getFieldValues().stream().map(fieldValue -> new ValueInfoDTO(fieldValue.getValueData(), fieldValue.getScore())).toList()
         );
     }
 

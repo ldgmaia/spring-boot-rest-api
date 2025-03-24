@@ -34,7 +34,7 @@ public record CategoryFieldsAssessmentInfoDTO(
                 categoryField.getField().getIsMultiple(),
                 categoryField.getEnabled(),
                 model.getNeedsMpn(),
-                categoryField.getField().getFieldValues().stream().map(fieldValue -> new ValueInfoDTO(fieldValue.getValueData())).toList()
+                categoryField.getField().getFieldValues().stream().map(fieldValue -> new ValueInfoDTO(fieldValue.getValueData(), fieldValue.getScore())).toList()
         );
     }
 }

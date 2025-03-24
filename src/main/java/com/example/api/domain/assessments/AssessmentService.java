@@ -340,6 +340,8 @@ public class AssessmentService {
                     .map(Gradings::getCompany_grade)
                     .orElse("NA");
         }
+        mainItemInventoryItem.setFunctionalGrade(gradingRepository.findByTypeAndScore("functional", lowestMainItemFunctionalScore.get()).getGrade());
+        mainItemInventoryItem.setCosmeticGrade(gradingRepository.findByTypeAndScore("cosmetic", lowestMainItemCosmeticScore.get()).getGrade());
         mainItemInventoryItem.setCompanyGrade(mainItemCompanyGrade);
     }
 
