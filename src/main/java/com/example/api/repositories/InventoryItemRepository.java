@@ -142,6 +142,8 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, Lo
 
     List<InventoryItem> findByModelIdAndItemStatusIdInAndInventoryItemsFieldsValues_FieldValue_Field_FieldTypeIn(Long modelId, List<Long> itemStatusesIds, List<String> fieldTypes);
 
+    List<InventoryItem> findByModelIdAndItemStatusIdIn(Long modelId, List<Long> itemStatusesIds);
+
 //    InventoryItem findByIdAndInventoryItemComponentsInventoryItemSectionAreaAndInventoryItemComponentsInventoryItemInventoryItemsFieldsValuesFieldValueFieldId(Long inventoryItemId, SectionArea sectionArea, Long fieldId);
 
 

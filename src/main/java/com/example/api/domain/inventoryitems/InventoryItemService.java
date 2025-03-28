@@ -7,6 +7,7 @@ import com.example.api.domain.inventoryitems.inspection.*;
 import com.example.api.domain.inventoryitems.validations.InventoryValidator;
 import com.example.api.domain.inventoryitemsfieldsvalues.InventoryItemsFieldsValues;
 import com.example.api.domain.inventoryitemsfieldsvalues.InventoryItemsFieldsValuesRegisterDTO;
+import com.example.api.domain.sectionareas.SectionArea;
 import com.example.api.domain.values.Value;
 import com.example.api.domain.values.ValueRegisterDTO;
 import com.example.api.repositories.*;
@@ -260,7 +261,8 @@ public class InventoryItemService {
 
     public List<InventoryItemLookUpResponseDTO> lookup(InventoryItemLookUpRequestDTO requestData) {
 
-        var inventoryItems = inventoryItemRepository.findByModelIdAndItemStatusIdInAndInventoryItemsFieldsValues_FieldValue_Field_FieldTypeIn(requestData.modelId(), requestData.statusesIds(), requestData.fieldsTypesIds());
+//        var inventoryItems = inventoryItemRepository.findByModelIdAndItemStatusIdInAndInventoryItemsFieldsValues_FieldValue_Field_FieldTypeIn(requestData.modelId(), requestData.statusesIds(), requestData.fieldsTypesIds());
+        var inventoryItems = inventoryItemRepository.findByModelIdAndItemStatusIdIn(requestData.modelId(), requestData.statusesIds());
 
 //        if (inventoryItems.isEmpty()) {
 //            throw new ValidationException("No items found");
@@ -278,6 +280,72 @@ public class InventoryItemService {
                 .toList();
 
         columns.add(Map.of("Item", uniqueItemNames));
+
+        inventoryItems
+                .stream().filter(ii -> Objects.equals(ii.getSerialNumber(), "aaa"))
+                .forEach(ii -> {
+                    ii.getModel().getSections()
+                            .forEach(section -> {
+                                section.getAreas() // sort areas by id
+                                        .stream().sorted(Comparator.comparing(SectionArea::getId))
+                                        .forEach(area -> {
+//                                            System.out.println(area.getId() + " - " + area.getName());
+
+//                                            area.getInventoryItems().forEach(aii -> {
+//                                                aii.getInventoryItemsFieldsValues()
+//                                                        .stream().filter(iifv ->
+//                                                                requestData.fieldsTypesIds().contains(
+//                                                                        iifv.getFieldValue().getField().getFieldType().name()))
+//                                                        .forEach(iifv -> {
+//                                                            System.out.println(iifv.getFieldValue().getField().getName());
+//                                                        });
+//                                            });
+
+//                                            List<String> uniqueFields = inventoryItems.stream()
+//                                                    .flatMap(ii2 -> ii2.getInventoryItemsFieldsValues().stream())
+//                                                    .filter(iifv -> requestData.fieldsTypesIds().contains(
+//                                                            iifv.getFieldValue().getField().getFieldType().name()))
+//                                                    .map(iifv -> iifv.getFieldValue().getField().getName())
+//                                                    .distinct()
+//                                                    .toList();
+
+//                                            List<String> uniqueFields = inventoryItems.stream()
+//                                                    .flatMap(ii2 -> ii2.getInventoryItemsFieldsValues().stream())
+//                                                    .filter(iifv -> requestData.fieldsTypesIds().contains(
+//                                                            iifv.getFieldValue().getField().getFieldType().name()))
+//                                                    .map(iifv -> iifv.getFieldValue().getField().getName())
+//                                                    .distinct()
+//                                                    .toList();
+
+                                            List<String> uniqueFields = area.getInventoryItems().stream()
+                                                    .flatMap(aii -> aii.getInventoryItemsFieldsValues().stream())
+                                                    .filter(iifv -> requestData.fieldsTypesIds().contains(
+                                                            iifv.getFieldValue().getField().getFieldType().name()))
+                                                    .map(iifv -> iifv.getFieldValue().getField().getName())
+                                                    .distinct()
+                                                    .toList();
+
+                                            columns.add(Map.of(area.getName(), uniqueFields));
+
+//                            columns.add(Map.of(area.getName(), List.of("Present", "Functional", "Cosmetic")));
+                                        });
+                            });
+//                    ii.getInventoryItemComponents().forEach(iic -> {
+//                        System.out.println(iic.getInventoryItem().getType());
+//                    });
+                });
+
+//        inventoryItems
+//                .stream().filter(ii -> Objects.equals(ii.getSerialNumber(), "aaa"))
+//                .forEach(ii -> {
+//
+//                    ii.getInventoryItemComponents().forEach(iic -> {
+//                        iic.getInventoryItem().getInventoryItemsFieldsValues().forEach(iifv -> {
+//                            System.out.println(ii.getSerialNumber() + " - " + iifv.getFieldValue().getField().getName() + " - " + iifv.getFieldValue().getValueData().getValueData());
+//                        });
+//                    });
+//                });
+
 
         var data = new ArrayList<Map<String, List<String>>>();
         inventoryItems.forEach(ii -> data.add(Map.of("Details", List.of(

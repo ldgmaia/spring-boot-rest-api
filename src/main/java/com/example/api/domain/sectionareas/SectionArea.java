@@ -1,11 +1,14 @@
 package com.example.api.domain.sectionareas;
 
+import com.example.api.domain.inventoryitems.InventoryItem;
 import com.example.api.domain.sectionareamodels.SectionAreaModel;
 import com.example.api.domain.sections.Section;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 @Table(name = "section_areas", uniqueConstraints = {
@@ -29,7 +32,7 @@ public class SectionArea {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sections_id")
     private Section section;
-    
+
     private Long areaOrder;
     private Boolean printOnLabel;
     private Boolean printAreaNameOnLabel;
@@ -38,6 +41,9 @@ public class SectionArea {
 
     @OneToMany(mappedBy = "sectionArea", orphanRemoval = true)
     private Set<SectionAreaModel> sectionAreaModels = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "sectionArea", orphanRemoval = true)
+    private List<InventoryItem> inventoryItems = new ArrayList<>();
 
     public SectionArea(SectionAreaRegisterDTO data) {
         this.name = data.name();
