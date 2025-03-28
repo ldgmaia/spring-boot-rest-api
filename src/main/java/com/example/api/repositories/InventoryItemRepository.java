@@ -132,7 +132,7 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, Lo
             	and sa.id = :sectionAreaId
             )
             """)
-    List<InventoryItem> findBystorageLevelIdAndTypeAndItemStatusId(
+    List<InventoryItem> findByStorageLevelIdAndTypeAndItemStatusId(
             @Param("storageLevelId") Long storageLevelId,
             @Param("type") String type,
             @Param("itemStatusId") Long itemStatusId,
@@ -140,6 +140,7 @@ public interface InventoryItemRepository extends JpaRepository<InventoryItem, Lo
             @Param("sectionAreaId") Long sectionAreaId
     );
 
+    List<InventoryItem> findByModelIdAndItemStatusIdInAndInventoryItemsFieldsValues_FieldValue_Field_FieldTypeIn(Long modelId, List<Long> itemStatusesIds, List<String> fieldTypes);
 
 //    InventoryItem findByIdAndInventoryItemComponentsInventoryItemSectionAreaAndInventoryItemComponentsInventoryItemInventoryItemsFieldsValuesFieldValueFieldId(Long inventoryItemId, SectionArea sectionArea, Long fieldId);
 

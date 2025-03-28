@@ -178,4 +178,10 @@ public class InventoryItemController {
         InventoryItemInspectedItemInfoDTO inspectedInfo = inventoryItemService.getInspectedItemInfoByInventoryItemId(inventoryItemId);
         return ResponseEntity.ok(inspectedInfo);
     }
+
+    @GetMapping("/inspection/items-lookup")
+    public ResponseEntity itemsLookup(@RequestBody @Valid InventoryItemLookUpRequestDTO data) {
+        var inventoryItems = inventoryItemService.lookup(data);
+        return ResponseEntity.ok(inventoryItems);
+    }
 }

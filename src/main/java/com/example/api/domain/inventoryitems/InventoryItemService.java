@@ -230,7 +230,7 @@ public class InventoryItemService {
     }
 
     public List<InventoryItemsByLocationDTO> getInventoryItemsByLocationId(Long locationId, String type, Long statusId, Long mainItemInventoryId, Long areaId) {
-        var inventoryList = inventoryItemRepository.findBystorageLevelIdAndTypeAndItemStatusId(locationId, type, statusId, mainItemInventoryId, areaId);
+        var inventoryList = inventoryItemRepository.findByStorageLevelIdAndTypeAndItemStatusId(locationId, type, statusId, mainItemInventoryId, areaId);
         return inventoryList.stream().map(InventoryItemsByLocationDTO::new).toList();
     }
 
@@ -256,6 +256,49 @@ public class InventoryItemService {
 
     public InventoryItemInspectedItemInfoDTO getInspectedItemInfoByInventoryItemId(Long inventoryItemId) {
         return new InventoryItemInspectedItemInfoDTO(inventoryItemRepository.getReferenceById(inventoryItemId));
+    }
+
+    public List<InventoryItemLookUpResponseDTO> lookup(InventoryItemLookUpRequestDTO requestData) {
+
+        var inventoryItems = inventoryItemRepository.findByModelIdAndItemStatusIdInAndInventoryItemsFieldsValues_FieldValue_Field_FieldTypeIn(requestData.modelId(), requestData.statusesIds(), requestData.fieldsTypesIds());
+
+//        if (inventoryItems.isEmpty()) {
+//            throw new ValidationException("No items found");
+//        }
+
+        var columns = new ArrayList<Map<String, List<String>>>();
+        columns.add(Map.of("Details", List.of("Serial Number", "MPN", "Grade", "Location", "Status")));
+
+        List<String> uniqueItemNames = inventoryItems.stream()
+                .flatMap(ii -> ii.getInventoryItemsFieldsValues().stream())
+                .filter(iifv -> requestData.fieldsTypesIds().contains(
+                        iifv.getFieldValue().getField().getFieldType().name()))
+                .map(iifv -> iifv.getFieldValue().getField().getName())
+                .distinct()
+                .toList();
+
+        columns.add(Map.of("Item", uniqueItemNames));
+
+        var data = new ArrayList<Map<String, List<String>>>();
+        inventoryItems.forEach(ii -> data.add(Map.of("Details", List.of(
+                ii.getSerialNumber(),
+                ii.getMpn().getName(),
+                ii.getCompanyGrade(),
+                ii.getStorageLevel().getName(),
+                ii.getItemStatus().getName()))));
+
+        inventoryItems.forEach(ii -> data.add(Map.of("Item",
+                                ii.getInventoryItemsFieldsValues().stream()
+                                        .filter(iifv -> requestData.fieldsTypesIds().contains(
+                                                iifv.getFieldValue().getField().getFieldType().name()))
+                                        .map(iifv -> iifv.getFieldValue().getValueData().getValueData())
+                                        .collect(Collectors.toList())
+                        )
+                )
+        );
+
+        return List.of(new InventoryItemLookUpResponseDTO(columns, data));
+//        return new InventoryItemLookUpResponseDTO();
     }
 
     public void saveInspection(@Valid InventoryItemSaveInspectionRequestDTO data) {

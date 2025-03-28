@@ -3,7 +3,6 @@ package com.example.api.domain.inventoryitems;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-//@ValidQuantityByQuantity
 public record InventoryItemRequestDTO(
         @NotNull Long receivingItemId,
         @NotNull Long categoryId,
