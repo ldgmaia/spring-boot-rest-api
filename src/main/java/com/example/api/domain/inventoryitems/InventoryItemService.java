@@ -7,7 +7,6 @@ import com.example.api.domain.inventoryitems.inspection.*;
 import com.example.api.domain.inventoryitems.validations.InventoryValidator;
 import com.example.api.domain.inventoryitemsfieldsvalues.InventoryItemsFieldsValues;
 import com.example.api.domain.inventoryitemsfieldsvalues.InventoryItemsFieldsValuesRegisterDTO;
-import com.example.api.domain.sectionareas.SectionArea;
 import com.example.api.domain.values.Value;
 import com.example.api.domain.values.ValueRegisterDTO;
 import com.example.api.repositories.*;
@@ -226,8 +225,8 @@ public class InventoryItemService {
         return min + (long) (random.nextDouble() * (max - min)); // Generates a random Long between min and max
     }
 
-    public List<InventoryItemsByReceivingItemDTO> getInventoryItemsByReceivingItemId(Long receivingItemId, String type, Long statusId) {
-        return inventoryItemRepository.findByReceivingItemId(receivingItemId, type);
+    public List<InventoryItemsByReceivingItemDTO> getInventoryItemsByReceivingItemId(Long receivingItemId, String type, Long itemStatusId) {
+        return inventoryItemRepository.findByReceivingItemId(receivingItemId, itemStatusId, type);
     }
 
     public List<InventoryItemsByLocationDTO> getInventoryItemsByLocationId(Long locationId, String type, Long statusId, Long mainItemInventoryId, Long areaId) {
@@ -261,112 +260,71 @@ public class InventoryItemService {
 
     public List<InventoryItemLookUpResponseDTO> lookup(InventoryItemLookUpRequestDTO requestData) {
 
-//        var inventoryItems = inventoryItemRepository.findByModelIdAndItemStatusIdInAndInventoryItemsFieldsValues_FieldValue_Field_FieldTypeIn(requestData.modelId(), requestData.statusesIds(), requestData.fieldsTypesIds());
-        var inventoryItems = inventoryItemRepository.findByModelIdAndItemStatusIdIn(requestData.modelId(), requestData.statusesIds());
-
-//        if (inventoryItems.isEmpty()) {
-//            throw new ValidationException("No items found");
-//        }
-
-        var columns = new ArrayList<Map<String, List<String>>>();
-        columns.add(Map.of("Details", List.of("Serial Number", "MPN", "Grade", "Location", "Status")));
-
-        List<String> uniqueItemNames = inventoryItems.stream()
-                .flatMap(ii -> ii.getInventoryItemsFieldsValues().stream())
-                .filter(iifv -> requestData.fieldsTypesIds().contains(
-                        iifv.getFieldValue().getField().getFieldType().name()))
-                .map(iifv -> iifv.getFieldValue().getField().getName())
-                .distinct()
+        var filteredInventoryItems = inventoryItemRepository
+                .findByModelIdAndItemStatusIdIn(requestData.modelId(), requestData.statusesIds())
+                .stream()
+                .filter(ii -> ii.getInventoryItemsFieldsValues().stream()
+                        .anyMatch(iifv -> requestData.fieldsTypes().contains(
+                                iifv.getFieldValue().getField().getFieldType().name()
+                        ))
+                )
                 .toList();
 
-        columns.add(Map.of("Item", uniqueItemNames));
+        return filteredInventoryItems.stream().map(InventoryItemLookUpResponseDTO::new).toList();
+    }
 
-        inventoryItems
-                .stream().filter(ii -> Objects.equals(ii.getSerialNumber(), "aaa"))
-                .forEach(ii -> {
-                    ii.getModel().getSections()
-                            .forEach(section -> {
-                                section.getAreas() // sort areas by id
-                                        .stream().sorted(Comparator.comparing(SectionArea::getId))
-                                        .forEach(area -> {
-//                                            System.out.println(area.getId() + " - " + area.getName());
+    public List<InventoryItemLookUpComponentsResponseDTO> lookupComponents(InventoryItemLookUpRequestDTO requestData) {
 
-//                                            area.getInventoryItems().forEach(aii -> {
-//                                                aii.getInventoryItemsFieldsValues()
-//                                                        .stream().filter(iifv ->
-//                                                                requestData.fieldsTypesIds().contains(
-//                                                                        iifv.getFieldValue().getField().getFieldType().name()))
-//                                                        .forEach(iifv -> {
-//                                                            System.out.println(iifv.getFieldValue().getField().getName());
-//                                                        });
-//                                            });
+        List<InventoryItemLookUpComponentsResponseDTO> result = inventoryItemRepository
+                .findByModelIdAndItemStatusIdIn(requestData.modelId(), requestData.statusesIds())
+                .stream()
+                .map(ii -> {
+                    Map<Long, InventoryItemLookUpComponentsResponseDTO.AreaDto> areaMap = new LinkedHashMap<>();
 
-//                                            List<String> uniqueFields = inventoryItems.stream()
-//                                                    .flatMap(ii2 -> ii2.getInventoryItemsFieldsValues().stream())
-//                                                    .filter(iifv -> requestData.fieldsTypesIds().contains(
-//                                                            iifv.getFieldValue().getField().getFieldType().name()))
-//                                                    .map(iifv -> iifv.getFieldValue().getField().getName())
-//                                                    .distinct()
-//                                                    .toList();
+                    ii.getInventoryItemComponents().forEach(iic -> {
+                        var component = iic.getInventoryItem();
+                        var model = component.getModel();
 
-//                                            List<String> uniqueFields = inventoryItems.stream()
-//                                                    .flatMap(ii2 -> ii2.getInventoryItemsFieldsValues().stream())
-//                                                    .filter(iifv -> requestData.fieldsTypesIds().contains(
-//                                                            iifv.getFieldValue().getField().getFieldType().name()))
-//                                                    .map(iifv -> iifv.getFieldValue().getField().getName())
-//                                                    .distinct()
-//                                                    .toList();
+                        component.getInventoryItemsFieldsValues().forEach(iifv -> {
+                            var field = iifv.getFieldValue().getField();
 
-                                            List<String> uniqueFields = area.getInventoryItems().stream()
-                                                    .flatMap(aii -> aii.getInventoryItemsFieldsValues().stream())
-                                                    .filter(iifv -> requestData.fieldsTypesIds().contains(
-                                                            iifv.getFieldValue().getField().getFieldType().name()))
-                                                    .map(iifv -> iifv.getFieldValue().getField().getName())
-                                                    .distinct()
-                                                    .toList();
+                            if (requestData.fieldsTypes().contains(field.getFieldType().name())) {
+                                String valueData = iifv.getFieldValue().getValueData().getValueData();
+                                Long fieldId = field.getId();
 
-                                            columns.add(Map.of(area.getName(), uniqueFields));
+                                model.getSectionAreaModels().forEach(sam -> {
+                                    var area = sam.getSectionArea();
+                                    var areaId = area.getId();
 
-//                            columns.add(Map.of(area.getName(), List.of("Present", "Functional", "Cosmetic")));
-                                        });
-                            });
-//                    ii.getInventoryItemComponents().forEach(iic -> {
-//                        System.out.println(iic.getInventoryItem().getType());
-//                    });
-                });
+                                    // Get or create the AreaDto
+                                    var areaDto = areaMap.computeIfAbsent(areaId, k ->
+                                            new InventoryItemLookUpComponentsResponseDTO.AreaDto(areaId, area.getName(), new ArrayList<>())
+                                    );
 
-//        inventoryItems
-//                .stream().filter(ii -> Objects.equals(ii.getSerialNumber(), "aaa"))
-//                .forEach(ii -> {
-//
-//                    ii.getInventoryItemComponents().forEach(iic -> {
-//                        iic.getInventoryItem().getInventoryItemsFieldsValues().forEach(iifv -> {
-//                            System.out.println(ii.getSerialNumber() + " - " + iifv.getFieldValue().getField().getName() + " - " + iifv.getFieldValue().getValueData().getValueData());
-//                        });
-//                    });
-//                });
+                                    // Deduplication: check if field already exists in that area's fields list
+                                    boolean alreadyExists = areaDto.fields().stream().anyMatch(f ->
+                                            f.fieldId().equals(fieldId) && f.valueData().equals(valueData)
+                                    );
 
+                                    if (!alreadyExists) {
+                                        areaDto.fields().add(
+                                                new InventoryItemLookUpComponentsResponseDTO.FieldDto(
+                                                        field.getId(),
+                                                        field.getName(),
+                                                        iifv.getFieldValue().getValueData().getId(),
+                                                        valueData
+                                                )
+                                        );
+                                    }
+                                });
+                            }
+                        });
+                    });
 
-        var data = new ArrayList<Map<String, List<String>>>();
-        inventoryItems.forEach(ii -> data.add(Map.of("Details", List.of(
-                ii.getSerialNumber(),
-                ii.getMpn().getName(),
-                ii.getCompanyGrade(),
-                ii.getStorageLevel().getName(),
-                ii.getItemStatus().getName()))));
-
-        inventoryItems.forEach(ii -> data.add(Map.of("Item",
-                                ii.getInventoryItemsFieldsValues().stream()
-                                        .filter(iifv -> requestData.fieldsTypesIds().contains(
-                                                iifv.getFieldValue().getField().getFieldType().name()))
-                                        .map(iifv -> iifv.getFieldValue().getValueData().getValueData())
-                                        .collect(Collectors.toList())
-                        )
-                )
-        );
-
-        return List.of(new InventoryItemLookUpResponseDTO(columns, data));
-//        return new InventoryItemLookUpResponseDTO();
+                    return new InventoryItemLookUpComponentsResponseDTO(ii.getId(), new ArrayList<>(areaMap.values()));
+                })
+                .toList();
+        return result;
     }
 
     public void saveInspection(@Valid InventoryItemSaveInspectionRequestDTO data) {

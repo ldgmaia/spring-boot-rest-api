@@ -179,9 +179,15 @@ public class InventoryItemController {
         return ResponseEntity.ok(inspectedInfo);
     }
 
-    @GetMapping("/inspection/items-lookup")
+    @GetMapping("/inspection/items-lookup-main")
     public ResponseEntity itemsLookup(@RequestBody @Valid InventoryItemLookUpRequestDTO data) {
         var inventoryItems = inventoryItemService.lookup(data);
+        return ResponseEntity.ok(inventoryItems);
+    }
+
+    @GetMapping("/inspection/items-lookup-components")
+    public ResponseEntity itemsLookupComponents(@RequestBody @Valid InventoryItemLookUpRequestDTO data) {
+        var inventoryItems = inventoryItemService.lookupComponents(data);
         return ResponseEntity.ok(inventoryItems);
     }
 }
