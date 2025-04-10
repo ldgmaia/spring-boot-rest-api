@@ -18,6 +18,7 @@ public interface ReceivingItemRepository extends JpaRepository<ReceivingItem, Lo
             SELECT COALESCE(SUM(ri.quantityAlreadyReceived), 0)
             FROM ReceivingItem ri
             WHERE ri.purchaseOrderItem.id = :purchaseOrderItemId
+            AND ri.receivableItem = true
             """)
     Long findSumAlreadyReceivedByPurchaseOrderItemId(@Param("purchaseOrderItemId") Long purchaseOrderItemId);
 
@@ -26,6 +27,7 @@ public interface ReceivingItemRepository extends JpaRepository<ReceivingItem, Lo
             FROM ReceivingItem ri
             JOIN ri.purchaseOrderItem poi
             WHERE poi.purchaseOrder.id = :purchaseOrderId
+            AND ri.receivableItem = true
             """)
     Long findSumAlreadyReceivedByPurchaseOrderId(@Param("purchaseOrderId") Long purchaseOrderId);
 

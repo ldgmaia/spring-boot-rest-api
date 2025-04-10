@@ -4,7 +4,6 @@ import com.example.api.domain.purchaseorderitems.PurchaseOrderItem;
 import com.example.api.domain.purchaseorderitems.PurchaseOrderItemInfoDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,10 +13,13 @@ public interface PurchaseOrderItemRepository extends JpaRepository<PurchaseOrder
 
     List<PurchaseOrderItemInfoDTO> findAllByPurchaseOrderId(Long purchaseOrderId);
 
-    @Query("""
-            SELECT COALESCE(SUM(poi.quantityOrdered), 0)
-            FROM PurchaseOrderItem poi
-            WHERE poi.purchaseOrder.id = :purchaseOrderId
+    @Query(
+            nativeQuery = true, value = """
+            SELECT COALESCE(SUM(poi.quantity_ordered), 0)
+            FROM purchase_order_items poi
+            join receiving_items ri on ri.purchase_order_item_id = poi.id
+            WHERE poi.purchase_orders_id = :purchaseOrderId
+            and ri.receivable_item
             """)
-    Long findSumQuantityOrderedByPurchaseOrderId(@Param("purchaseOrderId") Long purchaseOrderId);
+    Long findSumQuantityOrderedByPurchaseOrderId(Long purchaseOrderId);
 }
