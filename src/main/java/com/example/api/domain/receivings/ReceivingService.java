@@ -11,7 +11,6 @@ import com.example.api.domain.receivingpictures.ReceivingPicture;
 import com.example.api.domain.receivingpictures.ReceivingPictureRegisterDTO;
 import com.example.api.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 

@@ -25,7 +25,8 @@ public record InventoryItemInfoDTO(
         String companyGrade,
         String functionalGrade,
         LocalDateTime lastInspectedAt,
-        Long receivingItemId
+        Long receivingItemId,
+        String type
 ) {
     public InventoryItemInfoDTO(InventoryItem inventoryItem) {
         this(
@@ -44,7 +45,8 @@ public record InventoryItemInfoDTO(
                 inventoryItem.getCompanyGrade(),
                 inventoryItem.getFunctionalGrade(),
                 inventoryItem.getLastInspectedAt(),
-                inventoryItem.getReceivingItem() == null ? null : inventoryItem.getReceivingItem().getId()
+                inventoryItem.getReceivingItem() == null ? null : inventoryItem.getReceivingItem().getId(),
+                inventoryItem.getType()
         );
     }
 }

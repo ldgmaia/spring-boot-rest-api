@@ -13,6 +13,6 @@ public record InventoryItemLookUpRequestDTO(
         List<Long> statusesIds,
 
         @NotNull
-        List<String> fieldsTypesIds
+        List<String> fieldsTypes
 ) {
 }

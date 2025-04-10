@@ -1,10 +1,13 @@
 package com.example.api.domain.purchaseorderitems;
 
 import com.example.api.domain.purchaseorders.PurchaseOrder;
+import com.example.api.domain.receivingitems.ReceivingItem;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Table(name = "purchase_order_items")
 @Entity(name = "PurchaseOrderItem")
@@ -30,6 +33,9 @@ public class PurchaseOrderItem {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "purchase_orders_id")
     private PurchaseOrder purchaseOrder;
+
+    @OneToMany(mappedBy = "purchaseOrderItem", orphanRemoval = true)
+    private List<ReceivingItem> receivingItems = new ArrayList<>();
 
     public PurchaseOrderItem(PurchaseOrderItemRegisterDTO data) {
         this.name = data.name();
