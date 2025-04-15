@@ -205,6 +205,7 @@ public class AssessmentService {
         // 2 means 'In Stock'
         // 3 means 'In Use'
         parentInventoryItem.setItemStatus(itemStatusRepository.getReferenceById(2L));
+        parentInventoryItem.setSerialNumber(data.parentSerialNumber());
 
         // set the Receiving status accordingly
         var totalAssessed = inventoryItemRepository.countByReceivingItemIdAndTypeAndItemStatusIdNot(parentInventoryItem.getReceivingItem().getId(), "Main", 1L);
@@ -245,8 +246,8 @@ public class AssessmentService {
         var minimumFunctionalNonCriticalGrade = Optional.ofNullable(minimumGrades.get("functional_non_critical"))
                 .orElseThrow(() -> new NoSuchElementException("functional_non_critical not found"));
 
-        AtomicReference<Long> lowestMainItemFunctionalScore = new AtomicReference<>(9L);
-        AtomicReference<Long> lowestMainItemCosmeticScore = new AtomicReference<>(9L);
+        AtomicReference<Long> lowestMainItemFunctionalScore = new AtomicReference<>(99L);
+        AtomicReference<Long> lowestMainItemCosmeticScore = new AtomicReference<>(99L);
 
         // Query the database for scores
         Long functionalScore = inventoryItemsFieldValuesRepository.findMinScoreOfInventoryItem(inventoryItem.getId(), FieldType.FUNCTIONAL);
@@ -340,8 +341,21 @@ public class AssessmentService {
                     .map(Gradings::getCompany_grade)
                     .orElse("NA");
         }
-        mainItemInventoryItem.setFunctionalGrade(gradingRepository.findByTypeAndScore("functional", lowestMainItemFunctionalScore.get()).getGrade());
-        mainItemInventoryItem.setCosmeticGrade(gradingRepository.findByTypeAndScore("cosmetic", lowestMainItemCosmeticScore.get()).getGrade());
+
+        if (lowestMainItemFunctionalScore.get() == 99L && lowestMainItemCosmeticScore.get() == 99L) {
+            mainItemCompanyGrade = "NA";
+        }
+        Gradings functionalGrading = gradingRepository.findByTypeAndScore("functional", lowestMainItemFunctionalScore.get());
+        mainItemInventoryItem.setFunctionalGrade(
+                functionalGrading != null ? functionalGrading.getCompany_grade() : "Ungraded"
+        );
+
+        Gradings cosmeticGrading = gradingRepository.findByTypeAndScore("cosmetic", lowestMainItemCosmeticScore.get());
+        mainItemInventoryItem.setCosmeticGrade(
+                cosmeticGrading != null ? cosmeticGrading.getCompany_grade() : "Ungraded"
+        );
+//            mainItemInventoryItem.setCosmeticGrade(gradingRepository.findByTypeAndScore("cosmetic", lowestMainItemCosmeticScore.get()).getGrade());
+
         mainItemInventoryItem.setCompanyGrade(mainItemCompanyGrade);
     }
 
