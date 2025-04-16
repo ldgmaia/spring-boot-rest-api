@@ -6,6 +6,8 @@ import com.example.api.domain.categoryfields.CategoryFieldsMainItemInspectionInf
 import com.example.api.domain.inventoryitems.*;
 import com.example.api.domain.inventoryitems.inspection.InventoryItemInspectedItemInfoDTO;
 import com.example.api.domain.inventoryitems.inspection.InventoryItemSaveInspectionRequestDTO;
+import com.example.api.domain.itemtransferlog.ItemTransferInfoDTO;
+import com.example.api.domain.locations.changelocation.ChangeLocationService;
 import com.example.api.repositories.InventoryItemRepository;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.transaction.Transactional;
@@ -37,6 +39,9 @@ public class InventoryItemController {
 
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private ChangeLocationService changeLocationService;
 
     @Transactional
     @PostMapping
@@ -177,6 +182,11 @@ public class InventoryItemController {
     public ResponseEntity getInspectedItemInfoByInventoryItemId(@PathVariable Long inventoryItemId) {
         InventoryItemInspectedItemInfoDTO inspectedInfo = inventoryItemService.getInspectedItemInfoByInventoryItemId(inventoryItemId);
         return ResponseEntity.ok(inspectedInfo);
+    }
+
+    @GetMapping("/location-history/{inventoryItemId}")
+    public List<ItemTransferInfoDTO> getItemHistory(@PathVariable Long inventoryItemId) {
+        return changeLocationService.getInventoryItemHistory(inventoryItemId);
     }
 
     @GetMapping("/inspection/items-lookup-main")

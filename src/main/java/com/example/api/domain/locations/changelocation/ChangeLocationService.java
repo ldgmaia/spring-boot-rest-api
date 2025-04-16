@@ -3,6 +3,7 @@ package com.example.api.domain.locations.changelocation;
 
 import com.example.api.domain.ValidationException;
 import com.example.api.domain.inventoryitems.InventoryItem;
+import com.example.api.domain.itemtransferlog.ItemTransferInfoDTO;
 import com.example.api.domain.itemtransferlog.ItemTransferLog;
 import com.example.api.domain.itemtransferlog.ItemTransferRegisterDTO;
 import com.example.api.domain.itemtransferlog.TransferStatus;
@@ -191,12 +192,6 @@ public class ChangeLocationService {
             var fromLocationAreaId = item.getStorageLevel().getStorageLocation().getStorageArea().getId();
             var toLocationAreaId = storageLevelRepository.findById(data.toLocationLevelId()).get().getStorageLocation().getStorageArea().getId();
 
-//            var toLocationAreaId = Optional.of(data.toLocationLevelId())
-//                    .flatMap(storageLevelRepository::findById)
-//                    .map(storageLevel -> storageLevel.getStorageLocation().getStorageArea().getId())
-//                    .orElse(null);
-
-
             var myselfLocationAreaId = storageAreaRepository.findByName("myself").getId();
             var loggedUserLocationLevelId = currentUser.getStorageLevel().getId();
             var loggedUserLocationGroupIds = locationUserGroupUserRepository.findByUserId(currentUser.getId())
@@ -232,8 +227,15 @@ public class ChangeLocationService {
             item.setStorageLevel(newStorageLevel);
 
             inventoryItemRepository.save(item);
+
             var log = new ItemTransferLog(new ItemTransferRegisterDTO(item, fromLocationLevel, toLocationLevel, TransferStatus.SUCCESS, "SUCCESS - Location Changed"));
             itemTransferLogRepository.save(log);
         }
+    }
+
+    public List<ItemTransferInfoDTO> getInventoryItemHistory(Long inventoryItem) {
+        List<ItemTransferLog> history = itemTransferLogRepository.findByInventoryItemIdOrderByCreatedAtDesc(inventoryItem);
+
+        return history.stream().map(ItemTransferInfoDTO::new).collect(Collectors.toList());
     }
 }
