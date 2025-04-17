@@ -8,8 +8,8 @@ public record LocationUserGroupPermissionInfoDTO(
     public LocationUserGroupPermissionInfoDTO(LocationUserGroupPermission permission) {
         this(
                 permission.getId(),
-                permission.getFromLocationArea().getName(),
-                permission.getToLocationArea().getName()
+                permission.getFromLocationArea().getStorageZone().getName() + "/" + permission.getFromLocationArea().getName(),
+                permission.getToLocationArea().getStorageZone().getName() + "/" + permission.getToLocationArea().getName()
         );
     }
 }
