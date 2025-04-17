@@ -122,8 +122,8 @@ public class StorageLocationController {
     @Transactional
     public ResponseEntity<LocationUserGroupPermissionInfoDTO> createPermission(
             @RequestBody @Valid LocationUserGroupPermissionRequestDTO data) {
-        changeLocationService.createPermission(data);
-        return ResponseEntity.ok().build();
+        var newPermission = changeLocationService.createPermission(data);
+        return ResponseEntity.ok(newPermission);
     }
 
     @DeleteMapping("/delete-permission/{id}")

@@ -89,7 +89,7 @@ public class ErrorHandler {
             if (key.contains("sections.models_id")) {
                 return "A section with the name '" + entry.split("-")[1] + "' already exists.";
             }
-            return "A record with the same unique identifier already exists. Please use a different value.";
+            return "A record with the same value already exists. Please use a different value.";
         }
         // Add more checks for other common data integrity violations if needed
         return "A data integrity violation occurred. Please check your input and try again.";
