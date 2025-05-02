@@ -3,12 +3,14 @@ package com.example.api.domain.locations.changelocation.usergroupsusers;
 
 public record LocationUserGroupUserInfoDTO(
         Long userId,
-        String userName
+        String userName,
+        String fullName
 ) {
-    public LocationUserGroupUserInfoDTO(LocationUserGroupUser entity) {
+    public LocationUserGroupUserInfoDTO(LocationUserGroupUser data) {
         this(
-                entity.getUser().getId(),
-                entity.getUser().getUsername()
+                data.getUser().getId(),
+                data.getUser().getUsername(),
+                data.getUser().getFullName()
         );
     }
 }
