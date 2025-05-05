@@ -170,14 +170,14 @@ public class ChangeLocationService {
 
         List<InventoryItem> inventoryItemsToModify = inventoryItemRepository.findAllById(data.ids());
 
-        if (inventoryItemsToModify.isEmpty()) throw new ValidationException("No items found for IDs: " + data.ids());
+        if (inventoryItemsToModify.isEmpty()) throw new ValidationException("Item not found");
         if (inventoryItemsToModify.size() != data.ids().size())
             throw new ValidationException("One or more items not found for IDs: " + data.ids());
 
         for (InventoryItem item : inventoryItemsToModify) {
 
             if (item.getStorageLevel().getId().equals(data.toLocationLevelId())) {
-                throw new ValidationException("Serial number " + item.getSerialNumber() + " is already under location" + item.getStorageLevel().getName());
+                throw new ValidationException("Serial number " + item.getSerialNumber() + " is already under location " + item.getStorageLevel().getName());
             }
 
             var validStatusList = itemStatusRepository.findByCanTransferTrue();
