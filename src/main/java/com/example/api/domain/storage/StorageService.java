@@ -1,8 +1,10 @@
 package com.example.api.domain.storage;
 
+import com.example.api.domain.ValidationException;
 import com.example.api.domain.storage.storagearea.StorageArea;
 import com.example.api.domain.storage.storagearea.StorageAreaMoveDTO;
 import com.example.api.domain.storage.storagelevel.StorageLevel;
+import com.example.api.domain.storage.storagelevel.StorageLevelInfoDTO;
 import com.example.api.domain.storage.storagelevel.StorageLevelMoveDTO;
 import com.example.api.domain.storage.storagelocation.StorageLocation;
 import com.example.api.domain.storage.storagelocation.StorageLocationMoveDTO;
@@ -229,5 +231,17 @@ public class StorageService {
         StorageZone newZone = storageZoneRepository.findById(request.newZoneId()).orElseThrow(() -> new RuntimeException("Target Storage Zone not found"));
         storageArea.setStorageZone(newZone);
         storageAreaRepository.save(storageArea);
+    }
+
+    public StorageLevelInfoDTO getStorageLevelById(Long id) {
+//        StorageLevel storageLevel = storageLevelRepository.findById(id)
+//                .orElseThrow(() -> new ValidationException("Storage Level not found"));
+//        return new StorageLevelInfoDTO(storageLevel);
+
+        try {
+            return new StorageLevelInfoDTO(storageLevelRepository.getReferenceById(id));
+        } catch (Exception e) {
+            throw new ValidationException("Storage Level not found");
+        }
     }
 }

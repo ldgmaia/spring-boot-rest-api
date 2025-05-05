@@ -60,6 +60,12 @@ public class StorageLocationController {
         return ResponseEntity.ok(zones);
     }
 
+    @GetMapping("/get-storage-level/{id}")
+    public ResponseEntity getStorageLevelById(@PathVariable Long id) {
+        var storageLevel = storageService.getStorageLevelById(id);
+        return ResponseEntity.ok(storageLevel);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<StorageZoneInfoDTO> getStorage(@PathVariable Long id) {
         StorageZoneInfoDTO zone = storageService.getZoneInfo(id);
