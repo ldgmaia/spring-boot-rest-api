@@ -31,6 +31,9 @@ public class SecurityConfig {
     @Autowired
     private SecurityFilter securityFilter;
 
+    @Autowired
+    private CustomAuthenticationEntryPoint authenticationEntryPoint;
+
     @Bean
     CorsConfigurationSource myWebsiteConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
@@ -44,16 +47,6 @@ public class SecurityConfig {
         return source;
     }
 
-//    @Bean
-//    CorsConfigurationSource myWebsiteConfigurationSource() {
-//        CorsConfiguration configuration = new CorsConfiguration();
-//        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
-//        configuration.setAllowedMethods(Arrays.asList("GET", "POST"));
-//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//        source.registerCorsConfiguration("/**", configuration);
-//        return source;
-//    }
-
     @Bean
     public AuditorAware<User> auditorAware() {
         return new ApplicationAuditAware();
@@ -65,6 +58,9 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(exceptionHandling ->
+                        exceptionHandling.authenticationEntryPoint(authenticationEntryPoint)
+                )
                 .authorizeHttpRequests(req -> {
                     req.requestMatchers(HttpMethod.POST, "/login", "/qbo/webhook").permitAll(); // exclude the /login route from requiring the authentication token
 //                    req.requestMatchers(HttpMethod.POST, "/login", "/users").permitAll(); // exclude the /login route from requiring the authentication token
