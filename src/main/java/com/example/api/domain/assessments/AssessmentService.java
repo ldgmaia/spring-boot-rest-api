@@ -347,12 +347,12 @@ public class AssessmentService {
         }
         Gradings functionalGrading = gradingRepository.findByTypeAndScore("functional", lowestMainItemFunctionalScore.get());
         mainItemInventoryItem.setFunctionalGrade(
-                functionalGrading != null ? functionalGrading.getCompany_grade() : "Ungraded"
+                functionalGrading != null ? functionalGrading.getCompany_grade() : "NA"
         );
 
         Gradings cosmeticGrading = gradingRepository.findByTypeAndScore("cosmetic", lowestMainItemCosmeticScore.get());
         mainItemInventoryItem.setCosmeticGrade(
-                cosmeticGrading != null ? cosmeticGrading.getCompany_grade() : "Ungraded"
+                cosmeticGrading != null ? cosmeticGrading.getCompany_grade() : "NA"
         );
 //            mainItemInventoryItem.setCosmeticGrade(gradingRepository.findByTypeAndScore("cosmetic", lowestMainItemCosmeticScore.get()).getGrade());
 
