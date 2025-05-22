@@ -59,14 +59,19 @@ CREATE TABLE IF NOT EXISTS orders (
 );
 
 CREATE TABLE IF NOT EXISTS order_items (
-    id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    order_id        BIGINT UNSIGNED NOT NULL,
-    sku             VARCHAR(100),
-    name            VARCHAR(255),
-    quantity        INT,
-    unit_price      DECIMAL(10, 2),
-    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
+    id                      BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    order_item_id           BIGINT UNSIGNED NOT NULL,
+    line_item_key           VARCHAR(255),
+    order_id                BIGINT UNSIGNED NOT NULL,
+    sku                     VARCHAR(100),
+    name                    VARCHAR(255),
+    image_url               VARCHAR(510),
+    quantity                INT,
+    unit_price              DECIMAL(10, 2),
+    tax_amount              DECIMAL(10, 2),
+    shipping_amount         DECIMAL(10, 2),
+    created_at              TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at              TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
 
     PRIMARY KEY (id),
     INDEX (order_id),

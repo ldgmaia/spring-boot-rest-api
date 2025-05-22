@@ -34,12 +34,8 @@ public record OrderResponseDTO(
         String serviceCode,
         String packageCode,
         String confirmation,
-        String shipDate,
-        String holdUntilDate,
-        Weight weight,
-        Dimensions dimensions,
-        InsuranceOptions insuranceOptions,
-        InternationalOptions internationalOptions,
+        LocalDateTime shipDate,
+        LocalDateTime holdUntilDate,
         AdvancedOptions advancedOptions,
         List<Long> tagIds,
         Long userId,
@@ -72,59 +68,58 @@ public record OrderResponseDTO(
             String sku,
             String name,
             String imageUrl,
-            Weight weight,
-            Long quantity,
+            Integer quantity,
             BigDecimal unitPrice,
-            Double taxAmount,
-            Double shippingAmount,
+            BigDecimal taxAmount,
+            BigDecimal shippingAmount,
             String warehouseLocation,
             Long productId,
             String fulfillmentSku,
             Boolean adjustment,
             String upc,
-            String createDate,
-            String modifyDate
+            LocalDateTime createDate,
+            LocalDateTime modifyDate
     ) {
     }
 
-    public record Weight(
-            Double value,
-            String units,
-            Long WeightUnits
-    ) {
-    }
+//    public record Weight(
+//            BigDecimal value,
+//            String units,
+//            Long WeightUnits
+//    ) {
+//    }
 
-    public record Dimensions(
-            String units,
-            Double length,
-            Double width,
-            Double height
-    ) {
-    }
+//    public record Dimensions(
+//            String units,
+//            BigDecimal length,
+//            BigDecimal width,
+//            BigDecimal height
+//    ) {
+//    }
 
-    public record InsuranceOptions(
-            String provider,
-            Boolean insureShipment,
-            BigDecimal insuredValue
-    ) {
-    }
+//    public record InsuranceOptions(
+//            String provider,
+//            Boolean insureShipment,
+//            BigDecimal insuredValue
+//    ) {
+//    }
 
-    public record InternationalOptions(
-            String contents,
-            List<CustomsItem> customsItems,
-            String nonDelivery
-    ) {
-    }
+//    public record InternationalOptions(
+//            String contents,
+//            List<CustomsItem> customsItems,
+//            String nonDelivery
+//    ) {
+//    }
 
-    public record CustomsItem(
-            Long customsItemId,
-            String description,
-            Long quantity,
-            BigDecimal value,
-            String harmonizedTariffCode,
-            String countryOfOrigin
-    ) {
-    }
+//    public record CustomsItem(
+//            Long customsItemId,
+//            String description,
+//            Long quantity,
+//            BigDecimal value,
+//            String harmonizedTariffCode,
+//            String countryOfOrigin
+//    ) {
+//    }
 
     public record AdvancedOptions(
             int warehouseId,
