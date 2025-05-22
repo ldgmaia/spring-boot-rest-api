@@ -36,8 +36,7 @@ public class MPN {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
     private User createdBy;
-
-
+    
     public MPN(MPNRegisterDTO data, User currentUser) {
         this.name = data.name();
         this.description = data.description();
